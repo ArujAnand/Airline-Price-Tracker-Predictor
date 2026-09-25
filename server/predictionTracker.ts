@@ -189,14 +189,29 @@ class PredictionTracker {
 
   public async auditActivePredictions(): Promise<PredictionAuditSummary> {
     await this.ensureHydrated();
-    const snapshots = flightAggregator.getSnapshots();
+    
+    // Combine in-memory snapshots with persistent Firestore snapshots across both corridors
+    const memorySnapshots = flightAggregator.getSnapshots();
+    let firestoreSnaps: any[] = [];
+    try {
+      const [p1, p2] = await Promise.all([
+        firestoreDB.getSnapshots('PNQ-LKO', 1000),
+        firestoreDB.getSnapshots('LKO-PNQ', 1000),
+      ]);
+      firestoreSnaps = [...p1, ...p2];
+    } catch (err) {
+      console.warn('[PredictionTracker] Firestore snapshot fetch note:', err);
+    }
+
+    const allSnapshots = [...firestoreSnaps, ...memorySnapshots];
+    const todayStr = new Date().toISOString().split('T')[0];
 
     for (const record of this.records) {
       if (record.status !== 'PENDING_VERIFICATION') continue;
 
       // Find observed price snapshots for this route & departure date
-      const matchingSnapshots = snapshots.filter(
-        (s) => s.routeId === record.routeId && s.departureDate === record.departureDate
+      const matchingSnapshots = allSnapshots.filter(
+        (s) => s.routeId?.toUpperCase() === record.routeId.toUpperCase() && s.departureDate === record.departureDate
       );
 
       if (matchingSnapshots.length > 0) {
@@ -207,46 +222,51 @@ class PredictionTracker {
 
         if (lowestSnapshot.price < (record.actualLowestPriceObserved || Infinity)) {
           record.actualLowestPriceObserved = lowestSnapshot.price;
-          record.actualLowestDateObserved = lowestSnapshot.timestamp.split('T')[0];
+          record.actualLowestDateObserved = lowestSnapshot.timestamp?.split('T')[0] || todayStr;
         }
+      }
 
-        const departureTime = new Date(record.departureDate).getTime();
-        const now = Date.now();
-        const daysRemaining = (departureTime - now) / (1000 * 60 * 60 * 24);
+      const depDateStr = record.departureDate;
+      const isPastOrToday = depDateStr <= todayStr;
+      const departureTime = new Date(depDateStr).getTime();
+      const now = Date.now();
+      const daysRemaining = (departureTime - now) / (1000 * 60 * 60 * 24);
 
-        // If departed or within 1 day, close the audit
-        if (daysRemaining <= 1) {
-          const finalPrice = matchingSnapshots[matchingSnapshots.length - 1]?.price || record.initialPriceAtPrediction;
-          record.finalPriceAtDeparture = finalPrice;
+      // If departed (daysRemaining <= 0 or past date), resolve the audit
+      if (isPastOrToday || daysRemaining <= 0) {
+        const finalPrice = matchingSnapshots.length > 0
+          ? matchingSnapshots[matchingSnapshots.length - 1]?.price || record.initialPriceAtPrediction
+          : record.initialPriceAtPrediction;
+        record.finalPriceAtDeparture = finalPrice;
 
-          if (record.recommendationGiven === 'BUY_NOW') {
-            // Did price rise or stay at floor?
-            if (finalPrice >= record.initialPriceAtPrediction) {
-              record.status = 'VERIFIED_CORRECT';
-              record.wasAccurate = true;
-              record.actualSavingsOrLossINR = finalPrice - record.initialPriceAtPrediction;
-              record.auditNotes = `Accurate BUY_NOW: Price rose by ₹${record.actualSavingsOrLossINR}. User avoided surge.`;
-            } else {
-              record.status = 'DIVERGED';
-              record.wasAccurate = false;
-              record.actualSavingsOrLossINR = finalPrice - record.initialPriceAtPrediction;
-              record.auditNotes = `Diverged: Price dipped by ₹${Math.abs(record.actualSavingsOrLossINR)}. Model threshold calibrated.`;
-            }
-          } else if (record.recommendationGiven === 'WAIT_AND_WATCH' || record.recommendationGiven === 'DROP_IMMINENT') {
-            // Did price drop below initial price?
-            if ((record.actualLowestPriceObserved || record.initialPriceAtPrediction) < record.initialPriceAtPrediction) {
-              record.status = 'VERIFIED_CORRECT';
-              record.wasAccurate = true;
-              record.actualSavingsOrLossINR = record.initialPriceAtPrediction - (record.actualLowestPriceObserved || 0);
-              record.auditNotes = `Accurate WAIT_AND_WATCH: Captured drop of ₹${record.actualSavingsOrLossINR}.`;
-            } else {
-              record.status = 'VERIFIED_PARTIAL';
-              record.wasAccurate = false;
-              record.actualSavingsOrLossINR = 0;
-              record.auditNotes = 'Price stayed flat without further dip before departure.';
-            }
+        if (record.recommendationGiven === 'BUY_NOW') {
+          // Did price rise or stay at floor?
+          if (finalPrice >= record.initialPriceAtPrediction) {
+            record.status = 'VERIFIED_CORRECT';
+            record.wasAccurate = true;
+            record.actualSavingsOrLossINR = Math.max(0, finalPrice - record.initialPriceAtPrediction);
+            record.auditNotes = `Accurate BUY NOW recommendation: Fare locked in at ₹${record.initialPriceAtPrediction.toLocaleString()} before closing at ₹${finalPrice.toLocaleString()} at departure.`;
+          } else {
+            record.status = 'DIVERGED';
+            record.wasAccurate = false;
+            record.actualSavingsOrLossINR = finalPrice - record.initialPriceAtPrediction;
+            record.auditNotes = `Diverged: Price dipped by ₹${Math.abs(record.actualSavingsOrLossINR)} before departure.`;
+          }
+        } else if (record.recommendationGiven === 'WAIT_AND_WATCH' || record.recommendationGiven === 'DROP_IMMINENT') {
+          // Did price drop below initial price?
+          if ((record.actualLowestPriceObserved || record.initialPriceAtPrediction) < record.initialPriceAtPrediction) {
+            record.status = 'VERIFIED_CORRECT';
+            record.wasAccurate = true;
+            record.actualSavingsOrLossINR = record.initialPriceAtPrediction - (record.actualLowestPriceObserved || 0);
+            record.auditNotes = `Accurate WAIT recommendation: Captured dip to ₹${(record.actualLowestPriceObserved || 0).toLocaleString()} (saved ₹${record.actualSavingsOrLossINR}).`;
+          } else {
+            record.status = 'DIVERGED';
+            record.wasAccurate = false;
+            record.actualSavingsOrLossINR = 0;
+            record.auditNotes = 'Price stayed flat without further dip prior to departure.';
           }
         }
+
         firestoreDB.savePredictionRecord(record).catch(() => {});
       }
     }
@@ -278,11 +298,10 @@ class PredictionTracker {
       console.log(`[ML Engine Recalibrated] Quantile Decision Forest retrained with ${liveFeedbackRecords.length} live ground truth audit records.`);
     }
 
-    return this.getAuditSummary();
+    return this.getAuditSummaryInternal();
   }
 
-  public async getAuditSummary(): Promise<PredictionAuditSummary> {
-    await this.ensureHydrated();
+  private getAuditSummaryInternal(): PredictionAuditSummary {
     const verified = this.records.filter((r) => r.status === 'VERIFIED_CORRECT');
     const totalClosed = this.records.filter((r) => r.status !== 'PENDING_VERIFICATION');
     
@@ -301,6 +320,11 @@ class PredictionTracker {
       totalTravelerSavingsRealizedINR: totalSavings,
       recentRecords: this.records.slice(0, 100),
     };
+  }
+
+  public async getAuditSummary(): Promise<PredictionAuditSummary> {
+    await this.ensureHydrated();
+    return this.auditActivePredictions();
   }
 }
 

@@ -542,6 +542,9 @@ interface FareAnalyticsModalProps {
   routeId: string;
 }
 
+// In-memory session cache for the active browser session
+const sessionAnalyticsCache = new Map<string, RouteAnalyticsReport>();
+
 export const FareAnalyticsModal: React.FC<FareAnalyticsModalProps> = ({
   isOpen,
   onClose,
@@ -584,11 +587,24 @@ export const FareAnalyticsModal: React.FC<FareAnalyticsModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
+      // Check session cache first for instant switching
+      const cached = sessionAnalyticsCache.get(selectedRoute);
+      if (cached) {
+        setReport(cached);
+        setLoading(false);
+        return;
+      }
       fetchAnalytics(selectedRoute);
     }
   }, [isOpen, selectedRoute]);
 
-  const fetchAnalytics = async (rId: string) => {
+  const fetchAnalytics = async (rId: string, force = false) => {
+    if (!force && sessionAnalyticsCache.has(rId)) {
+      setReport(sessionAnalyticsCache.get(rId)!);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setLoadingStep(0);
     setError(null);
@@ -602,6 +618,7 @@ export const FareAnalyticsModal: React.FC<FareAnalyticsModalProps> = ({
       const res = await fetch(`/api/analytics/indices?routeId=${rId}`);
       if (!res.ok) throw new Error('Failed to fetch fare analytics report');
       const data: RouteAnalyticsReport = await res.json();
+      sessionAnalyticsCache.set(rId, data);
       setReport(data);
     } catch (err: any) {
       setError(err?.message || 'Error loading analytics');
@@ -853,6 +870,10 @@ export const FareAnalyticsModal: React.FC<FareAnalyticsModalProps> = ({
                             <KeyRound className="w-3 h-3 text-indigo-300" />
                             {report.aiAnalysis.keyLabel || 'Dual Key Pool'} Active
                           </span>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 flex items-center gap-1">
+                            <Clock className="w-3 h-3 text-emerald-300" />
+                            Daily Briefing (1x/day cadence)
+                          </span>
                         </div>
                         <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
                           Corridor Revenue & Yield Econometric Analysis
@@ -864,6 +885,11 @@ export const FareAnalyticsModal: React.FC<FareAnalyticsModalProps> = ({
                       <span className="text-[11px] font-mono text-indigo-200 bg-indigo-950/80 px-2.5 py-1 rounded-lg border border-indigo-700/40">
                         Model: {report.aiAnalysis.modelUsed}
                       </span>
+                      {report.aiAnalysis.generatedAt && (
+                        <span className="text-[10px] text-slate-300 bg-white/5 px-2 py-1 rounded-lg border border-white/10 hidden sm:inline-block">
+                          Updated: {new Date(report.aiAnalysis.generatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
+                      )}
                     </div>
                   </div>
 

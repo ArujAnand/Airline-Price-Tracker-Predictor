@@ -30,5 +30,11 @@ service cloud.firestore {
       allow read: if true;
       allow write: if true;
     }
+
+    // Daily AI Briefings (persisted once per calendar day)
+    match /daily_ai_briefings/{briefingId} {
+      allow read: if true;
+      allow write: if true;
+    }
   }
 }

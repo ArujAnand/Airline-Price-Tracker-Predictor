@@ -1,4 +1,5 @@
 import { GoogleGenAI, Type } from '@google/genai';
+import { firestoreDB } from './firestoreService';
 
 interface AIKeyRecord {
   key: string;
@@ -38,7 +39,7 @@ export interface CorridorAIAnalysis {
 class GeminiService {
   private keyStore = new Map<string, AIKeyRecord>();
   private cache = new Map<string, { data: any; timestamp: number }>();
-  private CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+  private CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours (once per calendar day)
 
   private getPool(): AIKeyRecord[] {
     const rawSources = [
@@ -122,13 +123,41 @@ class GeminiService {
   }
 
   /**
-   * Generates corridor index analytical insights strictly using Gemini analysis over Firestore data
+   * Generates corridor index analytical insights strictly using Gemini analysis over Firestore data.
+   * Enforces once-per-calendar-day generation by checking both in-memory cache and persistent Firestore storage.
    */
   public async generateCorridorAnalysis(input: CorridorInputData): Promise<CorridorAIAnalysis> {
-    const cacheKey = `corridor-${input.route}-${input.totalSnapshots}-${input.latestDate}`;
+    const todayDateKey = new Date().toISOString().split('T')[0];
+    const cacheKey = `corridor-daily-${input.route.toUpperCase()}-${todayDateKey}`;
+
+    // 1. Check in-memory daily cache
     const cached = this.cache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < this.CACHE_TTL_MS) {
+      console.log(`[Gemini Intelligence] Reusing in-memory daily cache for ${input.route} (${todayDateKey})`);
       return cached.data;
+    }
+
+    // 2. Check persistent Firestore daily cache
+    try {
+      const persisted = await firestoreDB.getDailyCorridorAnalysis(input.route, todayDateKey);
+      if (persisted && persisted.corridorSummary && persisted.keyTakeaways) {
+        console.log(`[Gemini Intelligence] Reusing persistent Firestore daily cache for ${input.route} (${todayDateKey})`);
+        const result: CorridorAIAnalysis = {
+          overallIndexInsight: persisted.overallIndexInsight,
+          bookingWindowInsight: persisted.bookingWindowInsight,
+          timeOfDayInsight: persisted.timeOfDayInsight,
+          dayOfWeekInsight: persisted.dayOfWeekInsight,
+          corridorSummary: persisted.corridorSummary,
+          keyTakeaways: persisted.keyTakeaways,
+          modelUsed: persisted.modelUsed || 'gemini-flash-latest',
+          keyLabel: persisted.keyLabel || 'Primary Key',
+          generatedAt: persisted.generatedAt || new Date().toISOString(),
+        };
+        this.cache.set(cacheKey, { data: result, timestamp: Date.now() });
+        return result;
+      }
+    } catch (err) {
+      console.warn('[Gemini Intelligence] Note checking Firestore daily cache:', err);
     }
 
     const pool = this.getPool();
@@ -220,7 +249,13 @@ Return structured JSON matching the schema.`;
               };
 
               this.cache.set(cacheKey, { data: result, timestamp: Date.now() });
-              console.log(`[Gemini Intelligence] Corridor analysis generated via ${keyRecord.label} (${modelName})`);
+
+              // Persist to Firestore daily briefings so all users & server restarts share today's analysis
+              firestoreDB.saveDailyCorridorAnalysis(input.route, todayDateKey, result).catch((err) => {
+                console.warn('[Gemini Intelligence] Could not persist daily analysis:', err);
+              });
+
+              console.log(`[Gemini Intelligence] Daily corridor analysis generated via ${keyRecord.label} (${modelName}) for ${input.route}`);
               return result;
             }
           } catch (err: any) {

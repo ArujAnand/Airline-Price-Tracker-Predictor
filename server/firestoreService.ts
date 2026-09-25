@@ -2,6 +2,7 @@ import {
   collection,
   doc,
   setDoc,
+  getDoc,
   getDocs,
   query,
   where,
@@ -191,6 +192,34 @@ export class FirestorePersistenceService {
     } catch (err) {
       console.warn('[Firestore] getNotifications warning:', err);
       return [];
+    }
+  }
+
+  // --- Daily AI Briefings (Persisted once per calendar day) ---
+  public async getDailyCorridorAnalysis(route: string, dateKey: string): Promise<any | null> {
+    try {
+      const docId = `${route.toUpperCase()}_${dateKey}`;
+      const docRef = doc(db, 'daily_ai_briefings', docId);
+      const snap = await getDoc(docRef);
+      if (snap.exists()) {
+        console.log(`[Firestore] Retrieved persistent daily AI briefing for ${docId}`);
+        return snap.data();
+      }
+      return null;
+    } catch (err) {
+      console.warn('[Firestore] getDailyCorridorAnalysis warning:', err);
+      return null;
+    }
+  }
+
+  public async saveDailyCorridorAnalysis(route: string, dateKey: string, analysis: any): Promise<void> {
+    try {
+      const docId = `${route.toUpperCase()}_${dateKey}`;
+      const docRef = doc(db, 'daily_ai_briefings', docId);
+      await setDoc(docRef, sanitizeForFirestore({ ...analysis, route: route.toUpperCase(), dateKey }), { merge: true });
+      console.log(`[Firestore] Saved persistent daily AI briefing for ${docId}`);
+    } catch (err) {
+      console.warn(`[Firestore] Failed to save daily analysis for ${route}:`, err);
     }
   }
 }
