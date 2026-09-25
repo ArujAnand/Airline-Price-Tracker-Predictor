@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { RouteAnalyticsReport } from '../types/analytics';
+import { 
+  RouteAnalyticsReport, 
+  OverallIndexPoint, 
+  BookingWindowPoint, 
+  TimeOfDayPoint, 
+  DayOfWeekPoint 
+} from '../types/analytics';
 import { 
   TrendingUp, 
   Clock, 
@@ -14,8 +20,358 @@ import {
   Database,
   Sparkles,
   KeyRound,
-  BrainCircuit
+  BrainCircuit,
+  BarChart3
 } from 'lucide-react';
+
+// ==========================================
+// DYNAMIC SVG GRAPHS (BOUND TO REAL DATA)
+// ==========================================
+
+const DailyTrendChart: React.FC<{ points: OverallIndexPoint[] }> = ({ points }) => {
+  if (!points || points.length === 0) {
+    return (
+      <div className="h-28 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center text-xs text-slate-400">
+        No daily snapshots recorded yet
+      </div>
+    );
+  }
+
+  const values = points.map((p) => p.indexValue);
+  const minVal = Math.min(...values, 100);
+  const maxVal = Math.max(...values, 100);
+  const range = maxVal === minVal ? 20 : (maxVal - minVal) * 1.35;
+  const paddingBottom = 22;
+  const paddingTop = 20;
+  const chartHeight = 90;
+  const width = 260;
+
+  const getX = (i: number) => {
+    if (points.length === 1) return width / 2;
+    return 25 + (i / (points.length - 1)) * (width - 50);
+  };
+
+  const getY = (val: number) => {
+    const norm = (val - (minVal - 4)) / (range || 1);
+    return chartHeight - paddingBottom - norm * (chartHeight - paddingTop - paddingBottom);
+  };
+
+  const coords = points.map((p, i) => ({ x: getX(i), y: getY(p.indexValue), ...p }));
+  const pointsStr = coords.map((c) => `${c.x},${c.y}`).join(' ');
+  const areaPoints = `${coords[0].x},${chartHeight - paddingBottom} ${pointsStr} ${coords[coords.length - 1].x},${chartHeight - paddingBottom}`;
+
+  return (
+    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 mb-3">
+      <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 mb-1">
+        <span>DAILY INDEX TREND (100 = BASELINE)</span>
+        <span className="text-blue-600 font-mono text-[10px]">
+          Latest: {points[points.length - 1]?.indexValue ?? 100}
+        </span>
+      </div>
+      <div className="h-28 w-full relative">
+        <svg className="w-full h-full overflow-visible" viewBox={`0 0 ${width} ${chartHeight}`} preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="p1-trend-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#2563eb" stopOpacity="0.25" />
+              <stop offset="100%" stopColor="#2563eb" stopOpacity="0.02" />
+            </linearGradient>
+          </defs>
+
+          {/* Baseline 100 dashed reference */}
+          <line
+            x1="12"
+            y1={getY(100)}
+            x2={width - 12}
+            y2={getY(100)}
+            stroke="#94a3b8"
+            strokeDasharray="3,3"
+            strokeWidth="1"
+          />
+          <text x="14" y={getY(100) - 3} fontSize="7" fill="#94a3b8" fontWeight="600">Base 100</text>
+
+          {/* Area fill */}
+          {coords.length > 1 && (
+            <polygon points={areaPoints} fill="url(#p1-trend-grad)" />
+          )}
+
+          {/* Curve Line */}
+          {coords.length > 1 && (
+            <polyline
+              fill="none"
+              stroke="#2563eb"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              points={pointsStr}
+            />
+          )}
+
+          {/* Data Points */}
+          {coords.map((c, i) => (
+            <g key={i}>
+              <circle
+                cx={c.x}
+                cy={c.y}
+                r="3.5"
+                fill="#2563eb"
+                stroke="#ffffff"
+                strokeWidth="1.5"
+              />
+              <text
+                x={c.x}
+                y={c.y - 6}
+                fontSize="8"
+                fontWeight="bold"
+                textAnchor="middle"
+                fill={c.percentChange > 0 ? '#b91c1c' : c.percentChange < 0 ? '#047857' : '#1e293b'}
+              >
+                {c.indexValue}
+              </text>
+              <text
+                x={c.x}
+                y={chartHeight - 6}
+                fontSize="7"
+                fill="#64748b"
+                textAnchor="middle"
+                fontWeight="600"
+              >
+                {c.date.slice(5)}
+              </text>
+            </g>
+          ))}
+        </svg>
+      </div>
+    </div>
+  );
+};
+
+const BookingWindowCurveChart: React.FC<{ points: BookingWindowPoint[] }> = ({ points }) => {
+  const sorted = [...points].sort((a, b) => b.daysBeforeDeparture - a.daysBeforeDeparture);
+  const sufficientFares = sorted.filter((p) => p.status === 'sufficient').map((p) => p.averageFare);
+  const minFare = sufficientFares.length > 0 ? Math.min(...sufficientFares) : 6000;
+  const maxFare = sufficientFares.length > 0 ? Math.max(...sufficientFares) : 12000;
+  const fareRange = maxFare === minFare ? 2500 : (maxFare - minFare) * 1.35;
+
+  const width = 260;
+  const chartHeight = 90;
+  const paddingTop = 18;
+  const paddingBottom = 22;
+
+  const getX = (i: number) => 22 + (i / (sorted.length - 1 || 1)) * (width - 44);
+  const getY = (fare: number) => {
+    if (fare <= 0) return chartHeight - paddingBottom - 10;
+    const norm = (fare - (minFare - 500)) / (fareRange || 1);
+    return Math.max(paddingTop, Math.min(chartHeight - paddingBottom, chartHeight - paddingBottom - norm * (chartHeight - paddingTop - paddingBottom)));
+  };
+
+  const coords = sorted.map((p, i) => ({
+    x: getX(i),
+    y: p.status === 'sufficient' ? getY(p.averageFare) : chartHeight - paddingBottom - 8,
+    ...p
+  }));
+
+  const sufficientCoords = coords.filter((c) => c.status === 'sufficient');
+
+  return (
+    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 mb-3">
+      <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 mb-1">
+        <span>ADVANCE PURCHASE YIELD CURVE</span>
+        <span className="text-amber-600 font-mono text-[9px]">T-90d &rarr; T-1d</span>
+      </div>
+      <div className="h-28 w-full relative">
+        <svg className="w-full h-full overflow-visible" viewBox={`0 0 ${width} ${chartHeight}`} preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="p2-curve-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#d97706" stopOpacity="0.2" />
+              <stop offset="100%" stopColor="#d97706" stopOpacity="0.02" />
+            </linearGradient>
+          </defs>
+
+          {/* Dotted connecting line */}
+          {coords.length > 1 && (
+            <polyline
+              fill="none"
+              stroke="#cbd5e1"
+              strokeWidth="1.5"
+              strokeDasharray="3,3"
+              points={coords.map((c) => `${c.x},${c.y}`).join(' ')}
+            />
+          )}
+
+          {/* Solid line between observed sufficient points */}
+          {sufficientCoords.length > 1 && (
+            <polyline
+              fill="none"
+              stroke="#d97706"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              points={sufficientCoords.map((c) => `${c.x},${c.y}`).join(' ')}
+            />
+          )}
+
+          {/* Points */}
+          {coords.map((c, i) => {
+            const isSuff = c.status === 'sufficient';
+            return (
+              <g key={i}>
+                <circle
+                  cx={c.x}
+                  cy={c.y}
+                  r={isSuff ? 3.5 : 2.5}
+                  fill={isSuff ? '#d97706' : '#f8fafc'}
+                  stroke={isSuff ? '#ffffff' : '#94a3b8'}
+                  strokeWidth={isSuff ? 1.5 : 1}
+                />
+                {isSuff ? (
+                  <text
+                    x={c.x}
+                    y={c.y - 6}
+                    fontSize="7.5"
+                    fontWeight="bold"
+                    textAnchor="middle"
+                    fill="#92400e"
+                  >
+                    ₹{(c.averageFare / 1000).toFixed(1)}k
+                  </text>
+                ) : (
+                  <text
+                    x={c.x}
+                    y={c.y - 5}
+                    fontSize="6.5"
+                    fill="#94a3b8"
+                    textAnchor="middle"
+                  >
+                    n={c.dataPointsCount}
+                  </text>
+                )}
+                <text
+                  x={c.x}
+                  y={chartHeight - 6}
+                  fontSize="7"
+                  fill="#64748b"
+                  textAnchor="middle"
+                  fontWeight="600"
+                >
+                  T-{c.daysBeforeDeparture}d
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+    </div>
+  );
+};
+
+const DepartureTimeOfDayChart: React.FC<{ points: TimeOfDayPoint[] }> = ({ points }) => {
+  const sufficientPoints = points.filter((p) => p.status === 'sufficient');
+  const fares = sufficientPoints.map((p) => p.averageFare);
+  const minFare = fares.length > 0 ? Math.min(...fares) : 5000;
+  const maxFare = fares.length > 0 ? Math.max(...fares) : 10000;
+
+  return (
+    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 mb-3">
+      <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 mb-1">
+        <span>DEPARTURE TIME BANDS</span>
+        <span className="text-yellow-700 font-mono text-[9px]">4-Hour Blocks</span>
+      </div>
+      <div className="h-28 flex items-end justify-between gap-1 pt-4 pb-2 px-1">
+        {points.map((pt) => {
+          const isSuff = pt.status === 'sufficient';
+          const isLowest = isSuff && pt.averageFare === minFare;
+          const isHighest = isSuff && pt.averageFare === maxFare && maxFare !== minFare;
+          
+          let heightPct = 18;
+          if (isSuff && maxFare > 0) {
+            heightPct = 28 + ((pt.averageFare - minFare) / (maxFare - minFare || 1)) * 62;
+          }
+
+          return (
+            <div key={pt.slot} className="flex-1 flex flex-col items-center h-full justify-end group relative">
+              <div className="text-[7px] font-bold text-slate-600 mb-1 truncate">
+                {isSuff ? `₹${(pt.averageFare / 1000).toFixed(1)}k` : `n=${pt.dataPointsCount}`}
+              </div>
+
+              <div
+                style={{ height: `${heightPct}%` }}
+                className={`w-full rounded-t-md transition-all ${
+                  !isSuff
+                    ? 'bg-slate-200 border border-dashed border-slate-300'
+                    : isLowest
+                    ? 'bg-emerald-500 shadow-sm'
+                    : isHighest
+                    ? 'bg-amber-500'
+                    : 'bg-yellow-400'
+                }`}
+              />
+
+              <span className="text-[7.5px] font-semibold text-slate-500 mt-1 truncate w-full text-center">
+                {pt.slot.split('-')[0].trim()}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+const DayOfWeekYieldChart: React.FC<{ points: DayOfWeekPoint[] }> = ({ points }) => {
+  const activeDays = points.filter((p) => p.status !== 'no_data');
+  const fares = activeDays.map((p) => p.averageFare);
+  const minFare = fares.length > 0 ? Math.min(...fares) : 5000;
+  const maxFare = fares.length > 0 ? Math.max(...fares) : 10000;
+
+  return (
+    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 mb-3">
+      <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 mb-1">
+        <span>DAY-OF-WEEK YIELD BARS</span>
+        <span className="text-teal-700 font-mono text-[9px]">Mon &rarr; Sun</span>
+      </div>
+      <div className="h-28 flex items-end justify-between gap-1 pt-4 pb-2 px-1">
+        {points.map((pt) => {
+          const hasNoData = pt.status === 'no_data';
+          const isSuff = pt.status === 'sufficient';
+          const isLowest = !hasNoData && pt.averageFare === minFare;
+          const isHighest = !hasNoData && pt.averageFare === maxFare && maxFare !== minFare;
+
+          let heightPct = 14;
+          if (!hasNoData && maxFare > 0) {
+            heightPct = 22 + ((pt.averageFare - minFare) / (maxFare - minFare || 1)) * 68;
+          }
+
+          return (
+            <div key={pt.dayName} className="flex-1 flex flex-col items-center h-full justify-end group relative">
+              <div className="text-[7.5px] font-bold text-slate-600 mb-1 truncate">
+                {hasNoData ? '—' : `₹${(pt.averageFare / 1000).toFixed(1)}k`}
+              </div>
+
+              <div
+                style={{ height: `${heightPct}%` }}
+                className={`w-full rounded-t-md transition-all ${
+                  hasNoData
+                    ? 'bg-slate-200/50 border border-dashed border-slate-300'
+                    : isLowest
+                    ? 'bg-emerald-500 shadow-sm'
+                    : isHighest
+                    ? 'bg-rose-500'
+                    : isSuff
+                    ? 'bg-teal-500'
+                    : 'bg-teal-300/80 border border-dashed border-teal-500'
+                }`}
+              />
+
+              <span className="text-[8px] font-bold text-slate-600 mt-1">
+                {pt.dayName.slice(0, 3)}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 interface FareAnalyticsModalProps {
   isOpen: boolean;
@@ -246,6 +602,9 @@ export const FareAnalyticsModal: React.FC<FareAnalyticsModalProps> = ({
                         Tracks minimum observed daily airfares on {report.routeId}. Baseline is established on the earliest tracked date ({report.summary.earliestDate || 'Sept 22, 2026'} = 100).
                       </p>
 
+                      {/* Dynamic Visual Trend Chart */}
+                      <DailyTrendChart points={report.overallIndex.points} />
+
                       {/* Real Data Points Visualization */}
                       <div className="border border-slate-200 rounded-xl p-3 bg-slate-50 mb-3">
                         <div className="flex items-center justify-between mb-2">
@@ -315,6 +674,9 @@ export const FareAnalyticsModal: React.FC<FareAnalyticsModalProps> = ({
                       <p className="text-[11px] text-slate-600 leading-snug mb-3">
                         Compares observed fares across advance booking buckets (1, 7, 14, 30, 60, and 90 days before departure) for {report.routeId}.
                       </p>
+
+                      {/* Dynamic Visual Yield Curve */}
+                      <BookingWindowCurveChart points={report.bookingWindowIndex.points} />
 
                       {/* Real Booking Window Buckets */}
                       <div className="border border-slate-200 rounded-xl p-3 bg-slate-50 mb-3 space-y-2">
@@ -402,6 +764,9 @@ export const FareAnalyticsModal: React.FC<FareAnalyticsModalProps> = ({
                         Analyzes average flight ticket prices across 4-hour departure blocks throughout the day on {report.routeId}.
                       </p>
 
+                      {/* Dynamic Visual Time Slot Bars */}
+                      <DepartureTimeOfDayChart points={report.timeOfDayIndex.points} />
+
                       {/* Real Time Slots */}
                       <div className="border border-slate-200 rounded-xl p-3 bg-slate-50 mb-3 space-y-2">
                         <div className="flex items-center justify-between mb-1">
@@ -485,6 +850,9 @@ export const FareAnalyticsModal: React.FC<FareAnalyticsModalProps> = ({
                           {report.dayOfWeekIndex.unobservedWeekdays.join(', ')} (no departures sampled yet)
                         </div>
                       )}
+
+                      {/* Dynamic Visual Day of Week Bar Chart */}
+                      <DayOfWeekYieldChart points={report.dayOfWeekIndex.points} />
 
                       {/* Real Weekdays */}
                       <div className="border border-slate-200 rounded-xl p-3 bg-slate-50 mb-3 space-y-1.5">
