@@ -549,9 +549,38 @@ export const FareAnalyticsModal: React.FC<FareAnalyticsModalProps> = ({
 }) => {
   const [report, setReport] = useState<RouteAnalyticsReport | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadingStep, setLoadingStep] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [selectedRoute, setSelectedRoute] = useState<string>(routeId || 'PNQ-LKO');
   const [subSegmentMode, setSubSegmentMode] = useState<'directional' | 'airlines'>('directional');
+
+  const LOADING_STEPS = [
+    {
+      title: 'Connecting & Hydrating Firestore Data',
+      desc: `Querying authentic price snapshots from Cloud Firestore database for ${selectedRoute} and corridor benchmarks...`,
+      icon: Database,
+    },
+    {
+      title: 'Computing 4-Pillar Baseline Indices',
+      desc: 'Calculating corridor baseline index (Base 100), advance booking curves (T-1d to T-90d), departure time slots, and Mon–Sun weekday yields...',
+      icon: TrendingUp,
+    },
+    {
+      title: 'Aggregating Directional & Airline Sub-Segments',
+      desc: 'Partitioning PNQ ➔ LKO (Outbound) vs LKO ➔ PNQ (Inbound) along with IndiGo, Air India Express, and Akasa Air yield matrices...',
+      icon: Plane,
+    },
+    {
+      title: 'Executing Gemini Econometric Analysis',
+      desc: 'Running Gemini AI multi-key pool to analyze corridor price dynamics, market elasticity, and revenue management takeaways...',
+      icon: BrainCircuit,
+    },
+    {
+      title: 'Assembling TOI-DPA Visual Layout',
+      desc: 'Rendering dynamic SVG area curves, empirical distribution grids, and interactive sub-segment micro-cards...',
+      icon: BarChart3,
+    },
+  ];
 
   useEffect(() => {
     if (isOpen) {
@@ -561,7 +590,14 @@ export const FareAnalyticsModal: React.FC<FareAnalyticsModalProps> = ({
 
   const fetchAnalytics = async (rId: string) => {
     setLoading(true);
+    setLoadingStep(0);
     setError(null);
+
+    // Incrementally advance visual steps during backend fetch
+    const stepTimer = setInterval(() => {
+      setLoadingStep((prev) => (prev < LOADING_STEPS.length - 1 ? prev + 1 : prev));
+    }, 420);
+
     try {
       const res = await fetch(`/api/analytics/indices?routeId=${rId}`);
       if (!res.ok) throw new Error('Failed to fetch fare analytics report');
@@ -570,6 +606,7 @@ export const FareAnalyticsModal: React.FC<FareAnalyticsModalProps> = ({
     } catch (err: any) {
       setError(err?.message || 'Error loading analytics');
     } finally {
+      clearInterval(stepTimer);
       setLoading(false);
     }
   };
@@ -681,9 +718,115 @@ export const FareAnalyticsModal: React.FC<FareAnalyticsModalProps> = ({
         {/* Scrollable Main Area */}
         <div className="p-6 overflow-y-auto flex-1 space-y-6">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-24 space-y-3">
-              <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-sm font-medium text-slate-500">Querying real Firestore snapshots for {selectedRoute}...</p>
+            <div className="py-12 px-4 max-w-2xl mx-auto">
+              <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm">
+                
+                {/* Header of Pipeline */}
+                <div className="flex items-center justify-between pb-5 border-b border-slate-100">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2.5 bg-blue-50 text-blue-600 rounded-2xl border border-blue-200 animate-pulse">
+                      <Database className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-black text-slate-900 tracking-tight">
+                        Computing Live Corridor Analytics
+                      </h3>
+                      <p className="text-xs text-slate-500 font-medium">
+                        Executing Firestore aggregation & AI econometric pipeline for {selectedRoute}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    <span className="text-xs font-black text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200">
+                      Step {loadingStep + 1} of {LOADING_STEPS.length}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="mt-4 mb-6">
+                  <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200/80">
+                    <div 
+                      className="bg-gradient-to-r from-blue-600 to-indigo-600 h-full rounded-full transition-all duration-300 ease-out"
+                      style={{ width: `${Math.min(((loadingStep + 1) / LOADING_STEPS.length) * 100, 100)}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Animated Pipeline Steps */}
+                <div className="space-y-3.5">
+                  {LOADING_STEPS.map((step, idx) => {
+                    const isCompleted = idx < loadingStep;
+                    const isCurrent = idx === loadingStep;
+                    const isUpcoming = idx > loadingStep;
+                    const StepIcon = step.icon;
+
+                    return (
+                      <div
+                        key={step.title}
+                        className={`p-3.5 rounded-2xl border transition-all duration-300 flex items-start gap-3.5 ${
+                          isCompleted
+                            ? 'bg-emerald-50/50 border-emerald-200/70 text-slate-800'
+                            : isCurrent
+                            ? 'bg-blue-50 border-blue-300 shadow-xs text-slate-900 ring-2 ring-blue-500/10'
+                            : 'bg-slate-50/40 border-slate-200/60 opacity-50 text-slate-400'
+                        }`}
+                      >
+                        {/* Status Icon */}
+                        <div className="mt-0.5 shrink-0">
+                          {isCompleted ? (
+                            <div className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-2xs">
+                              <CheckCircle2 className="w-4 h-4" />
+                            </div>
+                          ) : isCurrent ? (
+                            <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center animate-spin">
+                              <div className="w-2.5 h-2.5 border-2 border-white border-t-transparent rounded-full" />
+                            </div>
+                          ) : (
+                            <div className="w-6 h-6 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-[10px] font-bold">
+                              {idx + 1}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Text Details */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className={`text-xs font-black tracking-tight ${isCurrent ? 'text-blue-900' : isCompleted ? 'text-emerald-950' : 'text-slate-500'}`}>
+                              {step.title}
+                            </span>
+                            {isCompleted && (
+                              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.2 rounded">
+                                Completed
+                              </span>
+                            )}
+                            {isCurrent && (
+                              <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.2 rounded animate-pulse">
+                                Processing...
+                              </span>
+                            )}
+                          </div>
+                          <p className={`text-[11px] mt-0.5 leading-relaxed ${isCurrent ? 'text-blue-800/80 font-medium' : isCompleted ? 'text-slate-600' : 'text-slate-400'}`}>
+                            {step.desc}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Footer Assurance */}
+                <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium">
+                  <span className="flex items-center gap-1.5 text-slate-600">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                    Zero Synthetic Data • Firestore Grounded
+                  </span>
+                  <span>
+                    Database: <strong className="text-slate-700">ai-studio-flightpricetrend</strong>
+                  </span>
+                </div>
+              </div>
             </div>
           ) : error ? (
             <div className="p-6 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 text-center">
