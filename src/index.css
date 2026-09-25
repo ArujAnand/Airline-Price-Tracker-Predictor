@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@keyframes googleFlightsShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-google-flights {
+  background: linear-gradient(90deg, #f1f5f9 0%, #cbd5e1 50%, #f1f5f9 100%);
+  background-size: 200% 100%;
+  animation: googleFlightsShimmer 1.5s ease-in-out infinite;
+}

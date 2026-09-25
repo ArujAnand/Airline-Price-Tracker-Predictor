@@ -1,0 +1,34 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Snapshots: Open read for all users, write for server or authenticated
+    match /snapshots/{snapshotId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Prediction audit tracking records
+    match /prediction_records/{recordId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // User Price Alerts
+    match /price_alerts/{alertId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Flight schedules & airline catalog
+    match /flight_catalog/{flightId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Notifications log
+    match /notifications/{notifId} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Flight Price Trend Predictor & Aggregator",
+  "description": "Real-time flight price aggregator and predictive analysis engine tracking Google Flights data, historical pricing curves, and festival impact to forecast price drops and send optimal booking alerts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
