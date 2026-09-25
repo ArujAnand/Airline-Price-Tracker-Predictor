@@ -1,5 +1,18 @@
-import { HISTORICAL_TRAINING_RECORDS, HistoricalTrainingRecord } from './historicalData';
 import { MLModelComparison, FeatureImportance } from '../src/types';
+import { DataProvenance } from './types/mlPipeline';
+
+export interface EmpiricalTrainingRecord {
+  routeId: string;
+  leadTimeDays: number;
+  dayOfWeek: number;
+  month: number;
+  isSaturday: boolean;
+  isSunday: boolean;
+  departureHour: number;
+  actualFinalPrice: number;
+  lowestObservedPrice: number;
+  provenance: DataProvenance;
+}
 
 export interface MLPredictionResult {
   p10: number;
@@ -37,19 +50,43 @@ class FastQuantileForest {
   private residualStandardError = 950;
 
   constructor() {
-    this.train(HISTORICAL_TRAINING_RECORDS);
+    // Initialized empty - only trains on genuine REAL_OBSERVATION records
   }
 
-  private extractFeatures(record: HistoricalTrainingRecord): number[] {
+  private extractFeatures(record: EmpiricalTrainingRecord): number[] {
     return [
       record.leadTimeDays,                                // 0: Lead time
-      record.festivalDemandFactor,                        // 1: Festival multiplier
-      record.festivalOffsetDays === 999 ? 50 : Math.abs(record.festivalOffsetDays), // 2: Proximity to festival
-      record.isWeekend ? 1 : 0,                           // 3: Weekend flag
-      record.dayOfWeek,                                   // 4: Day of week (0-6)
-      record.seatLoadFactor,                              // 5: Load factor (0.4 - 0.98)
-      record.departureHour <= 5 ? 1 : 0,                  // 6: Off-peak overnight release (1-5 AM)
+      record.isSaturday || record.isSunday ? 1 : 0,       // 1: Weekend flag
+      record.dayOfWeek,                                   // 2: Day of week (0-6)
+      record.departureHour <= 5 ? 1 : 0,                  // 3: Early morning
     ];
+  }
+
+  public train(records: EmpiricalTrainingRecord[]) {
+    // Strict Data Purity Guard
+    for (const r of records) {
+      if (r.provenance !== 'REAL_OBSERVATION') {
+        throw new Error(`Data Integrity Violation: Non-real observation rejected by ML training pipeline: ${r.provenance}`);
+      }
+    }
+
+    if (records.length === 0) return;
+
+    this.trees = [];
+    const trainingData = records.map((r) => ({
+      features: this.extractFeatures(r),
+      target: r.actualFinalPrice,
+    }));
+
+    for (let t = 0; t < this.numTrees; t++) {
+      const sampleSize = Math.floor(trainingData.length * 0.75);
+      const sample: typeof trainingData = [];
+      for (let s = 0; s < sampleSize; s++) {
+        const randIdx = Math.floor(Math.random() * trainingData.length);
+        sample.push(trainingData[randIdx]);
+      }
+      this.trees.push(this.buildTree(sample, 0));
+    }
   }
 
   private buildTree(data: { features: number[]; target: number }[], depth: number): DecisionNode {
@@ -122,34 +159,6 @@ class FastQuantileForest {
     } else {
       return node.right ? this.predictTree(node.right, features) : 0;
     }
-  }
-
-  public train(records: HistoricalTrainingRecord[]) {
-    this.trees = [];
-    const trainingData = records.map((r) => ({
-      features: this.extractFeatures(r),
-      target: r.actualFinalPrice,
-    }));
-
-    for (let t = 0; t < this.numTrees; t++) {
-      // Bootstrap sampling (bagging with replacement)
-      const sampleSize = Math.floor(trainingData.length * 0.75);
-      const sample: typeof trainingData = [];
-      for (let s = 0; s < sampleSize; s++) {
-        const randIdx = Math.floor(Math.random() * trainingData.length);
-        sample.push(trainingData[randIdx]);
-      }
-      this.trees.push(this.buildTree(sample, 0));
-    }
-
-    // Calibrate empirical residual dispersion
-    let sumResSq = 0;
-    for (const d of trainingData) {
-      const preds = this.trees.map((tr) => this.predictTree(tr, d.features));
-      const med = preds.sort((a, b) => a - b)[Math.floor(preds.length * 0.5)] || d.target;
-      sumResSq += Math.pow(d.target - med, 2);
-    }
-    this.residualStandardError = Math.sqrt(sumResSq / Math.max(1, trainingData.length));
   }
 
   public predictQuantiles(features: number[], basePrice: number): { p10: number; p50: number; p90: number } {
@@ -301,7 +310,7 @@ export function predictFlightWithML(
       confidenceScore,
       maeHistorical: mae,
       rmseHistorical: rmse,
-      trainingDataPointsCount: HISTORICAL_TRAINING_RECORDS.length,
+      trainingDataPointsCount: 0,
     },
     consensusVerdict: {
       agreement: consensusAgreement,

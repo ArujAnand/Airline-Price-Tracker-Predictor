@@ -49,8 +49,13 @@ export class FirestorePersistenceService {
   // --- Snapshots ---
   public async saveSnapshot(snapshot: PriceSnapshot): Promise<void> {
     try {
-      const docRef = doc(db, 'snapshots', snapshot.id);
-      await setDoc(docRef, sanitizeForFirestore(snapshot), { merge: true });
+      const snapshotId = snapshot.id || (snapshot as any).observationId;
+      if (!snapshotId) {
+        console.warn('[Firestore] saveSnapshot skipped: missing id and observationId');
+        return;
+      }
+      const docRef = doc(db, 'snapshots', snapshotId);
+      await setDoc(docRef, sanitizeForFirestore({ ...snapshot, id: snapshotId }), { merge: true });
     } catch (err) {
       console.warn(`[Firestore] Failed to save snapshot ${snapshot.id}:`, err);
     }
@@ -63,8 +68,10 @@ export class FirestorePersistenceService {
         const batch = writeBatch(db);
         const chunk = snapshots.slice(i, i + 250);
         for (const s of chunk) {
-          const docRef = doc(db, 'snapshots', s.id);
-          batch.set(docRef, sanitizeForFirestore(s), { merge: true });
+          const snapshotId = s.id || (s as any).observationId;
+          if (!snapshotId) continue;
+          const docRef = doc(db, 'snapshots', snapshotId);
+          batch.set(docRef, sanitizeForFirestore({ ...s, id: snapshotId }), { merge: true });
         }
         await batch.commit();
       }
@@ -101,12 +108,22 @@ export class FirestorePersistenceService {
   }
 
   // --- Prediction Records (Ground Truth Audit) ---
-  public async savePredictionRecord(record: TrackedPredictionRecord): Promise<void> {
+  public async savePredictionRecord(record: TrackedPredictionRecord | any): Promise<void> {
     try {
-      const docRef = doc(db, 'prediction_records', record.id);
-      await setDoc(docRef, sanitizeForFirestore(record), { merge: true });
+      const recordId = record.predictionId || record.id;
+      if (!recordId || typeof recordId !== 'string') {
+        console.warn('[Firestore] Cannot save prediction record: missing predictionId or id', record);
+        return;
+      }
+      const docRef = doc(db, 'prediction_records', recordId);
+      const cleanRecord = sanitizeForFirestore({
+        ...record,
+        id: recordId,
+        predictionId: recordId
+      });
+      await setDoc(docRef, cleanRecord, { merge: true });
     } catch (err) {
-      console.warn(`[Firestore] Failed to persist prediction record ${record.id}:`, err);
+      console.warn(`[Firestore] Failed to persist prediction record ${record?.predictionId || record?.id}:`, err);
     }
   }
 

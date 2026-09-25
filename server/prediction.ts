@@ -4,7 +4,7 @@ import { getFestivalImpact } from './festivals';
 import { flightAggregator } from './aggregator';
 import { predictFlightWithML, mlForest } from './mlEngine';
 import { predictionTracker } from './predictionTracker';
-import { getYoYTrendsForRoute } from './historicalData';
+import { getFactualYoYTrends } from './historicalData';
 
 // Multi-key Gemini client pool setup with automatic failover, alternating load-balancing, and quota cooldown
 interface AIKeyRecord {
@@ -531,8 +531,9 @@ STRICT CONSTRAINTS:
     confidenceScore: mlResult.confidenceScore,
   });
 
-  // Get Year-on-Year historical trend points for chart
-  const yoyTrends = getYoYTrendsForRoute(routeId, festivalInfo.festivalName || 'Diwali');
+  // Get Year-on-Year historical trend points strictly from real observed snapshots
+  const snapshots = flightAggregator.getSnapshots(routeId, 500);
+  const yoyTrends = getFactualYoYTrends(snapshots, routeId);
 
   return {
     routeId,

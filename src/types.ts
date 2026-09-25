@@ -45,6 +45,7 @@ export interface PriceSnapshot {
   capturedHour: number; // 0-23
   type: 'hourly' | 'daily';
   source: string;
+  provenance?: string;
 }
 
 export interface FestivalEvent {

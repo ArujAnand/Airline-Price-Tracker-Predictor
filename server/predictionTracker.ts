@@ -1,7 +1,6 @@
 import { TrackedPredictionRecord, PredictionAuditSummary } from '../src/types';
 import { flightAggregator } from './aggregator';
 import { mlForest } from './mlEngine';
-import { HISTORICAL_TRAINING_RECORDS, HistoricalTrainingRecord } from './historicalData';
 import { firestoreDB } from './firestoreService';
 
 function calculateDaysToDeparture(departureDateStr: string, creationDateStr: string): number {
@@ -17,8 +16,7 @@ class PredictionTracker {
   private isHydrated = false;
 
   constructor() {
-    this.seedHistoricalAuditedPredictions();
-    // Fire off background hydration
+    // Rely strictly on genuine hydrated predictions from Firestore
     this.ensureHydrated().catch(() => {});
   }
 
@@ -37,9 +35,6 @@ class PredictionTracker {
       const persisted = await firestoreDB.getPredictionRecords();
       if (persisted.length > 0) {
         const existingMap = new Map<string, TrackedPredictionRecord>();
-        for (const r of this.records) {
-          existingMap.set(r.id, r);
-        }
         for (const p of persisted) {
           // Normalize flightGroupId and daysToDeparture if missing
           const routeUpper = p.routeId ? p.routeId.toUpperCase() : 'PNQ-LKO';
@@ -56,81 +51,10 @@ class PredictionTracker {
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
         this.isHydrated = true;
-        console.log(`[Firestore DB] Hydrated ${this.records.length} prediction audit records.`);
+        console.log(`[Firestore DB] Hydrated ${this.records.length} genuine prediction audit records.`);
       }
     } catch (err) {
       console.warn('[Firestore DB] Hydration warning for prediction records:', err);
-    }
-  }
-
-  private seedHistoricalAuditedPredictions() {
-    // Seed with realistic historical tracked predictions for PNQ-LKO & LKO-PNQ
-    // allowing the user to immediately see the audit history and how decisions are verified
-    const seed1Created = '2026-08-28T09:30:00.000Z';
-    const seed1Dep = '2026-10-18';
-    const seed1Days = calculateDaysToDeparture(seed1Dep, seed1Created);
-
-    const seed2Created = '2026-09-02T14:15:00.000Z';
-    const seed2Dep = '2026-10-24';
-    const seed2Days = calculateDaysToDeparture(seed2Dep, seed2Created);
-
-    const seeds: TrackedPredictionRecord[] = [
-      {
-        id: `pred-PNQ-LKO-${seed1Dep}-${seed1Days}d`,
-        flightGroupId: `PNQ-LKO-${seed1Dep}`,
-        daysToDeparture: seed1Days,
-        createdAt: seed1Created,
-        routeId: 'PNQ-LKO',
-        origin: 'PNQ',
-        destination: 'LKO',
-        departureDate: seed1Dep,
-        initialPriceAtPrediction: 7900,
-        predictedMin: 6400,
-        predictedMax: 8800,
-        predictedP50: 6800,
-        dropProbability: 79,
-        recommendationGiven: 'WAIT_AND_WATCH',
-        modelUsed: 'Quantile ML Forest',
-        confidenceScore: 89,
-        modelVersion: 'v1.2.0-quantile-forest',
-        actualLowestPriceObserved: 6520,
-        actualLowestDateObserved: '2026-09-12',
-        finalPriceAtDeparture: 8650,
-        status: 'VERIFIED_CORRECT',
-        wasAccurate: true,
-        actualSavingsOrLossINR: 1380, // Saved ₹1380 by waiting for the dip
-        auditNotes: 'Price fell from ₹7,900 to ₹6,520 in the T-36 window exactly as predicted. User saved ₹1,380 per ticket.',
-      },
-      {
-        id: `pred-LKO-PNQ-${seed2Dep}-${seed2Days}d`,
-        flightGroupId: `LKO-PNQ-${seed2Dep}`,
-        daysToDeparture: seed2Days,
-        createdAt: seed2Created,
-        routeId: 'LKO-PNQ',
-        origin: 'LKO',
-        destination: 'PNQ',
-        departureDate: seed2Dep,
-        initialPriceAtPrediction: 8400,
-        predictedMin: 8200,
-        predictedMax: 11200,
-        predictedP50: 9600,
-        dropProbability: 18,
-        recommendationGiven: 'BUY_NOW',
-        modelUsed: 'Quantile ML Forest',
-        confidenceScore: 92,
-        actualLowestPriceObserved: 8400,
-        actualLowestDateObserved: '2026-09-02',
-        finalPriceAtDeparture: 10800,
-        status: 'VERIFIED_CORRECT',
-        wasAccurate: true,
-        actualSavingsOrLossINR: 2400, // Locked in before surge
-        modelVersion: 'v1.2.0-quantile-forest',
-        auditNotes: 'Post-Diwali return rush: Immediate purchase locked in ₹8,400. Remaining seats subsequently surged to ₹10,800.',
-      },
-    ];
-    this.records = seeds;
-    for (const seed of seeds) {
-      firestoreDB.savePredictionRecord(seed).catch(() => {});
     }
   }
 
@@ -271,31 +195,27 @@ class PredictionTracker {
       }
     }
 
-    // Continuous Dynamic Retraining: Convert verified ground truth records into updated training data
+    // Continuous Dynamic Retraining: Convert verified ground truth records into updated training data (Real Data Only)
     const verified = this.records.filter((r) => r.status === 'VERIFIED_CORRECT' && r.actualLowestPriceObserved);
     if (verified.length > 0) {
-      const liveFeedbackRecords: HistoricalTrainingRecord[] = verified.map((v) => {
+      const liveFeedbackRecords = verified.map((v) => {
         const depDate = new Date(v.departureDate);
         return {
           routeId: v.routeId,
           leadTimeDays: Math.max(1, Math.round((new Date(v.departureDate).getTime() - new Date(v.createdAt).getTime()) / (1000 * 60 * 60 * 24))),
           dayOfWeek: depDate.getDay(),
           month: depDate.getMonth() + 1,
-          isWeekend: depDate.getDay() === 0 || depDate.getDay() === 6,
-          festivalOffsetDays: 999,
-          festivalDemandFactor: 1.1,
+          isSaturday: depDate.getDay() === 6,
+          isSunday: depDate.getDay() === 0,
           departureHour: 6,
-          seatLoadFactor: 0.85,
-          year: depDate.getFullYear(),
           actualFinalPrice: v.finalPriceAtDeparture || v.initialPriceAtPrediction,
           lowestObservedPrice: v.actualLowestPriceObserved || v.initialPriceAtPrediction,
-          priceWentDownLater: (v.actualLowestPriceObserved || v.initialPriceAtPrediction) < v.initialPriceAtPrediction,
-          priceDropPercentage: Math.max(0, Math.round(((v.initialPriceAtPrediction - (v.actualLowestPriceObserved || v.initialPriceAtPrediction)) / v.initialPriceAtPrediction) * 100)),
+          provenance: 'REAL_OBSERVATION' as const,
         };
       });
 
-      mlForest.train([...HISTORICAL_TRAINING_RECORDS, ...liveFeedbackRecords]);
-      console.log(`[ML Engine Recalibrated] Quantile Decision Forest retrained with ${liveFeedbackRecords.length} live ground truth audit records.`);
+      mlForest.train(liveFeedbackRecords);
+      console.log(`[ML Engine Recalibrated] Quantile Decision Forest retrained with ${liveFeedbackRecords.length} genuine real-world feedback records.`);
     }
 
     return this.getAuditSummaryInternal();

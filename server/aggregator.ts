@@ -2,6 +2,7 @@ import { Flight, PriceSnapshot, AggregatorStatus } from '../src/types';
 import { getFestivalImpact } from './festivals';
 import { getLiveGoogleFlights } from './googleFlightsScraper';
 import { firestoreDB } from './firestoreService';
+import { buildCanonicalFlightKey, buildObservationId } from './flightIdentity';
 
 export const AIRPORTS: Record<string, { city: string; name: string }> = {
   PNQ: { city: 'Pune', name: 'Pune Lohegaon Airport' },
@@ -586,11 +587,13 @@ class FlightAggregatorEngine {
       else if (festivalInfo.nearFestival) seatsRemaining = Math.max(3, 5 + (idx % 6));
       else seatsRemaining = 9 + (idx % 14);
 
+      const canonical = buildCanonicalFlightKey(origin, destination, tpl.flightNumber, departureDateStr, tpl.airlineCode);
+
       return {
-        id: `${routeKey}-${tpl.flightNumber}-${departureDateStr}`,
-        flightNumber: tpl.flightNumber,
+        id: canonical.canonicalId,
+        flightNumber: canonical.flightNumber,
         airline: tpl.airline,
-        airlineCode: tpl.airlineCode,
+        airlineCode: canonical.carrierCode,
         origin: origin.toUpperCase(),
         originCity: originInfo.city,
         originAirport: originInfo.name,
@@ -759,7 +762,7 @@ class FlightAggregatorEngine {
 
         flights.forEach((fl) => {
           const snap: PriceSnapshot = {
-            id: `snap-${Date.now()}-${fl.flightNumber}-${departureDate}`,
+            id: buildObservationId(fl.id, now.getTime()),
             flightId: fl.id,
             routeId,
             origin,
@@ -772,6 +775,7 @@ class FlightAggregatorEngine {
             capturedHour: now.getHours(),
             type: 'hourly',
             source: 'Google Flights 3h Yield Collector',
+            provenance: 'REAL_OBSERVATION' as any,
           };
           this.snapshots.push(snap);
           freshSnapshots.push(snap);

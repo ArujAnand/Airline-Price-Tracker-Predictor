@@ -1,5 +1,6 @@
 import { Flight } from '../src/types';
 import { AIRPORTS } from './aggregator';
+import { buildCanonicalFlightKey, normalizeCarrier } from './flightIdentity';
 
 // In-memory live cache to minimize redundant outbound fetches
 interface CacheEntry {
@@ -14,26 +15,14 @@ const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
  * Normalizes airline name and assigns standard IATA code and aircraft
  */
 function normalizeAirline(rawAirline: string): { name: string; code: string; aircraft: string } {
-  const lower = rawAirline.toLowerCase();
-  if (lower.includes('indigo') || lower.includes('6e')) {
-    return { name: 'IndiGo', code: '6E', aircraft: 'Airbus A320neo / A321neo' };
-  }
-  if (lower.includes('air india express') || lower.includes('ix')) {
-    return { name: 'Air India Express', code: 'IX', aircraft: 'Boeing 737 MAX 8' };
-  }
-  if (lower.includes('air india') || lower.includes('ai')) {
-    return { name: 'Air India', code: 'AI', aircraft: 'Airbus A320 / A321' };
-  }
-  if (lower.includes('akasa') || lower.includes('qp')) {
-    return { name: 'Akasa Air', code: 'QP', aircraft: 'Boeing 737 MAX' };
-  }
-  if (lower.includes('spicejet') || lower.includes('sg')) {
-    return { name: 'SpiceJet', code: 'SG', aircraft: 'Boeing 737-800' };
-  }
-  if (lower.includes('vistara') || lower.includes('uk')) {
-    return { name: 'Vistara (Air India)', code: 'UK', aircraft: 'Airbus A320neo' };
-  }
-  return { name: rawAirline || 'Domestic Carrier', code: '6E', aircraft: 'Airbus A320neo' };
+  const norm = normalizeCarrier(rawAirline);
+  if (norm.code === '6E') return { name: 'IndiGo', code: '6E', aircraft: 'Airbus A320neo / A321neo' };
+  if (norm.code === 'IX') return { name: 'Air India Express', code: 'IX', aircraft: 'Boeing 737 MAX 8' };
+  if (norm.code === 'QP') return { name: 'Akasa Air', code: 'QP', aircraft: 'Boeing 737 MAX' };
+  if (norm.code === 'SG') return { name: 'SpiceJet', code: 'SG', aircraft: 'Boeing 737-800' };
+  if (norm.code === 'UK') return { name: 'Vistara (Air India)', code: 'UK', aircraft: 'Airbus A320neo' };
+  if (norm.code === 'AI') return { name: 'Air India', code: 'AI', aircraft: 'Airbus A320 / A321' };
+  return { name: norm.name, code: norm.code, aircraft: 'Airbus A320neo' };
 }
 
 /**
@@ -91,17 +80,17 @@ async function fetchFromSerpApi(
       const durationMins = (item.total_duration || 120) % 60;
       const durationStr = `${durationHours}h ${durationMins}m`;
 
-      let baseUniqueId = `gf-serp-${origin.toUpperCase()}-${destination.toUpperCase()}-${cleanFlightNum}-${depTime.replace(':', '')}-${outboundDate}`;
-      let finalId = baseUniqueId;
+      const canonicalKey = buildCanonicalFlightKey(origin, destination, cleanFlightNum, outboundDate, norm.code);
+      let finalId = canonicalKey.canonicalId;
       let counter = 1;
       while (seenIds.has(finalId)) {
-        finalId = `${baseUniqueId}-f${counter++}`;
+        finalId = `${canonicalKey.canonicalId}-leg${counter++}`;
       }
       seenIds.add(finalId);
 
       uniqueFlights.push({
         id: finalId,
-        flightNumber: cleanFlightNum,
+        flightNumber: canonicalKey.flightNumber,
         airline: norm.name,
         airlineCode: norm.code,
         origin: origin.toUpperCase(),
@@ -184,15 +173,13 @@ async function fetchFromSearchApi(
       const depTime = leg.departure_airport?.time?.split(' ')[1] || '10:00';
       const arrTime = leg.arrival_airport?.time?.split(' ')[1] || '12:15';
 
-      const flightKey = `${cleanFlightNum}-${depTime}-${arrTime}-${price}`;
-      if (seenFlightKeys.has(flightKey)) return;
-      seenFlightKeys.add(flightKey);
-
-      const uniqueId = `gf-searchapi-${origin.toUpperCase()}-${destination.toUpperCase()}-${cleanFlightNum}-${depTime.replace(':', '')}-${outboundDate}`;
+      const canonicalKey = buildCanonicalFlightKey(origin, destination, cleanFlightNum, outboundDate, norm.code);
+      if (seenFlightKeys.has(canonicalKey.canonicalId)) return;
+      seenFlightKeys.add(canonicalKey.canonicalId);
 
       uniqueFlights.push({
-        id: uniqueId,
-        flightNumber: cleanFlightNum,
+        id: canonicalKey.canonicalId,
+        flightNumber: canonicalKey.flightNumber,
         airline: norm.name,
         airlineCode: norm.code,
         origin: origin.toUpperCase(),

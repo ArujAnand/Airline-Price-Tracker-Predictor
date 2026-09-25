@@ -1,4 +1,5 @@
 import { FestivalEvent } from '../src/types';
+import { NearbyCalendarEvent } from './types/mlPipeline';
 
 export const INDIAN_FESTIVALS_2026_2027: FestivalEvent[] = [
   {
@@ -65,6 +66,39 @@ export const INDIAN_FESTIVALS_2026_2027: FestivalEvent[] = [
     affectedRegions: ['PNQ', 'LKO', 'DEL', 'BOM']
   }
 ];
+
+/**
+ * Factual calendar event extractor:
+ * Returns all factual calendar events within +/- 45 days of travel date.
+ * Zero price multipliers or demand assumptions are attached.
+ */
+export function getFactualNearbyEvents(travelDateStr: string): NearbyCalendarEvent[] {
+  const travelDate = new Date(`${travelDateStr}T00:00:00Z`);
+  const travelTime = travelDate.getTime();
+  const events: NearbyCalendarEvent[] = [];
+
+  for (const festival of INDIAN_FESTIVALS_2026_2027) {
+    const start = new Date(`${festival.startDate}T00:00:00Z`).getTime();
+    const end = new Date(`${festival.endDate}T00:00:00Z`).getTime();
+
+    // Days from start date (signed integer: positive means departure is before festival, negative means after)
+    const daysFromStart = Math.round((start - travelTime) / (1000 * 60 * 60 * 24));
+    const daysFromEnd = Math.round((travelTime - end) / (1000 * 60 * 60 * 24));
+
+    // If within +/- 45 days of either start or end
+    if (Math.abs(daysFromStart) <= 45 || (travelTime >= start && travelTime <= end)) {
+      const signedOffset = (travelTime >= start && travelTime <= end) ? 0 : daysFromStart;
+      events.push({
+        eventName: festival.name,
+        eventDate: festival.startDate,
+        daysFromDeparture: signedOffset,
+        eventType: 'FESTIVAL'
+      });
+    }
+  }
+
+  return events;
+}
 
 export function getFestivalImpact(travelDateStr: string, origin: string, destination: string) {
   const travelDate = new Date(travelDateStr);
