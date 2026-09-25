@@ -11,7 +11,8 @@ import {
   RouteAnalyticsReport,
   DateFareInfo,
   CalendarFaresResponse,
-  InfographicBenchmarkData
+  InfographicBenchmarkData,
+  SubSegmentData
 } from '../src/types/analytics';
 
 export type {
@@ -23,7 +24,8 @@ export type {
   RouteAnalyticsReport,
   DateFareInfo,
   CalendarFaresResponse,
-  InfographicBenchmarkData
+  InfographicBenchmarkData,
+  SubSegmentData
 };
 
 /**
@@ -37,21 +39,39 @@ class FareIndexingService {
 
   public async getRouteAnalytics(routeId: string): Promise<RouteAnalyticsReport> {
     const cleanRouteId = routeId.toUpperCase();
-    // Fetch stored snapshots for this route from Firestore
-    const rawSnapshots = await firestoreDB.getSnapshots(cleanRouteId, 2000);
+    
+    // Fetch snapshots for both directions to support corridor & sub-segment comparison
+    const [rawPnqLko, rawLkoPnq] = await Promise.all([
+      firestoreDB.getSnapshots('PNQ-LKO', 2000),
+      firestoreDB.getSnapshots('LKO-PNQ', 2000),
+    ]);
 
-    // Filter strictly genuine snapshots (no synthetic / seed data)
-    const snapshots = rawSnapshots.filter(
-      (s) =>
-        s.routeId.toUpperCase() === cleanRouteId &&
-        !s.id.startsWith('hist-') &&
-        !(s.source && s.source.includes('Historical')) &&
-        Boolean(s.timestamp)
-    );
+    const filterValid = (list: PriceSnapshot[]) =>
+      list.filter(
+        (s) =>
+          !s.id.startsWith('hist-') &&
+          !(s.source && s.source.includes('Historical')) &&
+          Boolean(s.timestamp)
+      );
+
+    const pnqLkoSnaps = filterValid(rawPnqLko);
+    const lkoPnqSnaps = filterValid(rawLkoPnq);
+    const allCorridorSnaps = [...pnqLkoSnaps, ...lkoPnqSnaps];
+
+    // Determine target snapshots for the main report
+    let targetSnapshots: PriceSnapshot[];
+    if (cleanRouteId === 'LKO-PNQ') {
+      targetSnapshots = lkoPnqSnaps;
+    } else if (cleanRouteId === 'PNQ-LKO') {
+      targetSnapshots = pnqLkoSnaps;
+    } else {
+      // Combined Corridor
+      targetSnapshots = allCorridorSnaps;
+    }
 
     // Calculate real distinct calendar days of continuous data collected
     const uniqueDatesSet = new Set<string>();
-    snapshots.forEach((s) => {
+    targetSnapshots.forEach((s) => {
       const dayStr = s.timestamp.split('T')[0];
       if (dayStr) uniqueDatesSet.add(dayStr);
     });
@@ -65,15 +85,36 @@ class FareIndexingService {
       isPreliminary,
       minDataPointsThreshold: this.MIN_POINTS_THRESHOLD,
       minDaysThreshold: this.MIN_DAYS_THRESHOLD,
-      totalSnapshots: snapshots.length,
+      totalSnapshots: targetSnapshots.length,
       earliestDate: sortedDates[0] || '',
       latestDate: sortedDates[sortedDates.length - 1] || '',
     };
 
-    const overallIndex = this.computeOverallIndex(snapshots, totalDaysCollected, isPreliminary, cleanRouteId);
-    const bookingWindowIndex = this.computeBookingWindowIndex(snapshots, totalDaysCollected, isPreliminary, cleanRouteId);
-    const timeOfDayIndex = this.computeTimeOfDayIndex(snapshots, totalDaysCollected, isPreliminary, cleanRouteId);
-    const dayOfWeekIndexResult = this.computeDayOfWeekIndex(snapshots, totalDaysCollected, isPreliminary, cleanRouteId);
+    const overallIndex = this.computeOverallIndex(targetSnapshots, totalDaysCollected, isPreliminary, cleanRouteId);
+    const bookingWindowIndex = this.computeBookingWindowIndex(targetSnapshots, totalDaysCollected, isPreliminary, cleanRouteId);
+    const timeOfDayIndex = this.computeTimeOfDayIndex(targetSnapshots, totalDaysCollected, isPreliminary, cleanRouteId);
+    const dayOfWeekIndexResult = this.computeDayOfWeekIndex(targetSnapshots, totalDaysCollected, isPreliminary, cleanRouteId);
+
+    // Compute Sub-Segments (Directional & Airlines)
+    const directionalSegments: SubSegmentData[] = [
+      this.computeSubSegment('pnq-lko', 'PNQ ➔ LKO', 'Outbound Corridor', pnqLkoSnaps),
+      this.computeSubSegment('lko-pnq', 'LKO ➔ PNQ', 'Inbound Return', lkoPnqSnaps),
+    ];
+
+    // Airline Sub-Segments
+    const airlineBuckets: Record<string, PriceSnapshot[]> = {};
+    allCorridorSnaps.forEach((s) => {
+      const air = s.airline || 'Other';
+      if (!airlineBuckets[air]) airlineBuckets[air] = [];
+      airlineBuckets[air].push(s);
+    });
+
+    const airlineSegments: SubSegmentData[] = Object.entries(airlineBuckets)
+      .filter(([_, snaps]) => snaps.length >= 5)
+      .sort((a, b) => b[1].length - a[1].length)
+      .map(([airlineName, snaps]) =>
+        this.computeSubSegment(airlineName.toLowerCase().replace(/\s+/g, '-'), airlineName, 'Corridor Carrier', snaps)
+      );
 
     // Generate analytical insights using Gemini models with two API keys pool
     let aiAnalysis = undefined;
@@ -82,7 +123,7 @@ class FareIndexingService {
         route: cleanRouteId,
         trackingDays: totalDaysCollected,
         isPreliminary,
-        totalSnapshots: snapshots.length,
+        totalSnapshots: targetSnapshots.length,
         earliestDate: summary.earliestDate,
         latestDate: summary.latestDate,
         overallPoints: overallIndex.points.map((p) => ({
@@ -141,6 +182,206 @@ class FareIndexingService {
       timeOfDayIndex,
       dayOfWeekIndex: dayOfWeekIndexResult,
       aiAnalysis,
+      subSegments: {
+        directional: directionalSegments,
+        airlines: airlineSegments,
+      },
+    };
+  }
+
+  private computeSubSegment(
+    id: string,
+    name: string,
+    subname: string,
+    snapshots: PriceSnapshot[]
+  ): SubSegmentData {
+    const datesSet = new Set<string>();
+    snapshots.forEach((s) => {
+      const d = s.timestamp?.split('T')[0];
+      if (d) datesSet.add(d);
+    });
+
+    // 1. Overall Trend
+    const dailyLowest: Record<string, number> = {};
+    snapshots.forEach((s) => {
+      const d = s.timestamp?.split('T')[0];
+      if (!d) return;
+      if (!dailyLowest[d] || s.price < dailyLowest[d]) {
+        dailyLowest[d] = s.price;
+      }
+    });
+    const sortedDates = Object.keys(dailyLowest).sort();
+    const firstFare = sortedDates.length > 0 ? dailyLowest[sortedDates[0]] : 0;
+    const latestFare = sortedDates.length > 0 ? dailyLowest[sortedDates[sortedDates.length - 1]] : 0;
+    const percentChange = firstFare > 0 ? Math.round(((latestFare - firstFare) / firstFare) * 100) : 0;
+    const indexValue = firstFare > 0 ? Math.round((latestFare / firstFare) * 100) : 100;
+    const trendPoints = sortedDates.map((date) => ({
+      label: date.slice(5),
+      value: dailyLowest[date],
+    }));
+
+    // 2. Booking Window Curve
+    const windowMap: Record<number, { sum: number; count: number }> = {
+      1: { sum: 0, count: 0 },
+      7: { sum: 0, count: 0 },
+      14: { sum: 0, count: 0 },
+      30: { sum: 0, count: 0 },
+      60: { sum: 0, count: 0 },
+      90: { sum: 0, count: 0 },
+    };
+    snapshots.forEach((s) => {
+      if (!s.departureDate || !s.timestamp) return;
+      const depTime = new Date(s.departureDate).getTime();
+      const snapTime = new Date(s.timestamp.split('T')[0]).getTime();
+      const days = Math.round((depTime - snapTime) / (1000 * 60 * 60 * 24));
+      let tw = 90;
+      if (days <= 2) tw = 1;
+      else if (days <= 9) tw = 7;
+      else if (days <= 18) tw = 14;
+      else if (days <= 45) tw = 30;
+      else if (days <= 75) tw = 60;
+      else tw = 90;
+      windowMap[tw].sum += s.price;
+      windowMap[tw].count += 1;
+    });
+
+    const getAvg = (tw: number) =>
+      windowMap[tw].count >= 2 ? Math.round(windowMap[tw].sum / windowMap[tw].count) : null;
+    const t1Avg = getAvg(1);
+    const t30Avg = getAvg(30);
+    const t90Avg = getAvg(90);
+
+    let lowestWindow = 30;
+    let lowestVal = Infinity;
+    [1, 7, 14, 30, 60, 90].forEach((tw) => {
+      const avg = getAvg(tw);
+      if (avg && avg < lowestVal) {
+        lowestVal = avg;
+        lowestWindow = tw;
+      }
+    });
+
+    const bwPoints = [1, 7, 14, 30, 60, 90].map((tw) => ({
+      label: `T-${tw}d`,
+      value: windowMap[tw].count > 0 ? Math.round(windowMap[tw].sum / windowMap[tw].count) : 0,
+    }));
+
+    // 3. Time of Day
+    const slotMap: Record<string, { sum: number; count: number }> = {
+      '00:00 - 04:00': { sum: 0, count: 0 },
+      '04:00 - 08:00': { sum: 0, count: 0 },
+      '08:00 - 12:00': { sum: 0, count: 0 },
+      '12:00 - 16:00': { sum: 0, count: 0 },
+      '16:00 - 20:00': { sum: 0, count: 0 },
+      '20:00 - 24:00': { sum: 0, count: 0 },
+    };
+    snapshots.forEach((s) => {
+      let hour = s.capturedHour;
+      if (s.flightId && s.flightId.includes('-')) {
+        const parts = s.flightId.split('-');
+        const flNum = parts[parts.length - 1];
+        if (flNum === '612' || flNum === '601') hour = 6;
+        else if (flNum === '721' || flNum === '702') hour = 14;
+        else if (flNum === '834' || flNum === '803') hour = 21;
+      }
+      if (hour === undefined) hour = 12;
+      const bIdx = Math.floor(hour / 4);
+      const slots = [
+        '00:00 - 04:00',
+        '04:00 - 08:00',
+        '08:00 - 12:00',
+        '12:00 - 16:00',
+        '16:00 - 20:00',
+        '20:00 - 24:00',
+      ];
+      const slotName = slots[Math.min(bIdx, 5)];
+      slotMap[slotName].sum += s.price;
+      slotMap[slotName].count += 1;
+    });
+
+    let cheapestSlot = 'N/A';
+    let cheapestSlotFare = Infinity;
+    let peakSlot = 'N/A';
+    let peakSlotFare = 0;
+    const todPoints = Object.entries(slotMap).map(([slot, data]) => {
+      const avg = data.count > 0 ? Math.round(data.sum / data.count) : 0;
+      if (avg > 0 && avg < cheapestSlotFare) {
+        cheapestSlotFare = avg;
+        cheapestSlot = slot;
+      }
+      if (avg > peakSlotFare) {
+        peakSlotFare = avg;
+        peakSlot = slot;
+      }
+      return { label: slot.slice(0, 5), value: avg };
+    });
+
+    // 4. Day of Week
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayMap: Record<string, { sum: number; count: number }> = {};
+    dayNames.forEach((dn) => (dayMap[dn] = { sum: 0, count: 0 }));
+
+    snapshots.forEach((s) => {
+      if (!s.departureDate) return;
+      const dayIdx = new Date(s.departureDate).getDay();
+      const name = dayNames[dayIdx];
+      dayMap[name].sum += s.price;
+      dayMap[name].count += 1;
+    });
+
+    let cheapestDay = 'N/A';
+    let cheapestDayFare = Infinity;
+    let peakDay = 'N/A';
+    let peakDayFare = 0;
+    const dowPoints = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((shortName) => {
+      const fullName = dayNames.find((dn) => dn.startsWith(shortName)) || 'Monday';
+      const d = dayMap[fullName];
+      const avg = d && d.count > 0 ? Math.round(d.sum / d.count) : 0;
+      if (avg > 0 && avg < cheapestDayFare) {
+        cheapestDayFare = avg;
+        cheapestDay = shortName;
+      }
+      if (avg > peakDayFare) {
+        peakDayFare = avg;
+        peakDay = shortName;
+      }
+      return { label: shortName, value: avg };
+    });
+
+    return {
+      id,
+      name,
+      subname,
+      totalSnapshots: snapshots.length,
+      distinctDates: datesSet.size,
+      overallTrend: {
+        firstFare,
+        latestFare,
+        percentChange,
+        indexValue,
+        points: trendPoints,
+      },
+      bookingWindow: {
+        t1Avg,
+        t30Avg,
+        t90Avg,
+        sweetSpot: lowestVal < Infinity ? `~${lowestWindow}d ahead` : 'Gathering',
+        points: bwPoints,
+      },
+      timeOfDay: {
+        cheapestSlot: cheapestSlotFare < Infinity ? cheapestSlot : 'Gathering',
+        cheapestFare: cheapestSlotFare < Infinity ? cheapestSlotFare : 0,
+        peakSlot: peakSlotFare > 0 ? peakSlot : 'Gathering',
+        peakFare: peakSlotFare,
+        points: todPoints,
+      },
+      dayOfWeek: {
+        cheapestDay: cheapestDayFare < Infinity ? cheapestDay : 'Gathering',
+        cheapestFare: cheapestDayFare < Infinity ? cheapestDayFare : 0,
+        peakDay: peakDayFare > 0 ? peakDay : 'Gathering',
+        peakFare: peakDayFare,
+        points: dowPoints,
+      },
     };
   }
 

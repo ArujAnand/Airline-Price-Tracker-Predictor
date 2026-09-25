@@ -4,7 +4,8 @@ import {
   OverallIndexPoint, 
   BookingWindowPoint, 
   TimeOfDayPoint, 
-  DayOfWeekPoint 
+  DayOfWeekPoint,
+  SubSegmentData 
 } from '../types/analytics';
 import { 
   TrendingUp, 
@@ -373,6 +374,168 @@ const DayOfWeekYieldChart: React.FC<{ points: DayOfWeekPoint[] }> = ({ points })
   );
 };
 
+// ==========================================
+// SUB-SEGMENT MICRO-CARDS (TOI-DPA STYLE)
+// ==========================================
+
+const Pillar1SubSegments: React.FC<{ segments: SubSegmentData[] }> = ({ segments }) => {
+  if (!segments || segments.length === 0) return null;
+  return (
+    <div className="mt-3 pt-3 border-t border-slate-200">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+          Key Sectors / Carriers
+        </span>
+        <span className="text-[9px] text-slate-400 font-semibold">Trend vs Start</span>
+      </div>
+      <div className="grid grid-cols-1 gap-1.5">
+        {segments.map((seg) => {
+          const change = seg.overallTrend.percentChange;
+          const isUp = change > 0;
+          const isZero = change === 0;
+          return (
+            <div key={seg.id} className="bg-slate-50 border border-slate-200 rounded-xl p-2 flex items-center justify-between">
+              <div>
+                <div className="text-[11px] font-bold text-slate-900">{seg.name}</div>
+                <div className="text-[9px] text-slate-500 font-medium">
+                  Min: ₹{seg.overallTrend.latestFare.toLocaleString()} • n={seg.totalSnapshots}
+                </div>
+              </div>
+              <div className="flex items-center gap-2 text-right">
+                {seg.overallTrend.points.length > 1 && (
+                  <div className="w-12 h-4">
+                    <svg className="w-full h-full" viewBox="0 0 60 20">
+                      <polyline
+                        fill="none"
+                        stroke={isZero ? '#64748b' : isUp ? '#ef4444' : '#10b981'}
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        points={isUp ? '5,15 20,12 40,8 55,4' : '5,4 20,8 40,12 55,16'}
+                      />
+                    </svg>
+                  </div>
+                )}
+                <div>
+                  <div className="text-[10px] font-black text-slate-900">Idx {seg.overallTrend.indexValue}</div>
+                  <div className={`text-[9px] font-bold ${isZero ? 'text-slate-500' : isUp ? 'text-rose-600' : 'text-emerald-600'}`}>
+                    {isZero ? '0%' : `${isUp ? '+' : ''}${change}%`}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+const Pillar2SubSegments: React.FC<{ segments: SubSegmentData[] }> = ({ segments }) => {
+  if (!segments || segments.length === 0) return null;
+  return (
+    <div className="mt-3 pt-3 border-t border-slate-200">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+          Advance Booking Sweet Spots
+        </span>
+        <span className="text-[9px] text-slate-400 font-semibold">T-30d Lead</span>
+      </div>
+      <div className="grid grid-cols-1 gap-1.5">
+        {segments.map((seg) => (
+          <div key={seg.id} className="bg-slate-50 border border-slate-200 rounded-xl p-2 flex items-center justify-between">
+            <div>
+              <div className="text-[11px] font-bold text-slate-900">{seg.name}</div>
+              <div className="text-[9px] text-slate-500 font-medium">
+                {seg.bookingWindow.t30Avg ? `~30d: ₹${seg.bookingWindow.t30Avg.toLocaleString()}` : `Gathering windows`}
+              </div>
+            </div>
+            <div className="text-right">
+              <span className="text-[9px] font-bold bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded border border-amber-200">
+                {seg.bookingWindow.sweetSpot}
+              </span>
+              <div className="text-[8.5px] text-slate-500 mt-0.5">
+                {seg.bookingWindow.t1Avg ? `T-1d: ₹${seg.bookingWindow.t1Avg.toLocaleString()}` : `${seg.totalSnapshots} snaps`}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const Pillar3SubSegments: React.FC<{ segments: SubSegmentData[] }> = ({ segments }) => {
+  if (!segments || segments.length === 0) return null;
+  return (
+    <div className="mt-3 pt-3 border-t border-slate-200">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+          Departure Slot Yields
+        </span>
+        <span className="text-[9px] text-slate-400 font-semibold">Low vs Peak</span>
+      </div>
+      <div className="grid grid-cols-1 gap-1.5">
+        {segments.map((seg) => (
+          <div key={seg.id} className="bg-slate-50 border border-slate-200 rounded-xl p-2 flex items-center justify-between">
+            <div>
+              <div className="text-[11px] font-bold text-slate-900">{seg.name}</div>
+              <div className="text-[9px] text-emerald-700 font-semibold flex items-center gap-1">
+                <span>Low:</span>
+                <span>{seg.timeOfDay.cheapestSlot.split('-')[0].trim()}</span>
+                {seg.timeOfDay.cheapestFare > 0 && <span>(₹{seg.timeOfDay.cheapestFare.toLocaleString()})</span>}
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-[9px] text-rose-700 font-semibold">
+                Peak: {seg.timeOfDay.peakSlot.split('-')[0].trim()}
+              </div>
+              <div className="text-[8.5px] text-slate-500">
+                {seg.timeOfDay.peakFare > 0 ? `₹${seg.timeOfDay.peakFare.toLocaleString()}` : 'Gathering'}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const Pillar4SubSegments: React.FC<{ segments: SubSegmentData[] }> = ({ segments }) => {
+  if (!segments || segments.length === 0) return null;
+  return (
+    <div className="mt-3 pt-3 border-t border-slate-200">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+          Day-of-Week Yields
+        </span>
+        <span className="text-[9px] text-slate-400 font-semibold">Best Day</span>
+      </div>
+      <div className="grid grid-cols-1 gap-1.5">
+        {segments.map((seg) => (
+          <div key={seg.id} className="bg-slate-50 border border-slate-200 rounded-xl p-2 flex items-center justify-between">
+            <div>
+              <div className="text-[11px] font-bold text-slate-900">{seg.name}</div>
+              <div className="text-[9px] text-emerald-700 font-semibold flex items-center gap-1">
+                <span>Best:</span>
+                <span>{seg.dayOfWeek.cheapestDay}</span>
+                {seg.dayOfWeek.cheapestFare > 0 && <span>(₹{seg.dayOfWeek.cheapestFare.toLocaleString()})</span>}
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-[9px] text-rose-700 font-semibold">
+                Peak: {seg.dayOfWeek.peakDay}
+              </div>
+              <div className="text-[8.5px] text-slate-500">
+                {seg.dayOfWeek.peakFare > 0 ? `₹${seg.dayOfWeek.peakFare.toLocaleString()}` : 'Gathering'}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 interface FareAnalyticsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -388,6 +551,7 @@ export const FareAnalyticsModal: React.FC<FareAnalyticsModalProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedRoute, setSelectedRoute] = useState<string>(routeId || 'PNQ-LKO');
+  const [subSegmentMode, setSubSegmentMode] = useState<'directional' | 'airlines'>('directional');
 
   useEffect(() => {
     if (isOpen) {
@@ -413,6 +577,10 @@ export const FareAnalyticsModal: React.FC<FareAnalyticsModalProps> = ({
   if (!isOpen) return null;
 
   const isPNQtoLKO = selectedRoute === 'PNQ-LKO';
+  const activeSegments =
+    (subSegmentMode === 'directional'
+      ? report?.subSegments?.directional
+      : report?.subSegments?.airlines) || [];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-2 sm:p-4 overflow-y-auto">
@@ -578,6 +746,50 @@ export const FareAnalyticsModal: React.FC<FareAnalyticsModalProps> = ({
                 </div>
               )}
 
+              {/* Sub-Segment Comparison Mode Toggle (Directional vs Airline) */}
+              <div className="bg-white border border-slate-200 rounded-2xl p-3 px-5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xs">
+                <div className="flex items-center space-x-2.5">
+                  <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg border border-blue-200">
+                    <BarChart3 className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-black uppercase text-slate-900 tracking-wide block">
+                      Sub-Segment Analysis Breakdown (TOI-DPA Style)
+                    </span>
+                    <span className="text-[11px] text-slate-500 font-medium">
+                      Toggle micro-comparisons across all 4 pillars below
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setSubSegmentMode('directional')}
+                    className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                      subSegmentMode === 'directional'
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <span>⇄ Directional</span>
+                    <span className="text-[10px] opacity-80">(PNQ ➔ LKO vs LKO ➔ PNQ)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSubSegmentMode('airlines')}
+                    className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                      subSegmentMode === 'airlines'
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <span>✈ Airlines</span>
+                    <span className="text-[10px] opacity-80">(IndiGo, AIX, Akasa)</span>
+                  </button>
+                </div>
+              </div>
+
               {/* 4 Pillars Grid Powered by Real Computed Output */}
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
@@ -645,6 +857,9 @@ export const FareAnalyticsModal: React.FC<FareAnalyticsModalProps> = ({
                           </div>
                         )}
                       </div>
+
+                      {/* Sub-Segments (Directional vs Carrier) */}
+                      <Pillar1SubSegments segments={activeSegments} />
                     </div>
                   </div>
 
@@ -734,6 +949,9 @@ export const FareAnalyticsModal: React.FC<FareAnalyticsModalProps> = ({
                           );
                         })}
                       </div>
+
+                      {/* Sub-Segments (Directional vs Carrier) */}
+                      <Pillar2SubSegments segments={activeSegments} />
                     </div>
                   </div>
 
@@ -813,6 +1031,9 @@ export const FareAnalyticsModal: React.FC<FareAnalyticsModalProps> = ({
                           );
                         })}
                       </div>
+
+                      {/* Sub-Segments (Directional vs Carrier) */}
+                      <Pillar3SubSegments segments={activeSegments} />
                     </div>
                   </div>
 
@@ -916,6 +1137,9 @@ export const FareAnalyticsModal: React.FC<FareAnalyticsModalProps> = ({
                           );
                         })}
                       </div>
+
+                      {/* Sub-Segments (Directional vs Carrier) */}
+                      <Pillar4SubSegments segments={activeSegments} />
                     </div>
                   </div>
 

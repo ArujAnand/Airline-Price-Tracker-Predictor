@@ -88,6 +88,42 @@ export interface InfographicBenchmarkData {
   dayOfWeek: InfographicPillarData;
 }
 
+export interface SubSegmentData {
+  id: string;
+  name: string;
+  subname: string;
+  totalSnapshots: number;
+  distinctDates: number;
+  overallTrend: {
+    firstFare: number;
+    latestFare: number;
+    percentChange: number;
+    indexValue: number;
+    points: { label: string; value: number }[];
+  };
+  bookingWindow: {
+    t1Avg: number | null;
+    t30Avg: number | null;
+    t90Avg: number | null;
+    sweetSpot: string;
+    points: { label: string; value: number }[];
+  };
+  timeOfDay: {
+    cheapestSlot: string;
+    cheapestFare: number;
+    peakSlot: string;
+    peakFare: number;
+    points: { label: string; value: number }[];
+  };
+  dayOfWeek: {
+    cheapestDay: string;
+    cheapestFare: number;
+    peakDay: string;
+    peakFare: number;
+    points: { label: string; value: number }[];
+  };
+}
+
 export interface RouteAnalyticsReport {
   routeId: string;
   summary: IndexSummary;
@@ -114,6 +150,10 @@ export interface RouteAnalyticsReport {
     modelUsed: string;
     keyLabel: string;
     generatedAt: string;
+  };
+  subSegments?: {
+    directional: SubSegmentData[];
+    airlines: SubSegmentData[];
   };
   infographic?: InfographicBenchmarkData;
 }
