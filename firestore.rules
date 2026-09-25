@@ -36,5 +36,23 @@ service cloud.firestore {
       allow read: if true;
       allow write: if true;
     }
+
+    // Phase 3 Model Registry
+    match /model_registry/{modelId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Phase 3 Shadow Predictions
+    match /shadow_predictions/{shadowId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Phase 3 Dataset Manifests
+    match /dataset_manifests/{manifestId} {
+      allow read: if true;
+      allow write: if true;
+    }
   }
 }

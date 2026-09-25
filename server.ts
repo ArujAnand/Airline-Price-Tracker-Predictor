@@ -11,6 +11,8 @@ import { predictionTracker } from './server/predictionTracker';
 import { fareIndexingService } from './server/fareIndexer';
 import { backgroundScheduler } from './server/scheduler';
 import { auditOutcomeWorker } from './server/auditWorker';
+import { modelRegistryService } from './server/modelRegistryService';
+import { shadowSchedulerDaemon } from './server/shadowScheduler';
 import { firestoreDB } from './server/firestoreService';
 
 async function startServer() {
@@ -21,12 +23,18 @@ async function startServer() {
 
   // Ensure prediction tracker is hydrated from persistent Firestore
   await predictionTracker.ensureHydrated();
+
+  // Initialize Model Registry Service
+  await modelRegistryService.init();
   
   // Start background observation & prospective prediction daemon
   await backgroundScheduler.start();
 
   // Start background multi-horizon outcome resolution worker
   await auditOutcomeWorker.start();
+
+  // Start background prospective shadow prediction daemon
+  await shadowSchedulerDaemon.start();
 
   // API Routes
   app.get('/api/health', (req, res) => {

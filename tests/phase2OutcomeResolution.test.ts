@@ -212,6 +212,35 @@ const resHFar = outcomeResolverEngine.resolveCandidateHorizon(predH, '24h', obsH
 assert(resHFar.outcome?.priceAtExpiryINR === null, 'Expiry price is strictly null when nearest observation > 240 minutes');
 
 // ----------------------------------------------------------------------------
+// TEST I: Explicit Worker Idempotency & Late-Arriving Re-resolution
+// ----------------------------------------------------------------------------
+console.log('--- Test I: Worker Idempotency & Late-Arriving Re-resolution ---');
+const predI = createMockPred(7000);
+const obsI1 = [
+  createObs('obs-1', '2026-09-20T13:00:00.000Z', 7000),
+  createObs('obs-2', '2026-09-20T19:00:00.000Z', 7100)
+];
+
+// First run of resolution worker logic
+const resI1 = outcomeResolverEngine.resolveCandidateHorizon(predI, '24h', obsI1, '2026-09-21T11:00:00.000Z');
+assert(resI1.outcome !== null, 'First resolution run creates valid outcome');
+
+// Second run of resolution worker logic on identical data
+const resI2 = outcomeResolverEngine.resolveCandidateHorizon(predI, '24h', obsI1, '2026-09-21T11:00:00.000Z');
+assert(resI2.outcome !== null, 'Second resolution run creates valid outcome');
+assert(JSON.stringify(resI1.outcome) === JSON.stringify(resI2.outcome), 'Identical rerun produces exactly identical HorizonOutcome without factual mutation');
+assert(resI1.outcome?.resolutionVersion === resI2.outcome?.resolutionVersion, 'Resolution version remains identical (v1.0-raw-factual-measurement) on rerun');
+
+// Simulated late-arriving legitimate snapshot
+const obsI_late = [
+  ...obsI1,
+  createObs('obs-late', '2026-09-20T16:00:00.000Z', 6500) // Late-arriving ₹500 price drop!
+];
+const resI3 = outcomeResolverEngine.resolveCandidateHorizon(predI, '24h', obsI_late, '2026-09-21T11:00:00.000Z');
+assert(resI3.outcome?.minimumPriceObservedINR === 6500, 'Re-resolution correctly incorporates late-arriving legitimate snapshot');
+assert(resI3.outcome?.hasMeaningfulSavingEvent === 'CONFIRMED_TRUE', 'Re-resolution updates saving event state to CONFIRMED_TRUE');
+
+// ----------------------------------------------------------------------------
 // TEST J: Future observation excluded from shorter horizon
 // ----------------------------------------------------------------------------
 console.log('--- Test J: Future observation excluded from shorter horizon ---');

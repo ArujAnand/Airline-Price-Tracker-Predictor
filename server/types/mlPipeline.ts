@@ -181,6 +181,7 @@ export interface HorizonOutcome {
   
   // Saving Persistence & Opportunity Window
   meaningfulSavingObservationCount: number; // Count of snapshots where price <= initialPrice - 51
+  meaningfulSavingObservedAtTimestamps: string[]; // Timestamps where price <= initialPrice - 51
   meaningfulSavingDurationHours: number | null; // Step-interval estimate of duration saving remained available
   durationEstimationMethod: string | null;     // 'DISCRETE_SNAPSHOT_STEP_INTERVAL'
   
@@ -329,4 +330,144 @@ export interface DataSufficiencyAssessment {
   };
   maturityState: ModelMaturityState;
   maturityRationale: string;
+}
+
+// ============================================================================
+// 9. PHASE 3 INFRASTRUCTURE SCHEMAS (REGISTRY, SHADOW & EVALUATION)
+// ============================================================================
+export type ModelCapability = 
+  | 'POINT_PRICE_FORECAST'
+  | 'QUANTILE_PRICE_FORECAST'
+  | 'DROP_PROBABILITY'
+  | 'HORIZON_SCORE'
+  | 'DECISION_POLICY';
+
+export type TaskCategory = 
+  | 'PRICE_FORECASTING'
+  | 'MEANINGFUL_DROP_EVENT'
+  | 'HORIZON_SELECTION'
+  | 'DECISION_POLICY';
+
+export type ModelStatus = 
+  | 'BASELINE'
+  | 'CANDIDATE'
+  | 'CHALLENGER'
+  | 'CHAMPION'
+  | 'RETIRED';
+
+export interface ModelTaskEvaluationResults {
+  evaluatorVersion: string;
+  evaluatedAt: string;
+  datasetManifestId: string;
+  maeINR?: number | null;
+  medianAbsoluteErrorINR?: number | null;
+  rmseINR?: number | null;
+  brierScore?: number | null;
+  logLoss?: number | null;
+  rocAUC?: number | null;
+  maeImprovementVsPersistenceRatio?: number | null;
+  statusRationale: string;
+}
+
+export interface ModelRegistryRecord {
+  modelId: string;
+  task: TaskCategory;
+  algorithm: string;
+  modelVersion: string;
+  featureVersion: string;
+  trainingDatasetVersion: string;
+  trainingPeriod: { start: string; end: string };
+  routes: string[];
+  candidateHorizons: HorizonPeriod[];
+  hyperparameters: Record<string, any>;
+  trainingSampleCount: number;
+  uniqueFlightCount: number;
+  effectiveIndependentSampleCount: number;
+  evaluationResults: ModelTaskEvaluationResults | null;
+  status: ModelStatus;
+  outputCapabilities: ModelCapability[];
+  maturityState: ModelMaturityState;
+  createdAt: string;
+  lastEvaluatedAt: string | null;
+  shadowPredictionCount: number;
+  resolvedShadowPredictionCount: number;
+}
+
+export interface HorizonOutput {
+  horizon: HorizonPeriod;
+  pointForecastINR: number | null;        // null if model does not produce point forecast
+  quantileForecasts: { p10: number; p50: number; p90: number } | null; // null if uncalibrated/unsupported
+  dropProbability: number | null;         // null if model does not produce calibrated drop prob
+  horizonScore: number | null;            // null if horizon selector inactive
+  decisionPolicy: RecommendationAction | null; // null if decision policy inactive
+}
+
+export interface ShadowPredictionRecord {
+  shadowPredictionId: string;           // 'shadow-[modelId]-[canonicalId]-[windowKey]'
+  modelId: string;
+  modelVersion: string;
+  predictionTimestamp: string;          // ISO-8601 moment T_pred before outcome occurs
+  canonicalId: string;
+  routeId: string;
+  origin: string;
+  destination: string;
+  departureDate: string;
+  currentSpotFareINR: number;
+  horizonOutputs: Partial<Record<HorizonPeriod, HorizonOutput>>; // Horizon-specific outputs
+  provenance: DataProvenance;
+  createdAt: string;
+}
+
+export interface DatasetManifest {
+  manifestId: string;
+  manifestVersion: string;
+  createdTimestamp: string;
+  eligiblePredictionIds: string[];
+  eligibleSnapshotIds: string[];
+  horizonOutcomeVersions: Record<string, string>; // 'predictionId:horizon' -> resolutionVersion
+  uniqueFlightCount: number;
+  effectiveIndependentSampleCount: number;
+  dataSpanDays: number;
+  provenance: DataProvenance;
+}
+
+export interface CalibrationAnalysisReport {
+  status: 'INSUFFICIENT_EVIDENCE' | 'CALIBRATED' | 'UNCALIBRATED';
+  sampleCount: number;
+  confirmedTrueCount: number;
+  confirmedFalseCount: number;
+  brierScore: number | null;
+  logLoss: number | null;
+  reliabilityBins: Array<{
+    binRange: [number, number];
+    expectedFreq: number;
+    observedFreq: number;
+    sampleCount: number;
+  }>;
+  rationale: string;
+}
+
+export interface FeatureGroupEvidence {
+  featureGroup: 
+    | 'CURRENT_FARE'
+    | 'RECENT_TRAJECTORY'
+    | 'LEAD_TIME'
+    | 'ROUTE'
+    | 'AIRLINE'
+    | 'DEPARTURE_CALENDAR'
+    | 'FESTIVAL_CONTEXT'
+    | 'SCHEDULE_DRIFT'
+    | 'VOLATILITY'
+    | 'EXTERNAL_FACTUAL';
+  evidenceStatus: 'SUPPORTED' | 'NOT_SUPPORTED' | 'INSUFFICIENT_EVIDENCE';
+  multiFactorAssessment: {
+    independentEventCount: number;
+    departureDateCount: number;
+    uniqueFlightCount: number;
+    routeDirectionCoverageRatio: number;
+    leadTimeRegimeCoverageRatio: number;
+    nonEventBaselineComparisonCount: number;
+    effectiveSampleSize: number;
+  };
+  rationale: string;
 }

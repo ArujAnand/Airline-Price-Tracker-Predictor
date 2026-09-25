@@ -212,6 +212,61 @@ export class FirestorePersistenceService {
     }
   }
 
+  // --- Model Registry & Shadow Predictions ---
+  public async saveModelRegistryRecord(record: any): Promise<void> {
+    try {
+      const docRef = doc(db, 'model_registry', record.modelId);
+      await setDoc(docRef, sanitizeForFirestore(record), { merge: true });
+    } catch (err) {
+      console.warn(`[Firestore] Failed to save model registry record ${record?.modelId}:`, err);
+    }
+  }
+
+  public async getModelRegistryRecords(): Promise<any[]> {
+    try {
+      const colRef = collection(db, 'model_registry');
+      const snap = await getDocs(colRef);
+      const list: any[] = [];
+      snap.forEach(d => list.push(d.data()));
+      return list;
+    } catch (err) {
+      console.warn('[Firestore] getModelRegistryRecords warning:', err);
+      return [];
+    }
+  }
+
+  public async saveShadowPredictionRecord(record: any): Promise<void> {
+    try {
+      const docRef = doc(db, 'shadow_predictions', record.shadowPredictionId);
+      await setDoc(docRef, sanitizeForFirestore(record), { merge: true });
+    } catch (err) {
+      console.warn(`[Firestore] Failed to save shadow prediction record ${record?.shadowPredictionId}:`, err);
+    }
+  }
+
+  public async getShadowPredictionRecords(): Promise<any[]> {
+    try {
+      const colRef = collection(db, 'shadow_predictions');
+      const q = query(colRef, orderBy('createdAt', 'desc'), fsLimit(500));
+      const snap = await getDocs(q);
+      const list: any[] = [];
+      snap.forEach(d => list.push(d.data()));
+      return list;
+    } catch (err) {
+      console.warn('[Firestore] getShadowPredictionRecords warning:', err);
+      return [];
+    }
+  }
+
+  public async saveDatasetManifest(manifest: any): Promise<void> {
+    try {
+      const docRef = doc(db, 'dataset_manifests', manifest.manifestId);
+      await setDoc(docRef, sanitizeForFirestore(manifest), { merge: true });
+    } catch (err) {
+      console.warn(`[Firestore] Failed to save dataset manifest ${manifest?.manifestId}:`, err);
+    }
+  }
+
   // --- Daily AI Briefings (Persisted once per calendar day) ---
   public async getDailyCorridorAnalysis(route: string, dateKey: string): Promise<any | null> {
     try {

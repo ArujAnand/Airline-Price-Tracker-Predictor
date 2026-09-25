@@ -23,6 +23,16 @@ import {
   UnresolvedReason
 } from './types/mlPipeline';
 
+/**
+ * Configurable & Versioned Data-Quality Engineering Safeguards
+ * 
+ * NOTE: expiryObservationToleranceMinutes = 240 is a preliminary engineering threshold based on
+ * the 3-hour collection interval + 1-hour network buffer. It is NOT learned or tuned for model metrics.
+ * Raw actualExpiryObservationTimestamp and expiryObservationDistanceMinutes are strictly preserved
+ * to allow future sensitivity analysis.
+ */
+export const EXPIRY_OBSERVATION_TOLERANCE_MINUTES = 240;
+
 export const HORIZON_HOURS: Record<HorizonPeriod, number> = {
   '24h': 24,
   '48h': 48,
@@ -174,7 +184,7 @@ export class OutcomeResolverEngine {
 
       if (closestObs) {
         const distMinutes = Math.round(minDistanceMs / (60 * 1000));
-        if (distMinutes <= 240) { // 4 Hours
+        if (distMinutes <= EXPIRY_OBSERVATION_TOLERANCE_MINUTES) {
           priceAtExpiryINR = closestObs.priceINR;
           actualExpiryObsTimestamp = closestObs.observedAt;
           expiryDistanceMinutes = distMinutes;
@@ -210,6 +220,7 @@ export class OutcomeResolverEngine {
       maxDownsideSurgeINR,
       expiryPriceDeltaINR,
       meaningfulSavingObservationCount,
+      meaningfulSavingObservedAtTimestamps: savingObs.map(o => o.observedAt),
       meaningfulSavingDurationHours: savingDurationHours,
       durationEstimationMethod: durationMethod,
       observedTrajectorySnapshotIds: windowObs.map(o => o.observationId),
