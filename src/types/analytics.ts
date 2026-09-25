@@ -4,6 +4,9 @@ export interface IndexSummary {
   isPreliminary: boolean;
   minDataPointsThreshold: number;
   minDaysThreshold: number;
+  totalSnapshots: number;
+  earliestDate: string;
+  latestDate: string;
 }
 
 export interface OverallIndexPoint {
@@ -18,6 +21,7 @@ export interface BookingWindowPoint {
   normalizedFareIndex: number;
   averageFare: number;
   dataPointsCount: number;
+  distinctDatesCount: number;
   status: 'sufficient' | 'insufficient_data';
 }
 
@@ -27,6 +31,7 @@ export interface TimeOfDayPoint {
   normalizedIndex: number;
   averageFare: number;
   dataPointsCount: number;
+  distinctDatesCount: number;
   status: 'sufficient' | 'insufficient_data';
 }
 
@@ -36,7 +41,8 @@ export interface DayOfWeekPoint {
   normalizedIndex: number;
   averageFare: number;
   dataPointsCount: number;
-  status: 'sufficient' | 'insufficient_data';
+  distinctDatesCount: number;
+  status: 'sufficient' | 'insufficient_data' | 'no_data';
 }
 
 export interface DateFareInfo {
@@ -100,6 +106,14 @@ export interface RouteAnalyticsReport {
   dayOfWeekIndex: {
     points: DayOfWeekPoint[];
     insight: string;
+    unobservedWeekdays?: string[];
+  };
+  aiAnalysis?: {
+    corridorSummary: string;
+    keyTakeaways: string[];
+    modelUsed: string;
+    keyLabel: string;
+    generatedAt: string;
   };
   infographic?: InfographicBenchmarkData;
 }

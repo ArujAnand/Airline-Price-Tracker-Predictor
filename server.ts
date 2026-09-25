@@ -2,7 +2,8 @@ import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { flightAggregator, AIRPORTS } from './server/aggregator';
-import { runPricePrediction, getGeminiPoolStatus } from './server/prediction';
+import { runPricePrediction } from './server/prediction';
+import { geminiService } from './server/geminiService';
 import { alertsManager } from './server/alerts';
 import { INDIAN_FESTIVALS_2026_2027 } from './server/festivals';
 import { findSmartDates } from './server/smartDates';
@@ -25,7 +26,7 @@ async function startServer() {
   });
 
   app.get('/api/gemini/status', (req, res) => {
-    res.json(getGeminiPoolStatus());
+    res.json(geminiService.getPoolStatus());
   });
 
   app.get('/api/airports', (req, res) => {

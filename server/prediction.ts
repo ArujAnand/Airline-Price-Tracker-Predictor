@@ -118,7 +118,7 @@ export async function runPricePrediction(
   origin: string,
   destination: string,
   departureDateStr: string,
-  includeAI = false
+  includeAI = true
 ): Promise<PredictionAnalysis> {
   const routeId = `${origin.toUpperCase()}-${destination.toUpperCase()}`;
   const flights = await flightAggregator.getFlightsAsync(origin, destination, departureDateStr);
@@ -389,14 +389,11 @@ STRICT CONSTRAINTS:
 4. Do NOT invent urgency language stronger or weaker than what the numbers support (for example, NEVER write "book immediately", "buy now", or "must book today" when recommendation is WAIT_AND_WATCH or DROP_IMMINENT).
 5. If unsure how to phrase something, default to restating the numbers rather than interpreting them more strongly.`;
 
-        // Candidate models prioritized by highest quota
+        // Candidate models prioritized by highest throughput and active quota
         const candidateModels = [
           'gemini-3.1-flash-lite',
-          'gemini-3.5-flash-lite',
+          'gemini-flash-latest',
           'gemini-3.8-flash',
-          'gemini-3.7-flash',
-          'gemini-2.5-flash',
-          'gemini-2.5-flash-lite',
         ];
 
         let generationSuccess = false;

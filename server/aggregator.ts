@@ -238,7 +238,7 @@ class FlightAggregatorEngine {
   private autoDiscoveredCount: number = 0;
 
   constructor() {
-    this.seedHistoricalData();
+    // Only hydrate genuine real snapshots from persistent Cloud Firestore
     this.hydrateFromFirestore();
     this.startScheduledCollector();
     // Run initial auto-discovery immediately
@@ -258,6 +258,16 @@ class FlightAggregatorEngine {
           }
         }
         console.log(`[Firestore DB] Hydrated ${persisted.length} price snapshots from persistent Cloud Firestore.`);
+      }
+
+      // Auto-catchup if last snapshot is older than 3 hours (e.g. after container sleep or cold start)
+      const THREE_HOURS_MS = 3 * 60 * 60 * 1000;
+      const latestTime = this.snapshots.length > 0
+        ? Math.max(...this.snapshots.map((s) => new Date(s.timestamp).getTime()))
+        : 0;
+      if (latestTime === 0 || Date.now() - latestTime >= THREE_HOURS_MS) {
+        console.log('[Aggregator] Periodic sync due on startup / wake-up. Running catchup sync...');
+        this.triggerManualSync(true);
       }
     } catch (err) {
       console.warn('[Firestore DB] Hydration notice:', err);
@@ -689,6 +699,31 @@ class FlightAggregatorEngine {
     });
   }
 
+  // Helper to generate comprehensive departure date matrix for tracking
+  public getTargetTrackingDates(): string[] {
+    const dates: Set<string> = new Set();
+    const today = new Date();
+
+    // 1. Next 7 consecutive days (guarantees coverage of all 7 weekdays & short booking windows T-1 to T-7)
+    for (let offset = 1; offset <= 7; offset++) {
+      const d = new Date(today.getTime() + offset * 24 * 60 * 60 * 1000);
+      dates.add(d.toISOString().split('T')[0]);
+    }
+
+    // 2. Booking window milestones (T-14d, T-30d, T-60d, T-90d)
+    const milestones = [14, 30, 45, 60, 90];
+    for (const m of milestones) {
+      const d = new Date(today.getTime() + m * 24 * 60 * 60 * 1000);
+      dates.add(d.toISOString().split('T')[0]);
+    }
+
+    // 3. Anchor festival dates
+    dates.add('2026-10-18'); // Dussehra
+    dates.add('2026-11-08'); // Diwali
+
+    return Array.from(dates);
+  }
+
   // Capture fresh snapshots (scheduled every 3 hours; skips if route was updated < 3h ago unless force=true)
   public triggerManualSync(force: boolean = false): PriceSnapshot[] {
     const now = new Date();
@@ -697,7 +732,7 @@ class FlightAggregatorEngine {
     this.nextRun = new Date(now.getTime() + THREE_HOURS_MS);
     const freshSnapshots: PriceSnapshot[] = [];
 
-    const defaultDepartureDate = '2026-10-18';
+    const targetDates = this.getTargetTrackingDates();
 
     for (const routeId of this.monitoredRoutes) {
       // Check when was the last time fare was updated for this route
@@ -718,27 +753,30 @@ class FlightAggregatorEngine {
       }
 
       const [origin, destination] = routeId.split('-');
-      const flights = this.getFlights(origin, destination, defaultDepartureDate);
 
-      flights.forEach((fl) => {
-        const snap: PriceSnapshot = {
-          id: `snap-${Date.now()}-${fl.flightNumber}`,
-          flightId: fl.id,
-          routeId,
-          origin,
-          destination,
-          departureDate: defaultDepartureDate,
-          flightNumber: fl.flightNumber,
-          airline: fl.airline,
-          price: fl.currentPrice,
-          timestamp: now.toISOString(),
-          capturedHour: now.getHours(),
-          type: 'hourly',
-          source: 'Google Flights 3h Yield Collector',
-        };
-        this.snapshots.push(snap);
-        freshSnapshots.push(snap);
-      });
+      for (const departureDate of targetDates) {
+        const flights = this.getFlights(origin, destination, departureDate);
+
+        flights.forEach((fl) => {
+          const snap: PriceSnapshot = {
+            id: `snap-${Date.now()}-${fl.flightNumber}-${departureDate}`,
+            flightId: fl.id,
+            routeId,
+            origin,
+            destination,
+            departureDate,
+            flightNumber: fl.flightNumber,
+            airline: fl.airline,
+            price: fl.currentPrice,
+            timestamp: now.toISOString(),
+            capturedHour: now.getHours(),
+            type: 'hourly',
+            source: 'Google Flights 3h Yield Collector',
+          };
+          this.snapshots.push(snap);
+          freshSnapshots.push(snap);
+        });
+      }
     }
 
     // Persist to Cloud Firestore asynchronously
