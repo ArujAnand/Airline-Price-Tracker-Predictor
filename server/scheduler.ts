@@ -19,16 +19,27 @@ export class BackgroundSchedulerDaemon {
   private intervalTimer: NodeJS.Timeout | null = null;
   private isRunning = false;
   private readonly INTERVAL_MS = 3 * 60 * 60 * 1000; // 3 hours
+  private lastCycleTimestamp = 0;
+
+  public getLastCycleTimestamp(): number {
+    return this.lastCycleTimestamp;
+  }
 
   public async start(): Promise<void> {
     if (this.isRunning) return;
     this.isRunning = true;
     console.log('⏰ [Scheduler] Background prospective observation & prediction daemon started (3-hour cycle).');
 
-    // Run initial sweep after 5 seconds
+    // Render restart resilience: compute accurate time remaining until next 3-hour collection
+    const now = Date.now();
+    const timeSinceLast = now - this.lastCycleTimestamp;
+    const remainingDelay = Math.max(5000, this.INTERVAL_MS - timeSinceLast);
+
+    console.log(`⏰ [Scheduler] Next collection cycle scheduled in ${Math.round(remainingDelay / 1000)} seconds.`);
+
     setTimeout(() => {
       this.runCycle().catch(err => console.error('[Scheduler] Initial cycle error:', err));
-    }, 5000);
+    }, remainingDelay);
 
     this.intervalTimer = setInterval(() => {
       this.runCycle().catch(err => console.error('[Scheduler] Periodic cycle error:', err));
@@ -52,6 +63,7 @@ export class BackgroundSchedulerDaemon {
     prospectivePredictionsLogged: number;
     collectionCycleId: string;
   }> {
+    this.lastCycleTimestamp = Date.now();
     const now = new Date();
     const nowISO = now.toISOString();
     const collectionCycleId = `cycle-${now.getTime()}-${Math.random().toString(36).substring(2, 7)}`;

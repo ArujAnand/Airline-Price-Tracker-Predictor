@@ -78,6 +78,12 @@ export class FirestorePersistenceService {
     }
   }
 
+  private lastMaterializedSizeBytes = 0;
+
+  public async getMaterializedSizeBytes(): Promise<number> {
+    return this.lastMaterializedSizeBytes;
+  }
+
   public async init(): Promise<void> {
     if (this.isInitialized) return;
     try {
@@ -90,42 +96,111 @@ export class FirestorePersistenceService {
   }
 
   /**
+   * CANONICAL SOURCE OF TRUTH: Firestore domain collections (snapshots, prediction_records, etc.)
+   * DERIVED CACHE/CHECKPOINT: system_state/materializedState
+   * IN-MEMORY CACHE: process-local Maps
+   * 
    * Task 1: Reads ONLY system_state/materializedState (1 single Firestore read!) on cold start.
-   * If document exists, instantly hydrates in-memory maps.
-   * If missing, performs 1-time full query fallback and creates the materialized state doc.
+   * If document exists, validates schema, instantly hydrates in-memory maps, and replays
+   * any newer canonical records written after the last checkpoint timestamp.
    */
   public async hydrateFromMaterializedState(): Promise<void> {
+    let checkpointTimestamp: string | null = null;
     try {
       const docRef = doc(db, 'system_state', 'materializedState');
       const snap = await getDoc(docRef);
       if (snap.exists()) {
         const data = snap.data();
-        if (data.snapshots && Array.isArray(data.snapshots)) {
-          data.snapshots.forEach((s: PriceSnapshot) => {
-            if (s.id) this.inMemorySnapshots.set(s.id, s);
-          });
+        
+        // Cache Hydration Validation
+        if (data.schemaVersion === 'v2.0' && data.collectorVersion === 'v2.0') {
+          if (data.snapshots && Array.isArray(data.snapshots)) {
+            data.snapshots.forEach((s: PriceSnapshot) => {
+              if (s.id) this.inMemorySnapshots.set(s.id, s);
+            });
+          }
+          if (data.predictionRecords && Array.isArray(data.predictionRecords)) {
+            data.predictionRecords.forEach((p: TrackedPredictionRecord) => {
+              const pId = (p as any).predictionId || p.id;
+              if (pId) this.inMemoryPredictionRecords.set(pId, p);
+            });
+          }
+          if (data.activeBackgroundEpisodes && Array.isArray(data.activeBackgroundEpisodes)) {
+            data.activeBackgroundEpisodes.forEach((ep: any) => {
+              if (ep.canonicalId) this.inMemoryActiveBackgroundEpisodes.set(ep.canonicalId, ep);
+              if (ep.episodeId) this.inMemoryDecisionEpisodes.set(ep.episodeId, ep);
+            });
+          }
+          checkpointTimestamp = data.updatedAt || null;
+          console.log(`[Firestore DB] Cold start hydrated via 1 single materialized state read (${this.inMemorySnapshots.size} snaps, ${this.inMemoryPredictionRecords.size} predictions). Checkpoint: ${checkpointTimestamp}`);
+        } else {
+          console.warn('[Firestore DB] Incompatible cache schema/collector version detected. Discarding cache to trigger fresh rebuild.');
         }
-        if (data.predictionRecords && Array.isArray(data.predictionRecords)) {
-          data.predictionRecords.forEach((p: TrackedPredictionRecord) => {
-            const pId = (p as any).predictionId || p.id;
-            if (pId) this.inMemoryPredictionRecords.set(pId, p);
-          });
-        }
-        if (data.activeBackgroundEpisodes && Array.isArray(data.activeBackgroundEpisodes)) {
-          data.activeBackgroundEpisodes.forEach((ep: any) => {
-            if (ep.canonicalId) this.inMemoryActiveBackgroundEpisodes.set(ep.canonicalId, ep);
-            if (ep.episodeId) this.inMemoryDecisionEpisodes.set(ep.episodeId, ep);
-          });
-        }
-        console.log(`[Firestore DB] Cold start hydrated via 1 single materialized state read (${this.inMemorySnapshots.size} snaps, ${this.inMemoryPredictionRecords.size} predictions).`);
-        return;
       }
     } catch (err) {
       this.logQuotaWarningThrottled('hydrateFromMaterializedState', err);
     }
 
-    // 1-Time Fallback if materializedState doc does not exist yet
-    console.log('[Firestore DB] Materialized state doc missing — running initial 1-time fallback hydration.');
+    // Fallback & Watermark Replay Recovery if checkpoint timestamp exists
+    if (checkpointTimestamp) {
+      try {
+        console.log(`[Firestore DB] Replaying newer canonical records since last checkpoint ${checkpointTimestamp}...`);
+        
+        // Replay new snapshots (using >= with deterministic ID sorting to survive collisions)
+        const snapshotsRef = collection(db, 'snapshots');
+        const qSnap = query(snapshotsRef, where('timestamp', '>=', checkpointTimestamp));
+        const snapNew = await getDocs(qSnap);
+        const snapsList: PriceSnapshot[] = [];
+        snapNew.forEach((docItem) => {
+          snapsList.push(docItem.data() as PriceSnapshot);
+        });
+        
+        // Sort deterministically by timestamp, then document ID as secondary tie-breaker
+        snapsList.sort((a, b) => {
+          const tA = a.timestamp || '';
+          const tB = b.timestamp || '';
+          if (tA !== tB) return tA.localeCompare(tB);
+          const idA = a.id || '';
+          const idB = b.id || '';
+          return idA.localeCompare(idB);
+        });
+
+        snapsList.forEach((s) => {
+          if (s.id) this.inMemorySnapshots.set(s.id, s);
+        });
+
+        // Replay new prediction records
+        const predictionsRef = collection(db, 'prediction_records');
+        const qPred = query(predictionsRef, where('createdAt', '>=', checkpointTimestamp));
+        const predNew = await getDocs(qPred);
+        const predsList: TrackedPredictionRecord[] = [];
+        predNew.forEach((docItem) => {
+          predsList.push(docItem.data() as TrackedPredictionRecord);
+        });
+
+        predsList.sort((a, b) => {
+          const tA = a.createdAt || '';
+          const tB = b.createdAt || '';
+          if (tA !== tB) return tA.localeCompare(tB);
+          const idA = (a as any).predictionId || a.id || '';
+          const idB = (b as any).predictionId || b.id || '';
+          return idA.localeCompare(idB);
+        });
+
+        predsList.forEach((p) => {
+          const pId = (p as any).predictionId || p.id;
+          if (pId) this.inMemoryPredictionRecords.set(pId, p);
+        });
+        
+        console.log('[Firestore DB] Checkpoint watermark recovery replay complete.');
+        return;
+      } catch (replayErr) {
+        this.logQuotaWarningThrottled('checkpointWatermarkReplay', replayErr);
+      }
+    }
+
+    // Full 1-Time Fallback if materializedState doc does not exist yet or was discarded
+    console.log('[Firestore DB] Materialized state missing or invalid — running initial 1-time fallback hydration.');
     await this.getSnapshots(undefined, 500);
     await this.getPredictionRecords(500);
     await this.saveMaterializedState();
@@ -133,8 +208,7 @@ export class FirestorePersistenceService {
 
   /**
    * Persists rolled-up in-memory state summary to system_state/materializedState
-   * Fixed-size rolling summary (latest 50 snapshots per route = 100 max, 50 predictions, 36 episodes max)
-   * Keeps document lightweight (~28 KB) without unbounded growth.
+   * Uses safety size guard (256 KB) and partitions if exceeded.
    */
   public async saveMaterializedState(): Promise<void> {
     try {
@@ -158,6 +232,8 @@ export class FirestorePersistenceService {
 
       const payload = sanitizeForFirestore({
         id: 'materializedState',
+        schemaVersion: 'v2.0',
+        collectorVersion: 'v2.0',
         updatedAt: new Date().toISOString(),
         snapshotCount: this.inMemorySnapshots.size,
         predictionRecordCount: this.inMemoryPredictionRecords.size,
@@ -166,8 +242,29 @@ export class FirestorePersistenceService {
         activeBackgroundEpisodes: activeEpisodes
       });
 
+      // Calculate serialized size in bytes
+      const serialized = JSON.stringify(payload);
+      const sizeBytes = Buffer.byteLength(serialized, 'utf8');
+      this.lastMaterializedSizeBytes = sizeBytes;
+
       const docRef = doc(db, 'system_state', 'materializedState');
-      await this.runWithWriteTimeout(() => setDoc(docRef, payload, { merge: true }));
+
+      // Task 5: Operational Safety Guard (256 KB limit)
+      const SAFETY_GUARD_BYTES = 262144; // 256 KB
+      if (sizeBytes > SAFETY_GUARD_BYTES) {
+        console.warn(`[Firestore DB] Materialized State size ${sizeBytes} bytes exceeds safety guard of ${SAFETY_GUARD_BYTES} bytes! Executing partitioned checkpoint strategy.`);
+        
+        // Partition snapshots to save in separate sub-documents rather than silent truncation
+        const partRef1 = doc(db, 'system_state', 'materializedState_PNQLKO');
+        const partRef2 = doc(db, 'system_state', 'materializedState_LKOPNQ');
+        await this.runWithWriteTimeout(() => setDoc(partRef1, sanitizeForFirestore({ snapshots: pnqSnapshots }), { merge: true }));
+        await this.runWithWriteTimeout(() => setDoc(partRef2, sanitizeForFirestore({ snapshots: lkoSnapshots }), { merge: true }));
+
+        const smallerPayload = { ...payload, snapshots: [] };
+        await this.runWithWriteTimeout(() => setDoc(docRef, smallerPayload, { merge: true }));
+      } else {
+        await this.runWithWriteTimeout(() => setDoc(docRef, payload, { merge: true }));
+      }
     } catch (err) {
       this.logQuotaWarningThrottled('saveMaterializedState', err);
     }

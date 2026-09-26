@@ -21,9 +21,20 @@ async function startServer() {
 
   app.use(express.json());
 
+  let lastKeepaliveAt = new Date().toISOString();
+
   // API Routes
   app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+    lastKeepaliveAt = new Date().toISOString();
+    const lastCycle = backgroundScheduler.getLastCycleTimestamp();
+    
+    res.json({
+      status: 'ok',
+      timestamp: lastKeepaliveAt,
+      lastKeepaliveAt,
+      lastCollectionCycleAt: lastCycle ? new Date(lastCycle).toISOString() : 'pending_initial_run',
+      lastSuccessfulPrimaryProviderAt: lastCycle ? new Date(lastCycle).toISOString() : 'pending_initial_run'
+    });
   });
 
   app.get('/api/gemini/status', (req, res) => {
@@ -254,6 +265,18 @@ async function startServer() {
         }
       }
 
+      const mSizeBytes = await firestoreDB.getMaterializedSizeBytes();
+
+      // Dynamic approx Pacific midnight countdown
+      const now = new Date();
+      const pacTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+      const midnightPac = new Date(pacTime);
+      midnightPac.setHours(24, 0, 0, 0); // Next midnight
+      const diffMs = midnightPac.getTime() - pacTime.getTime();
+      const diffHrs = Math.floor(diffMs / (3600 * 1000));
+      const diffMins = Math.floor((diffMs % (3600 * 1000)) / (60 * 1000));
+      const approxTimeUntilReset = `${diffHrs}h ${diffMins}m (approximate)`;
+
       res.json({
         cleanProspectiveEra: {
           startedAt: '2026-09-26T10:30:00.000Z',
@@ -261,13 +284,16 @@ async function startServer() {
           provenancePolicyVersion: 'v2.0-strict-empirical',
           maturityState: 'DATA_COLLECTION',
           userRecommendation: 'INSUFFICIENT_EVIDENCE',
-          parallelExperiment: 'ACTIVE'
+          parallelExperiment: 'ACTIVE',
+          quotaResetInfo: 'Firestore daily free quota resets AROUND midnight Pacific time.',
+          approxTimeUntilReset
         },
         productionMetrics: {
           cleanGenuineSnapshots: cleanSnapshots,
           cleanPredictionsCount: cleanPredictions,
           cleanShadowPredictionsCount: shadows.filter((s: any) => s.evaluationEligibility === 'ELIGIBLE_REAL').length,
-          primaryProvider: 'CurrentProductionProvider (SerpApi / Direct Google Flights)'
+          primaryProvider: 'CurrentProductionProvider (SerpApi / Direct Google Flights)',
+          materializedStateSizeBytes: mSizeBytes
         },
         fliExperimentalMetrics: {
           status: 'ACTIVE_PARALLEL',
