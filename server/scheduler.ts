@@ -211,6 +211,9 @@ export class BackgroundSchedulerDaemon {
     console.log(`Prospective records created: ${prospectiveCount}`);
     console.log(`======================================================\n`);
 
+    // Task 1: Update materialized state document after collection cycle
+    await firestoreDB.saveMaterializedState();
+
     return {
       snapshotsCollected: collectionResult.snapshotsCollected,
       prospectivePredictionsLogged: prospectiveCount,

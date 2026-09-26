@@ -238,6 +238,70 @@ async function startServer() {
     }
   });
 
+  app.get('/api/analytics/clean-era-status', async (req, res) => {
+    try {
+      const snapshots = await firestoreDB.getSnapshots(undefined, 5000);
+      const predictions = await firestoreDB.getPredictionRecords(5000);
+      const shadows = await firestoreDB.getShadowPredictionRecords();
+
+      let cleanSnapshots = 0;
+      let nonRealSnapshots = 0;
+      let unknownSnapshots = 0;
+
+      for (const s of snapshots) {
+        if (s.provenance === 'REAL_EXTERNAL_OBSERVATION' || s.provenance === 'REAL_VERIFIED_HISTORICAL_OBSERVATION') {
+          cleanSnapshots++;
+        } else if (s.provenance === 'CONFIRMED_NON_REAL') {
+          nonRealSnapshots++;
+        } else {
+          unknownSnapshots++;
+        }
+      }
+
+      let cleanPredictions = 0;
+      let quarantinedPredictions = 0;
+
+      for (const p of predictions) {
+        if ((p as any).evaluationEligibility === 'ELIGIBLE_REAL') {
+          cleanPredictions++;
+        } else {
+          quarantinedPredictions++;
+        }
+      }
+
+      res.json({
+        cleanProspectiveEra: {
+          startedAt: '2026-09-26T10:30:00.000Z',
+          collectorVersion: 'v2.0-clean-prospective',
+          provenancePolicyVersion: 'v2.0-strict-empirical',
+          maturityState: 'DATA_COLLECTION',
+          userRecommendation: 'INSUFFICIENT_EVIDENCE',
+          parallelExperiment: 'ACTIVE'
+        },
+        productionMetrics: {
+          cleanGenuineSnapshots: cleanSnapshots,
+          cleanPredictionsCount: cleanPredictions,
+          cleanShadowPredictionsCount: shadows.filter((s: any) => s.evaluationEligibility === 'ELIGIBLE_REAL').length,
+          primaryProvider: 'CurrentProductionProvider (SerpApi / Direct Google Flights)'
+        },
+        fliExperimentalMetrics: {
+          status: 'ACTIVE_PARALLEL',
+          providerClass: 'FliPythonSidecar (v0.4.3 @ 8f2d1e0)',
+          priceInsightAvailability: 'AVAILABLE_ON_DEMAND',
+          mergedIntoProductionTrajectories: false
+        },
+        quarantinedHistory: {
+          nonRealSnapshots,
+          unknownSnapshots,
+          quarantinedPredictions,
+          quarantinedShadowPredictions: shadows.filter((s: any) => s.evaluationEligibility !== 'ELIGIBLE_REAL').length
+        }
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: err?.message || 'Failed to generate clean era status report' });
+    }
+  });
+
   app.get('/api/festivals', (req, res) => {
     res.json(INDIAN_FESTIVALS_2026_2027);
   });

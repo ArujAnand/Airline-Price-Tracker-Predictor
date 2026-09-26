@@ -10,7 +10,8 @@ import {
   limit as fsLimit,
   startAfter,
   deleteDoc,
-  writeBatch
+  writeBatch,
+  getCountFromServer
 } from 'firebase/firestore';
 import { db } from '../src/firebaseClient';
 import { PriceSnapshot, TrackedTripAlert, AppNotification, TrackedPredictionRecord } from '../src/types';
@@ -66,9 +67,94 @@ export class FirestorePersistenceService {
     if (this.isInitialized) return;
     try {
       console.log('[Firestore] Connected to persistent Firestore DB:', db.app.name);
+      await this.hydrateFromMaterializedState();
       this.isInitialized = true;
     } catch (err) {
       console.error('[Firestore] Initialization error:', err);
+    }
+  }
+
+  /**
+   * Task 1: Reads ONLY system_state/materializedState (1 single Firestore read!) on cold start.
+   * If document exists, instantly hydrates in-memory maps.
+   * If missing, performs 1-time full query fallback and creates the materialized state doc.
+   */
+  public async hydrateFromMaterializedState(): Promise<void> {
+    try {
+      const docRef = doc(db, 'system_state', 'materializedState');
+      const snap = await getDoc(docRef);
+      if (snap.exists()) {
+        const data = snap.data();
+        if (data.snapshots && Array.isArray(data.snapshots)) {
+          data.snapshots.forEach((s: PriceSnapshot) => {
+            if (s.id) this.inMemorySnapshots.set(s.id, s);
+          });
+        }
+        if (data.predictionRecords && Array.isArray(data.predictionRecords)) {
+          data.predictionRecords.forEach((p: TrackedPredictionRecord) => {
+            const pId = (p as any).predictionId || p.id;
+            if (pId) this.inMemoryPredictionRecords.set(pId, p);
+          });
+        }
+        if (data.activeBackgroundEpisodes && Array.isArray(data.activeBackgroundEpisodes)) {
+          data.activeBackgroundEpisodes.forEach((ep: any) => {
+            if (ep.canonicalId) this.inMemoryActiveBackgroundEpisodes.set(ep.canonicalId, ep);
+            if (ep.episodeId) this.inMemoryDecisionEpisodes.set(ep.episodeId, ep);
+          });
+        }
+        console.log(`[Firestore DB] Cold start hydrated via 1 single materialized state read (${this.inMemorySnapshots.size} snaps, ${this.inMemoryPredictionRecords.size} predictions).`);
+        return;
+      }
+    } catch (err) {
+      this.logQuotaWarningThrottled('hydrateFromMaterializedState', err);
+    }
+
+    // 1-Time Fallback if materializedState doc does not exist yet
+    console.log('[Firestore DB] Materialized state doc missing — running initial 1-time fallback hydration.');
+    await this.getSnapshots(undefined, 500);
+    await this.getPredictionRecords(500);
+    await this.saveMaterializedState();
+  }
+
+  /**
+   * Persists rolled-up in-memory state summary to system_state/materializedState
+   * Fixed-size rolling summary (latest 50 snapshots per route = 100 max, 50 predictions, 36 episodes max)
+   * Keeps document lightweight (~28 KB) without unbounded growth.
+   */
+  public async saveMaterializedState(): Promise<void> {
+    try {
+      const pnqSnapshots = Array.from(this.inMemorySnapshots.values())
+        .filter(s => s.routeId?.toUpperCase() === 'PNQ-LKO')
+        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+        .slice(0, 50);
+
+      const lkoSnapshots = Array.from(this.inMemorySnapshots.values())
+        .filter(s => s.routeId?.toUpperCase() === 'LKO-PNQ')
+        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+        .slice(0, 50);
+
+      const recentSnapshots = [...pnqSnapshots, ...lkoSnapshots];
+
+      const recentPredictions = Array.from(this.inMemoryPredictionRecords.values())
+        .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
+        .slice(0, 50);
+
+      const activeEpisodes = Array.from(this.inMemoryActiveBackgroundEpisodes.values()).slice(0, 36);
+
+      const payload = sanitizeForFirestore({
+        id: 'materializedState',
+        updatedAt: new Date().toISOString(),
+        snapshotCount: this.inMemorySnapshots.size,
+        predictionRecordCount: this.inMemoryPredictionRecords.size,
+        snapshots: recentSnapshots,
+        predictionRecords: recentPredictions,
+        activeBackgroundEpisodes: activeEpisodes
+      });
+
+      const docRef = doc(db, 'system_state', 'materializedState');
+      await setDoc(docRef, payload, { merge: true });
+    } catch (err) {
+      this.logQuotaWarningThrottled('saveMaterializedState', err);
     }
   }
 
@@ -118,13 +204,35 @@ export class FirestorePersistenceService {
     const snapshotId = snapshot.id || (snapshot as any).observationId;
     if (!snapshotId) return;
 
-    this.inMemorySnapshots.set(snapshotId, snapshot);
+    // Task 3: Automatic TTL Retention Policy (Expires 90 days after departure date)
+    const depTime = snapshot.departureDate ? new Date(snapshot.departureDate).getTime() : Date.now();
+    const expireAt = new Date(depTime + 90 * 24 * 60 * 60 * 1000).toISOString();
+    const enrichedSnapshot = { ...snapshot, id: snapshotId, expireAt };
+
+    this.inMemorySnapshots.set(snapshotId, enrichedSnapshot);
 
     try {
       const docRef = doc(db, 'snapshots', snapshotId);
-      await setDoc(docRef, sanitizeForFirestore({ ...snapshot, id: snapshotId }), { merge: true });
+      await setDoc(docRef, sanitizeForFirestore(enrichedSnapshot), { merge: true });
     } catch (err) {
       this.logQuotaWarningThrottled(`saveSnapshot (${snapshotId})`, err);
+    }
+  }
+
+  /**
+   * Task 2: Aggregation queries using getCountFromServer (1 read unit regardless of doc count!)
+   */
+  public async getCollectionCount(collectionName: string): Promise<number> {
+    try {
+      const colRef = collection(db, collectionName);
+      const snap = await getCountFromServer(colRef);
+      return snap.data().count;
+    } catch (err) {
+      this.logQuotaWarningThrottled(`getCollectionCount (${collectionName})`, err);
+      if (collectionName === 'snapshots') return this.inMemorySnapshots.size;
+      if (collectionName === 'prediction_records') return this.inMemoryPredictionRecords.size;
+      if (collectionName === 'shadow_predictions') return this.inMemoryShadowPredictions.size;
+      return 0;
     }
   }
 

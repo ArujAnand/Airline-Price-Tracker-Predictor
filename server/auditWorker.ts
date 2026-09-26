@@ -150,6 +150,9 @@ export class AuditOutcomeResolutionWorker {
 
     console.log(`🔍 [Audit Worker] Sweep complete: ${evaluatedPredictions} predictions evaluated, ${resolvedHorizonsTotal} candidate horizons newly resolved, ${updatedRecords} records persisted.`);
 
+    // Task 1: Update materialized state document after audit sweep
+    await firestoreDB.saveMaterializedState();
+
     return {
       evaluatedPredictionsCount: evaluatedPredictions,
       resolvedHorizonsCount: resolvedHorizonsTotal,
