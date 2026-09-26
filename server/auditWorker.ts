@@ -67,17 +67,16 @@ export class AuditOutcomeResolutionWorker {
     let resolvedHorizonsTotal = 0;
     let updatedRecords = 0;
 
-    // 2. Paginate predictions oldest-first (batches of 200 up to 1000 records per hourly run)
-    // Ensures records created >24h ago are evaluated and never starved by newer records
-    let currentCursor: string | undefined = undefined;
-    const MAX_PAGES = 5;
+    // 2. Paginate predictions deterministically (nextResolutionEligibleAt ASC, createdAt ASC, id ASC)
+    let currentCursor: { lastEligibleAt?: string; lastCreatedAt?: string; lastDocId?: string } | undefined = undefined;
+    const MAX_PAGES = 10;
 
     for (let page = 0; page < MAX_PAGES; page++) {
-      const pageResult = await firestoreDB.getPagedPredictionRecords(200, currentCursor);
+      const pageResult = await firestoreDB.getDeterministicallyPagedPredictionRecords(200, currentCursor);
       const batch = pageResult.records;
       if (!batch || batch.length === 0) break;
 
-      currentCursor = pageResult.lastCreatedAt;
+      currentCursor = pageResult.nextCursor;
 
       for (const predRaw of batch) {
         const pred = predRaw as unknown as PredictionAuditRecord;

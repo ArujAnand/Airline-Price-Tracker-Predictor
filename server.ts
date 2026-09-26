@@ -21,21 +21,6 @@ async function startServer() {
 
   app.use(express.json());
 
-  // Ensure prediction tracker is hydrated from persistent Firestore
-  await predictionTracker.ensureHydrated();
-
-  // Initialize Model Registry Service
-  await modelRegistryService.init();
-  
-  // Start background observation & prospective prediction daemon
-  await backgroundScheduler.start();
-
-  // Start background multi-horizon outcome resolution worker
-  await auditOutcomeWorker.start();
-
-  // Start background prospective shadow prediction daemon
-  await shadowSchedulerDaemon.start();
-
   // API Routes
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
@@ -382,6 +367,20 @@ async function startServer() {
 
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`✈️ Flight Price Aggregator Server running on http://0.0.0.0:${PORT}`);
+
+    // Asynchronously initialize persistent storage and background workers without blocking port binding
+    (async () => {
+      try {
+        await predictionTracker.ensureHydrated();
+        await modelRegistryService.init();
+        await backgroundScheduler.start();
+        await auditOutcomeWorker.start();
+        await shadowSchedulerDaemon.start();
+        console.log('✅ Background services & daemons initialized.');
+      } catch (bgErr) {
+        console.warn('⚠️ Background service initialization warning:', bgErr);
+      }
+    })();
   });
 }
 

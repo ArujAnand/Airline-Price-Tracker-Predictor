@@ -149,6 +149,18 @@ export class BackgroundSchedulerDaemon {
             // Compute next resolution eligibility timestamp (earliest candidate horizon is 24h)
             const nextResolutionEligibleAt = new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
 
+            // Build exact point-in-time snapshot provenance reference
+            const matchingSnapIds = matchingSnaps.map(s => s.id || (s as any).observationId || s.timestamp).sort();
+            const trajectoryProvRef = {
+              canonicalId: canonicalKey.canonicalId,
+              throughTimestamp: nowISO,
+              snapshotIds: matchingSnapIds,
+              snapshotCount: matchingSnapIds.length,
+              snapshotSetHash: `hash-${matchingSnapIds.length}-${matchingSnapIds.slice(0, 5).join('-')}`,
+              featureExtractorVersion: 'v2.0-point-in-time-pure',
+              cleanProspectiveEraStartedAt: '2026-09-26T10:30:00.000Z'
+            };
+
             const prospectiveRecord: PredictionAuditRecord = {
               predictionId,
               collectionCycleId,
@@ -168,11 +180,13 @@ export class BackgroundSchedulerDaemon {
               leadTimeHours: Math.round(features.leadTimeHours),
               currentFareINR: currentFare,
               features,
+              trajectoryProvenanceReference: trajectoryProvRef,
+              evaluationEligibility: 'ELIGIBLE_REAL',
               forecastingModelId: 'candidate-persistence-baseline',
               decisionModelId: 'candidate-insufficient-evidence-baseline',
-              modelVersion: 'v1.0-empirical-real',
+              modelVersion: 'v2.0-clean-prospective',
               maturityState: 'DATA_COLLECTION',
-              provenance: 'REAL_OBSERVATION',
+              provenance: 'REAL_EXTERNAL_OBSERVATION',
               forecast: {
                 p10: Math.round(currentFare * 0.90),
                 p50: currentFare,

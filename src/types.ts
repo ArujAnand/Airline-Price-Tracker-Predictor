@@ -303,6 +303,9 @@ export interface TrackedPredictionRecord {
   confidenceScore: number;
   modelVersion?: string; // e.g. "v1.2.0-quantile-forest"
   
+  // Operational tracking & resolution scheduling
+  nextResolutionEligibleAt?: string | null;
+  
   // Ground truth actual outcome verification
   actualLowestPriceObserved?: number;
   actualLowestDateObserved?: string;

@@ -309,6 +309,19 @@ export interface DecisionEvaluation {
   };
 }
 
+export interface TrajectoryProvenanceReference {
+  canonicalId?: string;
+  throughTimestamp?: string;
+  snapshotIds: string[];
+  snapshotCount?: number;
+  snapshotSetHash?: string;
+  featureExtractorVersion?: string;
+  cleanProspectiveEraStartedAt?: string;
+  windowStartTimestamp?: string;
+  windowEndTimestamp?: string;
+  resolverVersion?: string;
+}
+
 // ============================================================================
 // 6. PREDICTION & AUDIT RECORD SCHEMA
 // ============================================================================
@@ -329,6 +342,10 @@ export interface PredictionAuditRecord {
   
   // Point-in-time feature snapshot (strictly no future data)
   features: FactualContextFeatures;
+
+  // Exact deterministic trajectory provenance reference (Task 2)
+  trajectoryProvenanceReference?: TrajectoryProvenanceReference;
+  evaluationEligibility?: 'ELIGIBLE_REAL' | 'QUARANTINED_NON_REAL_INPUT' | 'QUARANTINED_UNKNOWN_INPUT';
 
   // Model Metadata
   forecastingModelId: string;
@@ -709,13 +726,6 @@ export type AsymmetricSavingState =
   | 'CONFIRMED_TRUE'              // >₹50 saving observed (valid under any coverage)
   | 'CONFIRMED_FALSE'             // No saving observed AND coverage is sufficient
   | 'UNKNOWN_DUE_TO_COVERAGE';    // No saving observed BUT coverage is poor
-
-export interface TrajectoryProvenanceReference {
-  snapshotIds: string[];
-  windowStartTimestamp: string;
-  windowEndTimestamp: string;
-  resolverVersion: string;
-}
 
 export interface OpportunityLabel {
   labelId: string;                      // 'opp-[versionId]-[horizon]'

@@ -100,6 +100,18 @@ service cloud.firestore {
       allow read: if true;
       allow write: if true;
     }
+    match /system_state/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
+    match /experimental_provider_observations/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
+    match /provider_comparisons/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
     match /experimental_provider_observations/{id} {
       allow read: if true;
       allow write: if true;

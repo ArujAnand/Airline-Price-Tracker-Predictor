@@ -49,6 +49,21 @@ export class FirestorePersistenceService {
   private inMemoryNotifications = new Map<string, AppNotification>();
   private lastQuotaWarningTimestamp = 0;
 
+  private async runWithWriteTimeout<T>(fn: () => Promise<T>, timeoutMs = 2500): Promise<T | null> {
+    let timer: NodeJS.Timeout;
+    const timeoutPromise = new Promise<null>((resolve) => {
+      timer = setTimeout(() => resolve(null), timeoutMs);
+    });
+    try {
+      const result = await Promise.race([fn(), timeoutPromise]);
+      clearTimeout(timer!);
+      return result;
+    } catch (err) {
+      clearTimeout(timer!);
+      throw err;
+    }
+  }
+
   private logQuotaWarningThrottled(context: string, err: any): void {
     const now = Date.now();
     const errStr = String(err?.message || err);
@@ -152,7 +167,7 @@ export class FirestorePersistenceService {
       });
 
       const docRef = doc(db, 'system_state', 'materializedState');
-      await setDoc(docRef, payload, { merge: true });
+      await this.runWithWriteTimeout(() => setDoc(docRef, payload, { merge: true }));
     } catch (err) {
       this.logQuotaWarningThrottled('saveMaterializedState', err);
     }
@@ -213,7 +228,7 @@ export class FirestorePersistenceService {
 
     try {
       const docRef = doc(db, 'snapshots', snapshotId);
-      await setDoc(docRef, sanitizeForFirestore(enrichedSnapshot), { merge: true });
+      await this.runWithWriteTimeout(() => setDoc(docRef, sanitizeForFirestore(enrichedSnapshot), { merge: true }));
     } catch (err) {
       this.logQuotaWarningThrottled(`saveSnapshot (${snapshotId})`, err);
     }
@@ -311,7 +326,7 @@ export class FirestorePersistenceService {
       this.inMemoryPredictionRecords.set(recordId, cleanRecord as TrackedPredictionRecord);
 
       const docRef = doc(db, 'prediction_records', recordId);
-      await setDoc(docRef, cleanRecord, { merge: true });
+      await this.runWithWriteTimeout(() => setDoc(docRef, cleanRecord, { merge: true }));
     } catch (err) {
       this.logQuotaWarningThrottled(`savePredictionRecord (${record?.predictionId || record?.id})`, err);
     }
@@ -344,42 +359,71 @@ export class FirestorePersistenceService {
     }
   }
 
-  public async getPagedPredictionRecords(
+  public async getDeterministicallyPagedPredictionRecords(
     batchSize: number = 200,
-    startAfterCreatedAt?: string
-  ): Promise<{ records: TrackedPredictionRecord[]; lastCreatedAt?: string }> {
+    cursor?: { lastEligibleAt?: string; lastCreatedAt?: string; lastDocId?: string }
+  ): Promise<{
+    records: TrackedPredictionRecord[];
+    nextCursor?: { lastEligibleAt?: string; lastCreatedAt?: string; lastDocId?: string };
+  }> {
+    // Also sync from Firestore if not full
     try {
       const colRef = collection(db, 'prediction_records');
-      let q = query(colRef, orderBy('createdAt', 'asc'), fsLimit(batchSize));
-      if (startAfterCreatedAt) {
-        q = query(colRef, orderBy('createdAt', 'asc'), startAfter(startAfterCreatedAt), fsLimit(batchSize));
-      }
-      const snap = await getDocs(q);
-      const list: TrackedPredictionRecord[] = [];
-      let lastCreatedAt: string | undefined = undefined;
+      const snap = await getDocs(query(colRef, fsLimit(batchSize * 5)));
       snap.forEach((docItem) => {
         const data = docItem.data() as TrackedPredictionRecord;
-        list.push(data);
-        lastCreatedAt = data.createdAt;
         const pId = (data as any).predictionId || data.id;
-        if (pId) {
-          this.inMemoryPredictionRecords.set(pId, data);
-        }
+        if (pId) this.inMemoryPredictionRecords.set(pId, data);
       });
-      return { records: list, lastCreatedAt };
     } catch (err) {
-      this.logQuotaWarningThrottled('getPagedPredictionRecords', err);
-      const all = Array.from(this.inMemoryPredictionRecords.values()).sort(
-        (a, b) => new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime()
-      );
-      let filtered = all;
-      if (startAfterCreatedAt) {
-        filtered = all.filter(r => (r.createdAt || '') > startAfterCreatedAt);
-      }
-      const slice = filtered.slice(0, batchSize);
-      const lastCreatedAt = slice.length > 0 ? slice[slice.length - 1].createdAt : undefined;
-      return { records: slice, lastCreatedAt };
+      this.logQuotaWarningThrottled('getDeterministicallyPagedPredictionRecords', err);
     }
+
+    const all = Array.from(this.inMemoryPredictionRecords.values()).sort((a, b) => {
+      const eligA = a.nextResolutionEligibleAt || '9999-12-31T23:59:59.999Z';
+      const eligB = b.nextResolutionEligibleAt || '9999-12-31T23:59:59.999Z';
+      if (eligA !== eligB) return eligA.localeCompare(eligB);
+
+      const createdA = a.createdAt || '';
+      const createdB = b.createdAt || '';
+      if (createdA !== createdB) return createdA.localeCompare(createdB);
+
+      const idA = (a as any).predictionId || a.id || '';
+      const idB = (b as any).predictionId || b.id || '';
+      return idA.localeCompare(idB);
+    });
+
+    let filtered = all;
+    if (cursor && (cursor.lastEligibleAt || cursor.lastCreatedAt || cursor.lastDocId)) {
+      filtered = all.filter((r) => {
+        const elig = r.nextResolutionEligibleAt || '9999-12-31T23:59:59.999Z';
+        const created = r.createdAt || '';
+        const docId = (r as any).predictionId || r.id || '';
+
+        const lastElig = cursor.lastEligibleAt || '';
+        const lastCreated = cursor.lastCreatedAt || '';
+        const lastId = cursor.lastDocId || '';
+
+        if (elig > lastElig) return true;
+        if (elig < lastElig) return false;
+        if (created > lastCreated) return true;
+        if (created < lastCreated) return false;
+        return docId > lastId;
+      });
+    }
+
+    const batch = filtered.slice(0, batchSize);
+    let nextCursor: { lastEligibleAt?: string; lastCreatedAt?: string; lastDocId?: string } | undefined = undefined;
+    if (batch.length > 0) {
+      const lastRec = batch[batch.length - 1];
+      nextCursor = {
+        lastEligibleAt: lastRec.nextResolutionEligibleAt || undefined,
+        lastCreatedAt: lastRec.createdAt,
+        lastDocId: (lastRec as any).predictionId || lastRec.id
+      };
+    }
+
+    return { records: batch, nextCursor };
   }
 
   public async deletePredictionRecord(recordId: string): Promise<void> {
@@ -391,13 +435,18 @@ export class FirestorePersistenceService {
     }
   }
 
+  private inMemoryModelRegistry = new Map<string, any>();
+  private inMemoryDatasetManifests = new Map<string, any>();
+
   // --- Price Alerts ---
   public async saveAlert(alert: TrackedTripAlert): Promise<void> {
+    if (!alert || !alert.id) return;
+    this.inMemoryAlerts.set(alert.id, alert);
     try {
       const docRef = doc(db, 'price_alerts', alert.id);
-      await setDoc(docRef, sanitizeForFirestore(alert), { merge: true });
+      await this.runWithWriteTimeout(() => setDoc(docRef, sanitizeForFirestore(alert), { merge: true }));
     } catch (err) {
-      console.warn(`[Firestore] Failed to save alert ${alert.id}:`, err);
+      this.logQuotaWarningThrottled(`saveAlert (${alert.id})`, err);
     }
   }
 
@@ -407,31 +456,36 @@ export class FirestorePersistenceService {
       const snap = await getDocs(colRef);
       const list: TrackedTripAlert[] = [];
       snap.forEach((d) => {
-        list.push(d.data() as TrackedTripAlert);
+        const item = d.data() as TrackedTripAlert;
+        list.push(item);
+        if (item.id) this.inMemoryAlerts.set(item.id, item);
       });
       return list;
     } catch (err) {
-      console.warn('[Firestore] getAlerts warning:', err);
-      return [];
+      this.logQuotaWarningThrottled('getAlerts', err);
+      return Array.from(this.inMemoryAlerts.values());
     }
   }
 
   public async deleteAlert(alertId: string): Promise<void> {
+    this.inMemoryAlerts.delete(alertId);
     try {
       const docRef = doc(db, 'price_alerts', alertId);
       await deleteDoc(docRef);
     } catch (err) {
-      console.warn(`[Firestore] Failed to delete alert ${alertId}:`, err);
+      this.logQuotaWarningThrottled(`deleteAlert (${alertId})`, err);
     }
   }
 
   // --- Notifications ---
   public async saveNotification(notification: AppNotification): Promise<void> {
+    if (!notification || !notification.id) return;
+    this.inMemoryNotifications.set(notification.id, notification);
     try {
       const docRef = doc(db, 'notifications', notification.id);
-      await setDoc(docRef, sanitizeForFirestore(notification), { merge: true });
+      await this.runWithWriteTimeout(() => setDoc(docRef, sanitizeForFirestore(notification), { merge: true }));
     } catch (err) {
-      console.warn(`[Firestore] Failed to save notification ${notification.id}:`, err);
+      this.logQuotaWarningThrottled(`saveNotification (${notification.id})`, err);
     }
   }
 
@@ -442,22 +496,26 @@ export class FirestorePersistenceService {
       const snap = await getDocs(q);
       const list: AppNotification[] = [];
       snap.forEach((d) => {
-        list.push(d.data() as AppNotification);
+        const item = d.data() as AppNotification;
+        list.push(item);
+        if (item.id) this.inMemoryNotifications.set(item.id, item);
       });
       return list;
     } catch (err) {
-      console.warn('[Firestore] getNotifications warning:', err);
-      return [];
+      this.logQuotaWarningThrottled('getNotifications', err);
+      return Array.from(this.inMemoryNotifications.values());
     }
   }
 
   // --- Model Registry & Shadow Predictions ---
   public async saveModelRegistryRecord(record: any): Promise<void> {
+    if (!record || !record.modelId) return;
+    this.inMemoryModelRegistry.set(record.modelId, record);
     try {
       const docRef = doc(db, 'model_registry', record.modelId);
-      await setDoc(docRef, sanitizeForFirestore(record), { merge: true });
+      await this.runWithWriteTimeout(() => setDoc(docRef, sanitizeForFirestore(record), { merge: true }));
     } catch (err) {
-      console.warn(`[Firestore] Failed to save model registry record ${record?.modelId}:`, err);
+      this.logQuotaWarningThrottled(`saveModelRegistryRecord (${record?.modelId})`, err);
     }
   }
 
@@ -466,20 +524,26 @@ export class FirestorePersistenceService {
       const colRef = collection(db, 'model_registry');
       const snap = await getDocs(colRef);
       const list: any[] = [];
-      snap.forEach(d => list.push(d.data()));
+      snap.forEach(d => {
+        const item = d.data();
+        list.push(item);
+        if (item.modelId) this.inMemoryModelRegistry.set(item.modelId, item);
+      });
       return list;
     } catch (err) {
-      console.warn('[Firestore] getModelRegistryRecords warning:', err);
-      return [];
+      this.logQuotaWarningThrottled('getModelRegistryRecords', err);
+      return Array.from(this.inMemoryModelRegistry.values());
     }
   }
 
   public async saveShadowPredictionRecord(record: any): Promise<void> {
+    if (!record || !record.shadowPredictionId) return;
+    this.inMemoryShadowPredictions.set(record.shadowPredictionId, record);
     try {
       const docRef = doc(db, 'shadow_predictions', record.shadowPredictionId);
-      await setDoc(docRef, sanitizeForFirestore(record), { merge: true });
+      await this.runWithWriteTimeout(() => setDoc(docRef, sanitizeForFirestore(record), { merge: true }));
     } catch (err) {
-      console.warn(`[Firestore] Failed to save shadow prediction record ${record?.shadowPredictionId}:`, err);
+      this.logQuotaWarningThrottled(`saveShadowPredictionRecord (${record?.shadowPredictionId})`, err);
     }
   }
 
@@ -489,20 +553,26 @@ export class FirestorePersistenceService {
       const q = query(colRef, orderBy('createdAt', 'desc'), fsLimit(500));
       const snap = await getDocs(q);
       const list: any[] = [];
-      snap.forEach(d => list.push(d.data()));
+      snap.forEach(d => {
+        const item = d.data();
+        list.push(item);
+        if (item.shadowPredictionId) this.inMemoryShadowPredictions.set(item.shadowPredictionId, item);
+      });
       return list;
     } catch (err) {
-      console.warn('[Firestore] getShadowPredictionRecords warning:', err);
-      return [];
+      this.logQuotaWarningThrottled('getShadowPredictionRecords', err);
+      return Array.from(this.inMemoryShadowPredictions.values());
     }
   }
 
   public async saveDatasetManifest(manifest: any): Promise<void> {
+    if (!manifest || !manifest.manifestId) return;
+    this.inMemoryDatasetManifests.set(manifest.manifestId, manifest);
     try {
       const docRef = doc(db, 'dataset_manifests', manifest.manifestId);
-      await setDoc(docRef, sanitizeForFirestore(manifest), { merge: true });
+      await this.runWithWriteTimeout(() => setDoc(docRef, sanitizeForFirestore(manifest), { merge: true }));
     } catch (err) {
-      console.warn(`[Firestore] Failed to save dataset manifest ${manifest?.manifestId}:`, err);
+      this.logQuotaWarningThrottled(`saveDatasetManifest (${manifest?.manifestId})`, err);
     }
   }
 
@@ -511,11 +581,15 @@ export class FirestorePersistenceService {
       const colRef = collection(db, 'dataset_manifests');
       const snap = await getDocs(colRef);
       const list: any[] = [];
-      snap.forEach(d => list.push(d.data()));
+      snap.forEach(d => {
+        const item = d.data();
+        list.push(item);
+        if (item.manifestId) this.inMemoryDatasetManifests.set(item.manifestId, item);
+      });
       return list;
     } catch (err) {
-      console.warn('[Firestore] getDatasetManifests warning:', err);
-      return [];
+      this.logQuotaWarningThrottled('getDatasetManifests', err);
+      return Array.from(this.inMemoryDatasetManifests.values());
     }
   }
 
