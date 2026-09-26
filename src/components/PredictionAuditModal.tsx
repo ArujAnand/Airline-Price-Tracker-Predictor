@@ -116,7 +116,7 @@ export const PredictionAuditModal: React.FC<PredictionAuditModalProps> = ({
                   <Coins className="h-4 w-4 text-blue-600" />
                 </div>
                 <div className="text-2xl font-black text-blue-900 mt-1">
-                  ₹{auditSummary.totalTravelerSavingsRealizedINR.toLocaleString('en-IN')}
+                  ₹{(auditSummary.totalTravelerSavingsRealizedINR ?? 0).toLocaleString('en-IN')}
                 </div>
                 <div className="text-[11px] text-blue-700 mt-0.5 font-medium">
                   Direct fare savings realized
@@ -225,24 +225,32 @@ export const PredictionAuditModal: React.FC<PredictionAuditModalProps> = ({
                               </span>
                             </td>
                             <td className="p-3 font-semibold text-slate-800">
-                              ₹{record.initialPriceAtPrediction.toLocaleString('en-IN')}
+                              {typeof record.initialPriceAtPrediction === 'number'
+                                ? `₹${record.initialPriceAtPrediction.toLocaleString('en-IN')}`
+                                : typeof (record as any).currentFareINR === 'number'
+                                ? `₹${(record as any).currentFareINR.toLocaleString('en-IN')}`
+                                : '—'}
                             </td>
                             <td className="p-3">
                               <span
                                 className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                                  record.recommendationGiven === 'BUY_NOW'
+                                  (record.recommendationGiven || (record as any).recommendation) === 'BUY_NOW'
                                     ? 'bg-emerald-100 text-emerald-800'
                                     : 'bg-blue-100 text-blue-800'
                                 }`}
                               >
-                                {record.recommendationGiven.replace(/_/g, ' ')}
+                                {(record.recommendationGiven || (record as any).recommendation || 'PENDING').replace(/_/g, ' ')}
                               </span>
                               <div className="text-[10px] text-slate-500 mt-0.5">
-                                {record.dropProbability}% drop prob
+                                {typeof record.dropProbability === 'number'
+                                  ? `${record.dropProbability}% drop prob`
+                                  : typeof (record as any).meaningfulDropProbability === 'number'
+                                  ? `${Math.round((record as any).meaningfulDropProbability * 100)}% drop prob`
+                                  : '—'}
                               </div>
                             </td>
                             <td className="p-3 font-bold text-slate-900">
-                              {record.actualLowestPriceObserved ? (
+                              {typeof record.actualLowestPriceObserved === 'number' ? (
                                 <span>₹{record.actualLowestPriceObserved.toLocaleString('en-IN')}</span>
                               ) : (
                                 <span className="text-slate-400">—</span>
@@ -267,7 +275,7 @@ export const PredictionAuditModal: React.FC<PredictionAuditModalProps> = ({
                               )}
                             </td>
                             <td className="p-3">
-                              {record.actualSavingsOrLossINR && record.actualSavingsOrLossINR > 0 ? (
+                              {typeof record.actualSavingsOrLossINR === 'number' && record.actualSavingsOrLossINR > 0 ? (
                                 <span className="font-bold text-emerald-600">
                                   +₹{record.actualSavingsOrLossINR.toLocaleString('en-IN')}
                                 </span>

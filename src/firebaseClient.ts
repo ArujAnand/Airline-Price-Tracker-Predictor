@@ -1,5 +1,8 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, setLogLevel } from 'firebase/firestore';
+
+// Suppress internal gRPC idle stream cancellation messages in Node.js environment
+setLogLevel('error');
 
 // In production (Render) use environment variables to keep credentials out of git.
 // In development / AI Studio, fallback to local firebase-applet-config.json if available.

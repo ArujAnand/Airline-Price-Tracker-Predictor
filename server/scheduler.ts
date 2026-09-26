@@ -90,10 +90,10 @@ export class BackgroundSchedulerDaemon {
     let staleStateCount = 0;
     const targetRoutes = ['PNQ-LKO', 'LKO-PNQ'];
 
-    // Target sample dates: 1 to 60 days out
+    // Target sample dates: 1 to 90 days out matching aggregator milestones
     const sampleDates: string[] = [];
     const today = new Date();
-    for (const offset of [1, 3, 7, 14, 21, 28, 35, 45, 60]) {
+    for (const offset of [1, 3, 7, 14, 21, 28, 30, 35, 40, 45, 50, 60, 70, 80, 90]) {
       const d = new Date(today);
       d.setDate(d.getDate() + offset);
       sampleDates.push(d.toISOString().split('T')[0]);

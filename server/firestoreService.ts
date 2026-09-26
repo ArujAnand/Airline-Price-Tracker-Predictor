@@ -37,6 +37,31 @@ function sanitizeForFirestore<T>(obj: T): T {
 export class FirestorePersistenceService {
   private isInitialized = false;
 
+  // In-memory fallback caches to ensure resilient operation during Firestore quota limits
+  private inMemorySnapshots = new Map<string, PriceSnapshot>();
+  private inMemoryDecisionEpisodes = new Map<string, any>();
+  private inMemoryActiveBackgroundEpisodes = new Map<string, any>();
+  private inMemoryRecommendationVersions = new Map<string, any>();
+  private inMemoryPredictionRecords = new Map<string, TrackedPredictionRecord>();
+  private inMemoryShadowPredictions = new Map<string, any>();
+  private inMemoryAlerts = new Map<string, TrackedTripAlert>();
+  private inMemoryNotifications = new Map<string, AppNotification>();
+  private lastQuotaWarningTimestamp = 0;
+
+  private logQuotaWarningThrottled(context: string, err: any): void {
+    const now = Date.now();
+    const errStr = String(err?.message || err);
+    const isQuotaError = errStr.includes('Quota limit exceeded') || err?.code === 'resource-exhausted';
+    if (isQuotaError) {
+      if (now - this.lastQuotaWarningTimestamp > 60000) { // Log once per 60 seconds maximum
+        console.warn(`[Firestore DB] Quota limit reached - operating gracefully via in-memory empirical cache. (${context})`);
+        this.lastQuotaWarningTimestamp = now;
+      }
+    } else {
+      console.warn(`[Firestore] ${context}:`, errStr);
+    }
+  }
+
   public async init(): Promise<void> {
     if (this.isInitialized) return;
     try {
@@ -90,16 +115,16 @@ export class FirestorePersistenceService {
     if (!this.validateSnapshotPurity(snapshot)) {
       return;
     }
+    const snapshotId = snapshot.id || (snapshot as any).observationId;
+    if (!snapshotId) return;
+
+    this.inMemorySnapshots.set(snapshotId, snapshot);
+
     try {
-      const snapshotId = snapshot.id || (snapshot as any).observationId;
-      if (!snapshotId) {
-        console.warn('[Firestore] saveSnapshot skipped: missing id and observationId');
-        return;
-      }
       const docRef = doc(db, 'snapshots', snapshotId);
       await setDoc(docRef, sanitizeForFirestore({ ...snapshot, id: snapshotId }), { merge: true });
     } catch (err) {
-      console.warn(`[Firestore] Failed to save snapshot ${snapshot.id}:`, err);
+      this.logQuotaWarningThrottled(`saveSnapshot (${snapshotId})`, err);
     }
   }
 
@@ -107,6 +132,12 @@ export class FirestorePersistenceService {
     if (!snapshots || snapshots.length === 0) return;
     const validSnapshots = snapshots.filter(s => this.validateSnapshotPurity(s));
     if (validSnapshots.length === 0) return;
+
+    validSnapshots.forEach(s => {
+      const snapshotId = s.id || (s as any).observationId;
+      if (snapshotId) this.inMemorySnapshots.set(snapshotId, s);
+    });
+
     try {
       for (let i = 0; i < validSnapshots.length; i += 250) {
         const batch = writeBatch(db);
@@ -121,7 +152,7 @@ export class FirestorePersistenceService {
       }
       console.log(`[Firestore] Persisted ${validSnapshots.length} price snapshots to database.`);
     } catch (err) {
-      console.warn('[Firestore] Batch save snapshots warning:', err);
+      this.logQuotaWarningThrottled('saveSnapshotsBatch', err);
     }
   }
 
@@ -142,12 +173,18 @@ export class FirestorePersistenceService {
       const snap = await getDocs(q);
       const list: PriceSnapshot[] = [];
       snap.forEach((docItem) => {
-        list.push(docItem.data() as PriceSnapshot);
+        const data = docItem.data() as PriceSnapshot;
+        list.push(data);
+        if (data.id) this.inMemorySnapshots.set(data.id, data);
       });
       return list;
     } catch (err) {
-      console.warn('[Firestore] getSnapshots fallback:', err);
-      return [];
+      this.logQuotaWarningThrottled('getSnapshots', err);
+      let list = Array.from(this.inMemorySnapshots.values());
+      if (routeId) {
+        list = list.filter(s => s.routeId.toUpperCase() === routeId.toUpperCase());
+      }
+      return list.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, limitCount);
     }
   }
 
@@ -156,18 +193,19 @@ export class FirestorePersistenceService {
     try {
       const recordId = record.predictionId || record.id;
       if (!recordId || typeof recordId !== 'string') {
-        console.warn('[Firestore] Cannot save prediction record: missing predictionId or id', record);
         return;
       }
-      const docRef = doc(db, 'prediction_records', recordId);
       const cleanRecord = sanitizeForFirestore({
         ...record,
         id: recordId,
         predictionId: recordId
       });
+      this.inMemoryPredictionRecords.set(recordId, cleanRecord as TrackedPredictionRecord);
+
+      const docRef = doc(db, 'prediction_records', recordId);
       await setDoc(docRef, cleanRecord, { merge: true });
     } catch (err) {
-      console.warn(`[Firestore] Failed to persist prediction record ${record?.predictionId || record?.id}:`, err);
+      this.logQuotaWarningThrottled(`savePredictionRecord (${record?.predictionId || record?.id})`, err);
     }
   }
 
@@ -179,12 +217,22 @@ export class FirestorePersistenceService {
       const snap = await getDocs(q);
       const list: TrackedPredictionRecord[] = [];
       snap.forEach((docItem) => {
-        list.push(docItem.data() as TrackedPredictionRecord);
+        const data = docItem.data() as TrackedPredictionRecord;
+        list.push(data);
+        const pId = (data as any).predictionId || data.id;
+        if (pId) {
+          this.inMemoryPredictionRecords.set(pId, data);
+        }
       });
       return list;
     } catch (err) {
-      console.warn('[Firestore] getPredictionRecords warning:', err);
-      return [];
+      this.logQuotaWarningThrottled('getPredictionRecords', err);
+      const list = Array.from(this.inMemoryPredictionRecords.values());
+      list.sort((a, b) => {
+        const diff = new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+        return oldestFirst ? diff : -diff;
+      });
+      return list.slice(0, limitCount);
     }
   }
 
@@ -205,11 +253,24 @@ export class FirestorePersistenceService {
         const data = docItem.data() as TrackedPredictionRecord;
         list.push(data);
         lastCreatedAt = data.createdAt;
+        const pId = (data as any).predictionId || data.id;
+        if (pId) {
+          this.inMemoryPredictionRecords.set(pId, data);
+        }
       });
       return { records: list, lastCreatedAt };
     } catch (err) {
-      console.warn('[Firestore] getPagedPredictionRecords warning:', err);
-      return { records: [] };
+      this.logQuotaWarningThrottled('getPagedPredictionRecords', err);
+      const all = Array.from(this.inMemoryPredictionRecords.values()).sort(
+        (a, b) => new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime()
+      );
+      let filtered = all;
+      if (startAfterCreatedAt) {
+        filtered = all.filter(r => (r.createdAt || '') > startAfterCreatedAt);
+      }
+      const slice = filtered.slice(0, batchSize);
+      const lastCreatedAt = slice.length > 0 ? slice[slice.length - 1].createdAt : undefined;
+      return { records: slice, lastCreatedAt };
     }
   }
 
@@ -337,28 +398,60 @@ export class FirestorePersistenceService {
     }
   }
 
+  public async getDatasetManifests(): Promise<any[]> {
+    try {
+      const colRef = collection(db, 'dataset_manifests');
+      const snap = await getDocs(colRef);
+      const list: any[] = [];
+      snap.forEach(d => list.push(d.data()));
+      return list;
+    } catch (err) {
+      console.warn('[Firestore] getDatasetManifests warning:', err);
+      return [];
+    }
+  }
+
   // --- Sequential Booking Decision persistence ---
   public async saveDecisionEpisode(episode: any): Promise<void> {
+    if (!episode || !episode.episodeId) return;
+    this.inMemoryDecisionEpisodes.set(episode.episodeId, episode);
+    if (episode.originType === 'EXPERIMENTAL_BACKGROUND' && episode.currentEpisodeState === 'ACTIVE' && episode.canonicalId) {
+      this.inMemoryActiveBackgroundEpisodes.set(episode.canonicalId, episode);
+    }
+
     try {
       const docRef = doc(db, 'decision_episodes', episode.episodeId);
       await setDoc(docRef, sanitizeForFirestore(episode), { merge: true });
     } catch (err) {
-      console.warn(`[Firestore] Failed to save decision episode ${episode?.episodeId}:`, err);
+      this.logQuotaWarningThrottled(`saveDecisionEpisode (${episode?.episodeId})`, err);
     }
   }
 
   public async getDecisionEpisode(episodeId: string): Promise<any | null> {
+    if (this.inMemoryDecisionEpisodes.has(episodeId)) {
+      return this.inMemoryDecisionEpisodes.get(episodeId);
+    }
     try {
       const docRef = doc(db, 'decision_episodes', episodeId);
       const snap = await getDoc(docRef);
-      return snap.exists() ? snap.data() : null;
-    } catch (err) {
-      console.warn(`[Firestore] Failed to get decision episode ${episodeId}:`, err);
+      if (snap.exists()) {
+        const data = snap.data();
+        this.inMemoryDecisionEpisodes.set(episodeId, data);
+        return data;
+      }
       return null;
+    } catch (err) {
+      this.logQuotaWarningThrottled(`getDecisionEpisode (${episodeId})`, err);
+      return this.inMemoryDecisionEpisodes.get(episodeId) || null;
     }
   }
 
   public async getActiveBackgroundEpisode(canonicalId: string): Promise<any | null> {
+    // Check in-memory store first
+    if (this.inMemoryActiveBackgroundEpisodes.has(canonicalId)) {
+      return this.inMemoryActiveBackgroundEpisodes.get(canonicalId);
+    }
+
     try {
       const colRef = collection(db, 'decision_episodes');
       const q = query(
@@ -369,32 +462,45 @@ export class FirestorePersistenceService {
       );
       const snap = await getDocs(q);
       if (!snap.empty) {
-        return snap.docs[0].data();
+        const data = snap.docs[0].data();
+        this.inMemoryActiveBackgroundEpisodes.set(canonicalId, data);
+        return data;
       }
       return null;
     } catch (err) {
-      console.warn(`[Firestore] Failed to query active background episode for ${canonicalId}:`, err);
-      return null;
+      this.logQuotaWarningThrottled(`getActiveBackgroundEpisode (${canonicalId})`, err);
+      return this.inMemoryActiveBackgroundEpisodes.get(canonicalId) || null;
     }
   }
 
   public async saveRecommendationVersion(version: any): Promise<void> {
+    if (!version || !version.versionId) return;
+    this.inMemoryRecommendationVersions.set(version.versionId, version);
+
     try {
       const docRef = doc(db, 'recommendation_versions', version.versionId);
       await setDoc(docRef, sanitizeForFirestore(version), { merge: true });
     } catch (err) {
-      console.warn(`[Firestore] Failed to save recommendation version ${version?.versionId}:`, err);
+      this.logQuotaWarningThrottled(`saveRecommendationVersion (${version?.versionId})`, err);
     }
   }
 
   public async getRecommendationVersion(versionId: string): Promise<any | null> {
+    if (this.inMemoryRecommendationVersions.has(versionId)) {
+      return this.inMemoryRecommendationVersions.get(versionId);
+    }
     try {
       const docRef = doc(db, 'recommendation_versions', versionId);
       const snap = await getDoc(docRef);
-      return snap.exists() ? snap.data() : null;
-    } catch (err) {
-      console.warn(`[Firestore] Failed to get recommendation version ${versionId}:`, err);
+      if (snap.exists()) {
+        const data = snap.data();
+        this.inMemoryRecommendationVersions.set(versionId, data);
+        return data;
+      }
       return null;
+    } catch (err) {
+      this.logQuotaWarningThrottled(`getRecommendationVersion (${versionId})`, err);
+      return this.inMemoryRecommendationVersions.get(versionId) || null;
     }
   }
 

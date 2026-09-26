@@ -120,6 +120,10 @@ async function runAll17RequiredTests() {
   console.log('\n--- 9. Shared provenance eligibility logic ---');
   assert(typeof isEmpiricallyEligibleObservation === 'function', 'Shared isEmpiricallyEligibleObservation is exported and available');
   assert(isEmpiricallyEligibleObservation({ provenance: 'REAL_EXTERNAL_OBSERVATION' }) === true, 'Shared logic verifies REAL_EXTERNAL_OBSERVATION');
+  assert(isEmpiricallyEligibleObservation({ provenance: 'REAL_VERIFIED_HISTORICAL_OBSERVATION' }) === true, 'Shared logic verifies REAL_VERIFIED_HISTORICAL_OBSERVATION');
+  assert(isEmpiricallyEligibleObservation({ provenance: 'REAL_OBSERVATION', source: 'SerpApi (Google Flights)' }) === true, 'Legacy REAL_OBSERVATION verified with SerpApi source is eligible');
+  assert(isEmpiricallyEligibleObservation({ provenance: 'REAL_OBSERVATION', source: 'Google Flights Live Aggregator Scraper' }) === false, 'Legacy REAL_OBSERVATION with unverified scraper source is rejected');
+  assert(isEmpiricallyEligibleObservation({ provenance: 'REAL_OBSERVATION' }) === false, 'Legacy REAL_OBSERVATION without verified source is rejected');
   assert(isEmpiricallyEligibleObservation({ provenance: 'EXPERIMENTAL_EXTERNAL_OBSERVATION' }) === false, 'Shared logic excludes EXPERIMENTAL_EXTERNAL_OBSERVATION');
   assert(isEmpiricallyEligibleObservation({ provenance: 'CONFIRMED_NON_REAL' }) === false, 'Shared logic excludes CONFIRMED_NON_REAL');
 

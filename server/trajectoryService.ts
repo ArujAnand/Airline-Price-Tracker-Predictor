@@ -46,16 +46,27 @@ export class LongitudinalTrajectoryService {
       raw.source?.includes('simulation') ||
       raw.purityClassification === 'POTENTIALLY_NON_REAL';
 
-    // Enforce typed provenance as primary scientific guard; legacy fallback only when provenance is undefined
+    // Enforce typed provenance as primary scientific guard with explicit legacy verification mapping
     let provenance: SnapshotProvenance;
-    if (raw.provenance) {
+    if (raw.provenance === 'REAL_OBSERVATION') {
+      const isVerifiedSource = raw.source === 'SerpApi (Google Flights)' || 
+                               raw.source === 'SearchApi (Google Flights)' || 
+                               raw.source === 'GOOGLE_FLIGHTS_SCRAPER';
+      if (isVerifiedSource && !isSyntheticSource) {
+        provenance = 'REAL_VERIFIED_HISTORICAL_OBSERVATION';
+      } else if (isSyntheticSource) {
+        provenance = 'CONFIRMED_NON_REAL';
+      } else {
+        provenance = 'UNKNOWN_PROVENANCE';
+      }
+    } else if (raw.provenance) {
       provenance = raw.provenance;
     } else if (isSyntheticSource) {
       provenance = 'CONFIRMED_NON_REAL';
     } else if (raw.source === 'Google Flights Live Aggregator Scraper') {
       provenance = 'UNKNOWN_PROVENANCE';
-    } else if (raw.source === 'SerpApi (Google Flights)') {
-      provenance = 'REAL_EXTERNAL_OBSERVATION';
+    } else if (raw.source === 'SerpApi (Google Flights)' || raw.source === 'SearchApi (Google Flights)') {
+      provenance = 'REAL_VERIFIED_HISTORICAL_OBSERVATION';
     } else {
       provenance = 'UNKNOWN_PROVENANCE';
     }
@@ -261,8 +272,22 @@ export function isEmpiricallyEligibleObservation(snapshot: any): boolean {
   ) {
     return false;
   }
-  return provenance === 'REAL_EXTERNAL_OBSERVATION' || 
-         provenance === 'REAL_VERIFIED_HISTORICAL_OBSERVATION' ||
-         provenance === 'REAL_OBSERVATION';
+  if (provenance === 'REAL_EXTERNAL_OBSERVATION' || provenance === 'REAL_VERIFIED_HISTORICAL_OBSERVATION') {
+    return true;
+  }
+  if (provenance === 'REAL_OBSERVATION') {
+    // Only eligible if separately verified by source / known code path
+    const isVerifiedSource = snapshot.source === 'SerpApi (Google Flights)' || 
+                             snapshot.source === 'SearchApi (Google Flights)' || 
+                             snapshot.source === 'GOOGLE_FLIGHTS_SCRAPER';
+    const isSyntheticSource = snapshot.source?.includes('Yield') || 
+                              snapshot.source?.includes('Collector') || 
+                              snapshot.source?.includes('Calibrator') || 
+                              snapshot.source?.includes('fallback') || 
+                              snapshot.source?.includes('synthetic') || 
+                              snapshot.source?.includes('simulation');
+    return isVerifiedSource && !isSyntheticSource;
+  }
+  return false;
 }
 

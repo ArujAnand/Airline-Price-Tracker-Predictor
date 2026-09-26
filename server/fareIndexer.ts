@@ -226,7 +226,11 @@ class FareIndexingService {
       7: { sum: 0, count: 0 },
       14: { sum: 0, count: 0 },
       30: { sum: 0, count: 0 },
+      40: { sum: 0, count: 0 },
+      50: { sum: 0, count: 0 },
       60: { sum: 0, count: 0 },
+      70: { sum: 0, count: 0 },
+      80: { sum: 0, count: 0 },
       90: { sum: 0, count: 0 },
     };
     snapshots.forEach((s) => {
@@ -238,8 +242,12 @@ class FareIndexingService {
       if (days <= 2) tw = 1;
       else if (days <= 9) tw = 7;
       else if (days <= 18) tw = 14;
-      else if (days <= 45) tw = 30;
-      else if (days <= 75) tw = 60;
+      else if (days <= 35) tw = 30;
+      else if (days <= 45) tw = 40;
+      else if (days <= 55) tw = 50;
+      else if (days <= 65) tw = 60;
+      else if (days <= 75) tw = 70;
+      else if (days <= 85) tw = 80;
       else tw = 90;
       windowMap[tw].sum += s.price;
       windowMap[tw].count += 1;
@@ -253,7 +261,7 @@ class FareIndexingService {
 
     let lowestWindow = 30;
     let lowestVal = Infinity;
-    [1, 7, 14, 30, 60, 90].forEach((tw) => {
+    [1, 7, 14, 30, 40, 50, 60, 70, 80, 90].forEach((tw) => {
       const avg = getAvg(tw);
       if (avg && avg < lowestVal) {
         lowestVal = avg;
@@ -261,7 +269,7 @@ class FareIndexingService {
       }
     });
 
-    const bwPoints = [1, 7, 14, 30, 60, 90].map((tw) => ({
+    const bwPoints = [1, 7, 14, 30, 40, 50, 60, 70, 80, 90].map((tw) => ({
       label: `T-${tw}d`,
       value: windowMap[tw].count > 0 ? Math.round(windowMap[tw].sum / windowMap[tw].count) : 0,
     }));

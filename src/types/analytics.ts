@@ -103,7 +103,14 @@ export interface SubSegmentData {
   };
   bookingWindow: {
     t1Avg: number | null;
+    t7Avg?: number | null;
+    t14Avg?: number | null;
     t30Avg: number | null;
+    t40Avg?: number | null;
+    t50Avg?: number | null;
+    t60Avg?: number | null;
+    t70Avg?: number | null;
+    t80Avg?: number | null;
     t90Avg: number | null;
     sweetSpot: string;
     points: { label: string; value: number }[];

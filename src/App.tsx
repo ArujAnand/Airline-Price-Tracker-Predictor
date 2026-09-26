@@ -12,6 +12,7 @@ import { ModelCompareModal } from './components/ModelCompareModal';
 import { SmartDateFinderModal } from './components/SmartDateFinderModal';
 import { PredictionAuditModal } from './components/PredictionAuditModal';
 import { FareAnalyticsModal } from './components/FareAnalyticsModal';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { 
   Flight, 
   PriceSnapshot, 
@@ -23,6 +24,9 @@ import {
 } from './types';
 import { sendBrowserPushNotification } from './utils/notifications';
 import { Plane, AlertTriangle, RefreshCw, Sparkles, Database } from 'lucide-react';
+
+// Module-scoped cache for main route searches across session
+const mainRouteDataCache = new Map<string, { flights: Flight[]; prediction: PredictionAnalysis | null; snapshots: PriceSnapshot[] }>();
 
 export default function App() {
   // Route selection state - start empty with no pre-selected values as requested
@@ -100,8 +104,18 @@ export default function App() {
   };
 
   // Load route flights, predictions, and snapshots
-  const loadRouteData = useCallback(async (orig = origin, dest = destination, date = departureDate, isBackground = false) => {
+  const loadRouteData = useCallback(async (orig = origin, dest = destination, date = departureDate, isBackground = false, forceRefresh = false) => {
     if (!orig || !dest || !date || orig === dest) return;
+
+    const cacheKey = `${orig.toUpperCase()}-${dest.toUpperCase()}-${date}`;
+    if (!forceRefresh && mainRouteDataCache.has(cacheKey)) {
+      const cached = mainRouteDataCache.get(cacheKey)!;
+      setFlights(cached.flights);
+      if (cached.prediction) setPrediction(cached.prediction);
+      setSnapshots(cached.snapshots);
+      setIsLoading(false);
+      return;
+    }
 
     if (!isBackground) {
       setIsLoading(true);
@@ -117,18 +131,24 @@ export default function App() {
       ]);
 
       if (!flightsRes.ok) throw new Error('Failed to retrieve flight schedules');
+
       const flightData: Flight[] = await flightsRes.json();
       setFlights(flightData);
 
+      let predData: PredictionAnalysis | null = null;
       if (predictRes.ok) {
-        const predData: PredictionAnalysis = await predictRes.json();
+        predData = await predictRes.json();
         setPrediction(predData);
       }
 
+      let snapData: PriceSnapshot[] = [];
       if (snapsRes.ok) {
-        const snapData: PriceSnapshot[] = await snapsRes.json();
+        snapData = await snapsRes.json();
         setSnapshots(snapData);
       }
+
+      // Update in-memory session cache
+      mainRouteDataCache.set(cacheKey, { flights: flightData, prediction: predData, snapshots: snapData });
     } catch (err: any) {
       console.error('Error loading route data:', err);
       if (!isBackground) {
@@ -535,10 +555,12 @@ export default function App() {
         mlComparison={prediction?.mlComparison}
       />
 
-      <PredictionAuditModal
-        isOpen={isAuditOpen}
-        onClose={() => setIsAuditOpen(false)}
-      />
+      <ErrorBoundary fallbackTitle="Decision Audit Modal Error">
+        <PredictionAuditModal
+          isOpen={isAuditOpen}
+          onClose={() => setIsAuditOpen(false)}
+        />
+      </ErrorBoundary>
 
       <FareAnalyticsModal
         isOpen={isFareAnalyticsOpen}
