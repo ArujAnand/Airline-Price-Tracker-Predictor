@@ -73,7 +73,7 @@ async function runTests() {
     isScheduleChanged: false,
     scheduleDriftMinutes: 0,
     isIdentityInferred: false,
-    provenance: 'REAL_OBSERVATION',
+    provenance: 'ISOLATED_TEST_FIXTURE',
     source: 'PERSISTED_FIRESTORE'
   }];
   const mOut = trailingMomentumBaseline.generateHorizonOutputs(7400, ['24h'], singleObs, nowISO, 24);
@@ -102,7 +102,7 @@ async function runTests() {
     departureDate: '2026-10-18',
     currentSpotFareINR: 7400,
     horizonOutputs: multiHorizonOut,
-    provenance: 'REAL_OBSERVATION',
+    provenance: 'ISOLATED_TEST_FIXTURE',
     createdAt: '2026-09-25T10:00:00.000Z'
   };
   const targetExpiryMs = new Date('2026-09-25T10:00:00.000Z').getTime() + 24 * 3600 * 1000;
@@ -197,9 +197,9 @@ async function runTests() {
   // TEST 11: Same-flight outcome leakage is prevented in evaluation
   // --------------------------------------------------------------------------
   console.log('--- Test 11: Same-flight outcome leakage is prevented in evaluation ---');
-  const realRecord1 = { ...fixtureRecord, predictionId: 'pred-1', provenance: 'REAL_OBSERVATION' as const, createdAt: '2026-09-20T10:00:00.000Z' };
-  const realRecord2 = { ...fixtureRecord, predictionId: 'pred-2', provenance: 'REAL_OBSERVATION' as const, createdAt: '2026-09-22T10:00:00.000Z' };
-  const splitRes = groupedTemporalEvaluator.performGroupedTemporalSplit([realRecord1, realRecord2], '2026-09-21T00:00:00.000Z');
+  const fixtureRecord1 = { ...fixtureRecord, predictionId: 'pred-1', provenance: 'ISOLATED_TEST_FIXTURE' as const, createdAt: '2026-09-20T10:00:00.000Z' };
+  const fixtureRecord2 = { ...fixtureRecord, predictionId: 'pred-2', provenance: 'ISOLATED_TEST_FIXTURE' as const, createdAt: '2026-09-22T10:00:00.000Z' };
+  const splitRes = groupedTemporalEvaluator.performGroupedTemporalSplit([fixtureRecord1, fixtureRecord2], '2026-09-21T00:00:00.000Z', true);
   assert(splitRes.uniqueTrainFlights === 1 && splitRes.uniqueEvalFlights === 0, 'All predictions for same canonicalId placed together in train split without leakage');
 
   // --------------------------------------------------------------------------

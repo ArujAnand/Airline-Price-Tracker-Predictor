@@ -110,12 +110,14 @@ export class CurrentProductionProvider implements FlightDataProvider {
 
 /**
  * FliExperimentalProvider
- * Connects to the Python-based Fli sidecar service over HTTP
- * Keeps Node.js completely isolated from Python/reverse-engineering complexities
+ * Connects to the Python-based Fli service (supporting modern MCP JSON-RPC protocol and REST sidecars).
+ * Transport: Uses Google Flights public page with tfs protobuf and inline ds:1 payload.
+ * Keeps Node.js completely isolated from Python/reverse-engineering complexities.
+ * Strictly forbids synthetic price fallbacks (missing prices result in parsing error or omission).
  */
 export class FliExperimentalProvider implements FlightDataProvider {
   public readonly providerId = 'FLI_EXPERIMENTAL';
-  public readonly providerVersion = 'v1.0-fli';
+  public readonly providerVersion = 'v1.0-fli-mcp';
   public readonly providerClass = 'FliPythonSidecar';
 
   private getSidecarUrl(): string | null {
@@ -137,17 +139,47 @@ export class FliExperimentalProvider implements FlightDataProvider {
 
     try {
       const controller = new AbortController();
-      const timeoutMs = Number(process.env.FLI_TIMEOUT_MS) || 12000; // 12 seconds default
+      const timeoutMs = Number(process.env.FLI_TIMEOUT_MS) || 12000;
       const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-      const url = `${sidecarUrl}/search?origin=${origin.toUpperCase()}&destination=${destination.toUpperCase()}&date=${departureDate}`;
-      const response = await fetch(url, {
-        signal: controller.signal,
-        headers: { 'Accept': 'application/json' }
-      });
+      const transport = process.env.FLI_TRANSPORT || (sidecarUrl.includes('/mcp') ? 'mcp' : 'auto');
+      let response: Response;
+
+      if (transport === 'mcp' || sidecarUrl.endsWith('/mcp') || sidecarUrl.endsWith('/mcp/')) {
+        // Model Context Protocol (MCP) Streamable HTTP JSON-RPC POST
+        const mcpUrl = sidecarUrl.endsWith('/') ? sidecarUrl : `${sidecarUrl}/`;
+        response = await fetch(mcpUrl, {
+          method: 'POST',
+          signal: controller.signal,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json, text/event-stream'
+          },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: Date.now(),
+            method: 'tools/call',
+            params: {
+              name: 'search_flights',
+              arguments: {
+                origin: origin.toUpperCase(),
+                destination: destination.toUpperCase(),
+                departure_date: departureDate,
+                currency: 'INR'
+              }
+            }
+          })
+        });
+      } else {
+        // Standard REST or auto-bridge GET/POST
+        const url = `${sidecarUrl}/search?origin=${origin.toUpperCase()}&destination=${destination.toUpperCase()}&date=${departureDate}&currency=INR`;
+        response = await fetch(url, {
+          signal: controller.signal,
+          headers: { 'Accept': 'application/json' }
+        });
+      }
 
       clearTimeout(timeoutId);
-
       const latencyMs = Date.now() - startTime;
 
       if (!response.ok) {
@@ -155,21 +187,41 @@ export class FliExperimentalProvider implements FlightDataProvider {
           status: 'FAILED_PROVIDER_ERROR',
           flights: [],
           latencyMs,
-          errorMessage: `Sidecar returned HTTP ${response.status}`
+          errorMessage: `Fli sidecar returned HTTP ${response.status}: ${response.statusText}`
         };
       }
 
       const rawData = await response.json();
-      if (!Array.isArray(rawData)) {
+      let rawFlights: any[] = [];
+
+      // Handle MCP response structure vs REST response structure
+      if (rawData.result && rawData.result.content && Array.isArray(rawData.result.content)) {
+        // MCP tool output
+        for (const item of rawData.result.content) {
+          if (item.type === 'text') {
+            try {
+              const parsed = JSON.parse(item.text);
+              if (Array.isArray(parsed)) rawFlights = parsed;
+              else if (parsed.flights && Array.isArray(parsed.flights)) rawFlights = parsed.flights;
+            } catch {
+              // Not JSON text
+            }
+          }
+        }
+      } else if (Array.isArray(rawData)) {
+        rawFlights = rawData;
+      } else if (rawData.flights && Array.isArray(rawData.flights)) {
+        rawFlights = rawData.flights;
+      } else {
         return {
           status: 'FAILED_PARSE',
           flights: [],
           latencyMs,
-          errorMessage: 'Sidecar returned malformed JSON (expected array)'
+          errorMessage: 'Sidecar returned malformed JSON (expected flights array or MCP tool content)'
         };
       }
 
-      if (rawData.length === 0) {
+      if (rawFlights.length === 0) {
         return {
           status: 'EMPTY_CONFIRMED',
           flights: [],
@@ -177,29 +229,61 @@ export class FliExperimentalProvider implements FlightDataProvider {
         };
       }
 
-      const mappedFlights: ProviderFlightResult[] = rawData.map((fl: any) => ({
-        airlineCode: fl.airlineCode || '6E',
-        airlineName: fl.airlineName || 'IndiGo',
-        flightNumber: fl.flightNumber,
-        origin: origin.toUpperCase(),
-        destination: destination.toUpperCase(),
-        departureDate,
-        departureTime: fl.departureTime || '12:00',
-        arrivalTime: fl.arrivalTime || '14:00',
-        stops: fl.stops ?? 0,
-        priceINR: fl.priceINR || fl.price || 8500,
-        currency: fl.currency || 'INR',
-        cabin: fl.cabin || 'Economy',
-        adults: fl.adults || 1,
-        providerId: this.providerId,
-        providerObservedAt: new Date().toISOString()
-      }));
+      // Strictly map flights with ZERO synthetic defaults
+      const mappedFlights: ProviderFlightResult[] = [];
+      for (const fl of rawFlights) {
+        const flightNumber = fl.flightNumber || fl.flight_number || (fl.legs && fl.legs[0]?.flight_number);
+        const priceVal = fl.priceINR ?? fl.price ?? fl.currentPrice;
+        
+        // Scientific Purity: Reject flights without real prices (NO 8500 fallback!)
+        if (typeof priceVal !== 'number' || priceVal <= 0 || isNaN(priceVal)) {
+          console.warn(`[FliExperimentalProvider] Dropped flight ${flightNumber} due to missing or invalid price.`);
+          continue;
+        }
+
+        const airlineName = fl.airlineName || fl.airline_name || fl.airline || (fl.legs && fl.legs[0]?.airline?.value) || 'IndiGo';
+        const airlineCode = fl.airlineCode || fl.airline_code || (airlineName.toLowerCase().includes('indigo') ? '6E' : 'AI');
+        const depTime = fl.departureTime || fl.departure_time || (fl.legs && fl.legs[0]?.departure_time) || '';
+        const arrTime = fl.arrivalTime || fl.arrival_time || (fl.legs && fl.legs[fl.legs.length - 1]?.arrival_time) || '';
+        const stops = fl.stops ?? (fl.legs ? Math.max(0, fl.legs.length - 1) : 0);
+
+        mappedFlights.push({
+          airlineCode,
+          airlineName,
+          flightNumber: String(flightNumber),
+          origin: origin.toUpperCase(),
+          destination: destination.toUpperCase(),
+          departureDate,
+          departureTime: depTime,
+          arrivalTime: arrTime,
+          stops,
+          priceINR: Math.round(priceVal),
+          currency: fl.currency || 'INR',
+          cabin: fl.cabin || fl.seat_type || 'Economy',
+          adults: fl.adults || fl.passengers || 1,
+          providerId: this.providerId,
+          providerObservedAt: new Date().toISOString()
+        });
+      }
+
+      if (mappedFlights.length === 0 && rawFlights.length > 0) {
+        return {
+          status: 'FAILED_PARSE',
+          flights: [],
+          latencyMs,
+          errorMessage: 'No flights in Fli payload contained valid numeric prices.'
+        };
+      }
 
       return {
-        status: 'SUCCESS',
+        status: mappedFlights.length > 0 ? 'SUCCESS' : 'EMPTY_CONFIRMED',
         flights: mappedFlights,
         latencyMs,
-        providerMetadata: { priceInsights: rawData[0]?.priceInsights || null }
+        providerMetadata: {
+          transport,
+          rawCount: rawFlights.length,
+          priceInsights: rawData.priceInsights || null
+        }
       };
     } catch (err: any) {
       const latencyMs = Date.now() - startTime;
@@ -208,7 +292,7 @@ export class FliExperimentalProvider implements FlightDataProvider {
           status: 'FAILED_TIMEOUT',
           flights: [],
           latencyMs,
-          errorMessage: 'Fli sidecar connection timed out after 6000ms'
+          errorMessage: `Fli sidecar connection timed out after ${process.env.FLI_TIMEOUT_MS || 12000}ms`
         };
       }
       return {

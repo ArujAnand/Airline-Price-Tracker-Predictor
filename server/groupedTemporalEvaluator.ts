@@ -31,15 +31,18 @@ export class GroupedTemporalEvaluator {
    */
   public performGroupedTemporalSplit(
     allRecords: PredictionAuditRecord[],
-    splitTimestampISO: string
+    splitTimestampISO: string,
+    allowTestFixtures = false
   ): TrainEvalSplitResult {
     const splitTimeMs = new Date(splitTimestampISO).getTime();
 
     // 1. Group records by canonical flight instance (canonicalId)
     const flightGroupMap = new Map<string, PredictionAuditRecord[]>();
     for (const rec of allRecords) {
-      if (rec.provenance === 'ISOLATED_TEST_FIXTURE') {
-        throw new Error(`Data Integrity Violation: Isolated test fixture prediction rejected by GroupedTemporalEvaluator.`);
+      if (rec.provenance === 'ISOLATED_TEST_FIXTURE' || (rec.provenance as any) === 'CONFIRMED_TEST_ARTIFACT') {
+        if (!allowTestFixtures) {
+          throw new Error(`Data Integrity Violation: Isolated test fixture prediction rejected by GroupedTemporalEvaluator.`);
+        }
       }
       const list = flightGroupMap.get(rec.canonicalId) || [];
       list.push(rec);

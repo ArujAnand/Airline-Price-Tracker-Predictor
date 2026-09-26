@@ -39,7 +39,7 @@ const newSnapshot = {
   carrierCode: '6E',
   priceINR: 7100,
   observedAt: '2026-09-21T10:00:00.000Z',
-  provenance: 'REAL_OBSERVATION'
+  provenance: 'ISOLATED_TEST_FIXTURE'
 };
 
 const normLegacy = trajectoryService.normalizeRawSnapshot(legacySnapshot);
@@ -47,8 +47,11 @@ const normNew = trajectoryService.normalizeRawSnapshot(newSnapshot);
 
 assert(normLegacy.canonicalId === normNew.canonicalId, 'Legacy snap-* and new obs-* map to identical canonical ID: PNQ-LKO-6E-656-2026-10-18');
 
-// Build trajectory series combining legacy + new
-const combinedSeries = trajectoryService.buildTrajectorySeries([legacySnapshot, newSnapshot]);
+// Build trajectory series combining legacy + new (in-test isolation mode)
+const combinedSeries = trajectoryService.buildTrajectorySeries([
+  { ...legacySnapshot, source: 'SerpApi (Google Flights)', provenance: 'ISOLATED_TEST_FIXTURE' },
+  newSnapshot
+], true);
 const series = combinedSeries.get('PNQ-LKO-6E-656-2026-10-18');
 
 assert(series !== undefined, 'Legacy and new snapshot grouped into single trajectory series');
@@ -106,7 +109,7 @@ const futureSnapshot: LongitudinalObservation = {
   isScheduleChanged: false,
   scheduleDriftMinutes: 0,
   isIdentityInferred: false,
-  provenance: 'REAL_OBSERVATION',
+  provenance: 'ISOLATED_TEST_FIXTURE',
   source: 'PERSISTED_FIRESTORE'
 };
 

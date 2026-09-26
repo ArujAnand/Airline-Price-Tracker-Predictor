@@ -11,9 +11,109 @@
 // 1. DATA PROVENANCE & OPERATIONAL MATURITY
 // ============================================================================
 export type DataProvenance = 
-  | 'REAL_OBSERVATION'         // Genuine scraped/live market observation persisted from production
-  | 'ISOLATED_TEST_FIXTURE'   // Isolated unit test fixture (Strictly prohibited from ML training)
-  | 'EXPERIMENTAL';            // Live candidate model output generated for evaluation
+  | 'REAL_EXTERNAL_OBSERVATION'          // Genuine live scraped/API observations from production
+  | 'REAL_VERIFIED_HISTORICAL_OBSERVATION' // Verified audited real historical snapshots
+  | 'EXPERIMENTAL_EXTERNAL_OBSERVATION'    // Raw parallel experimental observations (Fli sidecar)
+  | 'UNKNOWN_PROVENANCE'                 // Unverified snapshots with ambiguous harvest paths
+  | 'CONFIRMED_NON_REAL'                 // Artificially generated/calculated yield fallback prices
+  | 'ISOLATED_TEST_FIXTURE'              // Isolated test snapshots (Strictly prohibited from live pipelines/training)
+  | 'CONFIRMED_TEST_ARTIFACT'            // Test generated artifact in storage (Strictly prohibited from live pipelines/training)
+  | 'REAL_OBSERVATION'                   // Legacy real observations (for backwards compatibility)
+  | 'EXPERIMENTAL';                      // Live candidate model output generated for evaluation
+
+export interface ProvenanceEligibilityPolicy {
+  mayEnterProductionSnapshots: boolean;
+  mayEnterTrajectories: boolean;
+  mayEnterDecisionEpisodes: boolean;
+  mayEnterOutcomeResolution: boolean;
+  mayEnterReadiness: boolean;
+  mayEnterTraining: boolean;
+  mayEnterProviderComparison: boolean;
+}
+
+export const PROVENANCE_ELIGIBILITY_MATRIX: Record<DataProvenance, ProvenanceEligibilityPolicy> = {
+  REAL_EXTERNAL_OBSERVATION: {
+    mayEnterProductionSnapshots: true,
+    mayEnterTrajectories: true,
+    mayEnterDecisionEpisodes: true,
+    mayEnterOutcomeResolution: true,
+    mayEnterReadiness: true,
+    mayEnterTraining: true,
+    mayEnterProviderComparison: true
+  },
+  REAL_VERIFIED_HISTORICAL_OBSERVATION: {
+    mayEnterProductionSnapshots: true,
+    mayEnterTrajectories: true,
+    mayEnterDecisionEpisodes: true,
+    mayEnterOutcomeResolution: true,
+    mayEnterReadiness: true,
+    mayEnterTraining: true,
+    mayEnterProviderComparison: true
+  },
+  EXPERIMENTAL_EXTERNAL_OBSERVATION: {
+    mayEnterProductionSnapshots: false,
+    mayEnterTrajectories: false,
+    mayEnterDecisionEpisodes: false,
+    mayEnterOutcomeResolution: false,
+    mayEnterReadiness: false,
+    mayEnterTraining: false,
+    mayEnterProviderComparison: true
+  },
+  UNKNOWN_PROVENANCE: {
+    mayEnterProductionSnapshots: false,
+    mayEnterTrajectories: false,
+    mayEnterDecisionEpisodes: false,
+    mayEnterOutcomeResolution: false,
+    mayEnterReadiness: false,
+    mayEnterTraining: false,
+    mayEnterProviderComparison: false
+  },
+  CONFIRMED_NON_REAL: {
+    mayEnterProductionSnapshots: false,
+    mayEnterTrajectories: false,
+    mayEnterDecisionEpisodes: false,
+    mayEnterOutcomeResolution: false,
+    mayEnterReadiness: false,
+    mayEnterTraining: false,
+    mayEnterProviderComparison: false
+  },
+  ISOLATED_TEST_FIXTURE: {
+    mayEnterProductionSnapshots: false,
+    mayEnterTrajectories: false,
+    mayEnterDecisionEpisodes: false,
+    mayEnterOutcomeResolution: false,
+    mayEnterReadiness: false,
+    mayEnterTraining: false,
+    mayEnterProviderComparison: false
+  },
+  CONFIRMED_TEST_ARTIFACT: {
+    mayEnterProductionSnapshots: false,
+    mayEnterTrajectories: false,
+    mayEnterDecisionEpisodes: false,
+    mayEnterOutcomeResolution: false,
+    mayEnterReadiness: false,
+    mayEnterTraining: false,
+    mayEnterProviderComparison: false
+  },
+  REAL_OBSERVATION: {
+    mayEnterProductionSnapshots: true,
+    mayEnterTrajectories: true,
+    mayEnterDecisionEpisodes: true,
+    mayEnterOutcomeResolution: true,
+    mayEnterReadiness: true,
+    mayEnterTraining: true,
+    mayEnterProviderComparison: true
+  },
+  EXPERIMENTAL: {
+    mayEnterProductionSnapshots: false,
+    mayEnterTrajectories: false,
+    mayEnterDecisionEpisodes: false,
+    mayEnterOutcomeResolution: false,
+    mayEnterReadiness: false,
+    mayEnterTraining: false,
+    mayEnterProviderComparison: false
+  }
+};
 
 export type ModelMaturityState = 
   | 'DATA_COLLECTION'          // Insufficient real longitudinal data; display factuals; recommend INSUFFICIENT_EVIDENCE
@@ -262,6 +362,13 @@ export interface PredictionAuditRecord {
   horizonResolutionStates: Partial<Record<HorizonPeriod, HorizonResolutionState>>;
   horizonOutcomes: Partial<Record<HorizonPeriod, HorizonOutcome>>;
   
+  // Operational tracking & resolution scheduling
+  collectionCycleId?: string | null;
+  freshObservationThisCycle?: boolean;
+  latestObservationTimestamp?: string;
+  observationAgeMinutes?: number;
+  nextResolutionEligibleAt?: string | null;
+
   // Backward-compatibility references
   isResolved: boolean;
   resolvedAt?: string;

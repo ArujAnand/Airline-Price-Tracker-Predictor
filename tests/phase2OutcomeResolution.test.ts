@@ -46,7 +46,7 @@ function createMockPred(initialFare = 7000): PredictionAuditRecord {
     decisionModelId: 'baseline-insufficient-evidence',
     modelVersion: 'v1.0-empirical-real',
     maturityState: 'DATA_COLLECTION',
-    provenance: 'REAL_OBSERVATION',
+    provenance: 'ISOLATED_TEST_FIXTURE',
     forecast: { p10: 6000, p50: 7000, p90: 8000, expectedMean: 7000, uncertaintySpreadRatio: 0.2 },
     selectedValidityHorizon: null,
     candidateHorizons: ['24h', '48h', '3d', '5d', '7d', '14d'],
@@ -68,7 +68,7 @@ function createObs(
   observedAtISO: string,
   priceINR: number,
   canonicalId = canonicalKey.canonicalId,
-  provenance: DataProvenance = 'REAL_OBSERVATION'
+  provenance: DataProvenance = 'ISOLATED_TEST_FIXTURE'
 ): LongitudinalObservation {
   return {
     observationId: id,
@@ -103,7 +103,7 @@ const obsA = [
   createObs('obs-2', '2026-09-20T16:00:00.000Z', 6949), // ₹51 drop!
   createObs('obs-3', '2026-09-21T09:55:00.000Z', 7000)
 ];
-const resA = outcomeResolverEngine.resolveCandidateHorizon(predA, '24h', obsA, '2026-09-21T11:00:00.000Z');
+const resA = outcomeResolverEngine.resolveCandidateHorizon(predA, '24h', obsA, '2026-09-21T11:00:00.000Z', true);
 assert(resA.outcome?.hasMeaningfulSavingEvent === 'CONFIRMED_TRUE', 'Saving ₹51 (6949) evaluates as CONFIRMED_TRUE');
 assert(resA.outcome?.maxAchievableSavingINR === 51, 'Max achievable saving is exactly ₹51');
 
@@ -122,7 +122,7 @@ const obsB = [
   createObs('obs-7', '2026-09-21T07:00:00.000Z', 7000),
   createObs('obs-8', '2026-09-21T10:00:00.000Z', 7000)
 ];
-const resB = outcomeResolverEngine.resolveCandidateHorizon(predB, '24h', obsB, '2026-09-21T11:00:00.000Z');
+const resB = outcomeResolverEngine.resolveCandidateHorizon(predB, '24h', obsB, '2026-09-21T11:00:00.000Z', true);
 assert(resB.outcome?.hasMeaningfulSavingEvent === 'CONFIRMED_FALSE', 'Saving of exactly ₹50 evaluates as CONFIRMED_FALSE (product rule > ₹50)');
 
 // ----------------------------------------------------------------------------
@@ -135,7 +135,7 @@ const obsC = [
   createObs('obs-2', '2026-09-20T18:00:00.000Z', 9000), // ₹2,000 surge
   createObs('obs-3', '2026-09-21T09:00:00.000Z', 9000)
 ];
-const resC = outcomeResolverEngine.resolveCandidateHorizon(predC, '24h', obsC, '2026-09-21T11:00:00.000Z');
+const resC = outcomeResolverEngine.resolveCandidateHorizon(predC, '24h', obsC, '2026-09-21T11:00:00.000Z', true);
 assert(resC.outcome?.hasMeaningfulSavingEvent === 'CONFIRMED_TRUE', 'Saving event preserved as CONFIRMED_TRUE');
 assert(resC.outcome?.maxAchievableSavingINR === 100, 'Max achievable saving recorded as ₹100');
 assert(resC.outcome?.maxDownsideSurgeINR === 2000, 'Downside surge recorded independently as ₹2,000');
@@ -148,7 +148,7 @@ const predD = createMockPred(7000);
 const obsD = Array.from({ length: 8 }, (_, i) => 
   createObs(`obs-${i}`, new Date(new Date(predTimestamp).getTime() + (i + 1) * 3 * 3600 * 1000).toISOString(), 7200)
 );
-const resD = outcomeResolverEngine.resolveCandidateHorizon(predD, '24h', obsD, '2026-09-21T11:00:00.000Z');
+const resD = outcomeResolverEngine.resolveCandidateHorizon(predD, '24h', obsD, '2026-09-21T11:00:00.000Z', true);
 assert(resD.outcome?.isSufficientCoverage === true, 'Coverage flagged as sufficient (8/8 snapshots)');
 assert(resD.outcome?.hasMeaningfulSavingEvent === 'CONFIRMED_FALSE', 'Evaluates as CONFIRMED_FALSE with high coverage');
 
@@ -160,7 +160,7 @@ const predE = createMockPred(7000);
 const obsE = [
   createObs('obs-1', '2026-09-20T12:00:00.000Z', 7200) // Only 1 snapshot in 24h
 ];
-const resE = outcomeResolverEngine.resolveCandidateHorizon(predE, '24h', obsE, '2026-09-21T11:00:00.000Z');
+const resE = outcomeResolverEngine.resolveCandidateHorizon(predE, '24h', obsE, '2026-09-21T11:00:00.000Z', true);
 assert(resE.outcome?.isSufficientCoverage === false, 'Coverage flagged as insufficient (1 snapshot in 24h)');
 assert(resE.outcome?.hasMeaningfulSavingEvent === 'UNKNOWN_DUE_TO_COVERAGE', 'Undercovered horizon resolves to UNKNOWN_DUE_TO_COVERAGE (never false)');
 
@@ -172,7 +172,7 @@ const predF = createMockPred(7000);
 const obsF = [
   createObs('obs-1', '2026-09-20T12:00:00.000Z', 6200) // ₹800 drop in single snapshot!
 ];
-const resF = outcomeResolverEngine.resolveCandidateHorizon(predF, '24h', obsF, '2026-09-21T11:00:00.000Z');
+const resF = outcomeResolverEngine.resolveCandidateHorizon(predF, '24h', obsF, '2026-09-21T11:00:00.000Z', true);
 assert(resF.outcome?.hasMeaningfulSavingEvent === 'CONFIRMED_TRUE', 'Asymmetric observability: drop is CONFIRMED_TRUE despite sparse snapshots');
 assert(resF.outcome?.isSufficientCoverage === false, 'Outcome retains coverage warning (isSufficientCoverage = false)');
 
@@ -187,7 +187,7 @@ const obsG = [
   createObs('obs-1', '2026-10-17T12:00:00.000Z', 7000),
   createObs('obs-2', '2026-10-18T05:00:00.000Z', 7000)
 ];
-const resG = outcomeResolverEngine.resolveCandidateHorizon(predG, '7d', obsG, '2026-10-25T00:00:00.000Z');
+const resG = outcomeResolverEngine.resolveCandidateHorizon(predG, '7d', obsG, '2026-10-25T00:00:00.000Z', true);
 assert(resG.outcome?.wasHorizonTruncatedByDeparture === true, '7d horizon truncated at flight departure moment');
 assert(resG.outcome?.effectiveHorizonEndTimestamp === '2026-10-18T06:10:00.000Z', 'Effective horizon end equals scheduled departure');
 
@@ -200,7 +200,7 @@ const obsHNear = [
   createObs('obs-1', '2026-09-20T13:00:00.000Z', 7000),
   createObs('obs-2', '2026-09-21T09:00:00.000Z', 6800) // 60 mins before 24h expiry
 ];
-const resHNear = outcomeResolverEngine.resolveCandidateHorizon(predH, '24h', obsHNear, '2026-09-21T11:00:00.000Z');
+const resHNear = outcomeResolverEngine.resolveCandidateHorizon(predH, '24h', obsHNear, '2026-09-21T11:00:00.000Z', true);
 assert(resHNear.outcome?.priceAtExpiryINR === 6800, 'Expiry price captured within 240m window (60m distance)');
 assert(resHNear.outcome?.expiryObservationDistanceMinutes === 60, 'Distance recorded as 60 minutes');
 
@@ -208,7 +208,7 @@ const obsHFar = [
   createObs('obs-1', '2026-09-20T13:00:00.000Z', 7000),
   createObs('obs-2', '2026-09-21T02:00:00.000Z', 6800) // 8 hours (480 mins) before expiry!
 ];
-const resHFar = outcomeResolverEngine.resolveCandidateHorizon(predH, '24h', obsHFar, '2026-09-21T11:00:00.000Z');
+const resHFar = outcomeResolverEngine.resolveCandidateHorizon(predH, '24h', obsHFar, '2026-09-21T11:00:00.000Z', true);
 assert(resHFar.outcome?.priceAtExpiryINR === null, 'Expiry price is strictly null when nearest observation > 240 minutes');
 
 // ----------------------------------------------------------------------------
@@ -222,11 +222,11 @@ const obsI1 = [
 ];
 
 // First run of resolution worker logic
-const resI1 = outcomeResolverEngine.resolveCandidateHorizon(predI, '24h', obsI1, '2026-09-21T11:00:00.000Z');
+const resI1 = outcomeResolverEngine.resolveCandidateHorizon(predI, '24h', obsI1, '2026-09-21T11:00:00.000Z', true);
 assert(resI1.outcome !== null, 'First resolution run creates valid outcome');
 
 // Second run of resolution worker logic on identical data
-const resI2 = outcomeResolverEngine.resolveCandidateHorizon(predI, '24h', obsI1, '2026-09-21T11:00:00.000Z');
+const resI2 = outcomeResolverEngine.resolveCandidateHorizon(predI, '24h', obsI1, '2026-09-21T11:00:00.000Z', true);
 assert(resI2.outcome !== null, 'Second resolution run creates valid outcome');
 assert(JSON.stringify(resI1.outcome) === JSON.stringify(resI2.outcome), 'Identical rerun produces exactly identical HorizonOutcome without factual mutation');
 assert(resI1.outcome?.resolutionVersion === resI2.outcome?.resolutionVersion, 'Resolution version remains identical (v1.0-raw-factual-measurement) on rerun');
@@ -236,7 +236,7 @@ const obsI_late = [
   ...obsI1,
   createObs('obs-late', '2026-09-20T16:00:00.000Z', 6500) // Late-arriving ₹500 price drop!
 ];
-const resI3 = outcomeResolverEngine.resolveCandidateHorizon(predI, '24h', obsI_late, '2026-09-21T11:00:00.000Z');
+const resI3 = outcomeResolverEngine.resolveCandidateHorizon(predI, '24h', obsI_late, '2026-09-21T11:00:00.000Z', true);
 assert(resI3.outcome?.minimumPriceObservedINR === 6500, 'Re-resolution correctly incorporates late-arriving legitimate snapshot');
 assert(resI3.outcome?.hasMeaningfulSavingEvent === 'CONFIRMED_TRUE', 'Re-resolution updates saving event state to CONFIRMED_TRUE');
 
@@ -249,7 +249,7 @@ const obsJ = [
   createObs('obs-1', '2026-09-20T18:00:00.000Z', 7000),
   createObs('obs-2', '2026-09-22T10:00:00.000Z', 4000) // 48 hours after pred (outside 24h window)
 ];
-const resJ = outcomeResolverEngine.resolveCandidateHorizon(predJ, '24h', obsJ, '2026-09-21T11:00:00.000Z');
+const resJ = outcomeResolverEngine.resolveCandidateHorizon(predJ, '24h', obsJ, '2026-09-21T11:00:00.000Z', true);
 assert(resJ.outcome?.actualObservationCount === 1, '24h horizon excludes 48h observation');
 assert(resJ.outcome?.minimumPriceObservedINR === 7000, 'Min price inside 24h window is ₹7,000 (excluding ₹4,000 future drop)');
 
@@ -268,11 +268,12 @@ const legacyRaw = {
   price: 6800,
   timestamp: '2026-09-20T16:00:00.000Z',
   type: 'hourly',
-  source: 'Legacy Collector'
+  source: 'SerpApi (Google Flights)',
+  provenance: 'ISOLATED_TEST_FIXTURE'
 };
 const normLegacy = trajectoryService.normalizeRawSnapshot(legacyRaw);
 const predK = createMockPred(7000);
-const resK = outcomeResolverEngine.resolveCandidateHorizon(predK, '24h', [normLegacy], '2026-09-21T11:00:00.000Z');
+const resK = outcomeResolverEngine.resolveCandidateHorizon(predK, '24h', [normLegacy], '2026-09-21T11:00:00.000Z', true);
 assert(resK.outcome?.minimumPriceObservedINR === 6800, 'Normalized legacy snapshot resolves identical min fare ₹6,800');
 
 // ----------------------------------------------------------------------------

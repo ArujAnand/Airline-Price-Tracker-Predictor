@@ -46,12 +46,19 @@ export class LongitudinalTrajectoryService {
       raw.source?.includes('simulation') ||
       raw.purityClassification === 'POTENTIALLY_NON_REAL';
 
-    // Enforce provenance
-    const provenance: any = raw.provenance === 'ISOLATED_TEST_FIXTURE' 
-      ? 'ISOLATED_TEST_FIXTURE' 
-      : isSyntheticSource
-      ? 'POTENTIALLY_NON_REAL'
-      : (raw.provenance || 'REAL_OBSERVATION');
+    // Enforce typed provenance as primary scientific guard; legacy fallback only when provenance is undefined
+    let provenance: SnapshotProvenance;
+    if (raw.provenance) {
+      provenance = raw.provenance;
+    } else if (isSyntheticSource) {
+      provenance = 'CONFIRMED_NON_REAL';
+    } else if (raw.source === 'Google Flights Live Aggregator Scraper') {
+      provenance = 'UNKNOWN_PROVENANCE';
+    } else if (raw.source === 'SerpApi (Google Flights)') {
+      provenance = 'REAL_EXTERNAL_OBSERVATION';
+    } else {
+      provenance = 'UNKNOWN_PROVENANCE';
+    }
 
     return {
       observationId: raw.id || `obs-${new Date(observedAt).getTime()}-${key.canonicalId}`,
@@ -80,13 +87,17 @@ export class LongitudinalTrajectoryService {
    * Builds longitudinal trajectory series for a set of raw snapshots
    * Filters by provenance if requested, groups by canonical flight ID, and sorts chronologically
    */
-  public buildTrajectorySeries(rawSnapshots: any[]): Map<string, FlightTrajectorySeries> {
+  public buildTrajectorySeries(rawSnapshots: any[], allowTestFixtures = false): Map<string, FlightTrajectorySeries> {
     const trajectories = new Map<string, FlightTrajectorySeries>();
 
     for (const raw of rawSnapshots) {
       const obs = this.normalizeRawSnapshot(raw);
-      if (!isEmpiricallyEligibleObservation(obs)) {
-        continue; // Strictly quarantine non-real and potentially non-real observations!
+      if (obs.provenance === 'ISOLATED_TEST_FIXTURE') {
+        if (!allowTestFixtures) {
+          continue; // Strictly exclude test fixtures from production trajectories
+        }
+      } else if (!isEmpiricallyEligibleObservation(obs)) {
+        continue; // Strictly quarantine non-real, experimental, and unverified observations!
       }
       
       let series = trajectories.get(obs.canonicalId);
@@ -232,10 +243,24 @@ export type SnapshotProvenance =
   | 'UNKNOWN_PROVENANCE'                 // Unverified snapshots with ambiguous harvest paths
   | 'CONFIRMED_NON_REAL'                 // Artificially generated/calculated yield fallback prices
   | 'ISOLATED_TEST_FIXTURE'              // Isolated test snapshots (Strictly prohibited from live pipelines/training)
+  | 'CONFIRMED_TEST_ARTIFACT'            // Test generated artifact in storage (Strictly prohibited from live pipelines/training)
   | 'REAL_OBSERVATION';                  // Legacy real observations (for backwards compatibility)
 
 export function isEmpiricallyEligibleObservation(snapshot: any): boolean {
+  if (!snapshot) return false;
   const provenance = snapshot.provenance;
+  // Explicitly reject non-empirical categories
+  if (
+    !provenance ||
+    provenance === 'ISOLATED_TEST_FIXTURE' ||
+    provenance === 'CONFIRMED_TEST_ARTIFACT' ||
+    provenance === 'CONFIRMED_NON_REAL' ||
+    provenance === 'UNKNOWN_PROVENANCE' ||
+    provenance === 'EXPERIMENTAL_EXTERNAL_OBSERVATION' ||
+    provenance === 'EXPERIMENTAL'
+  ) {
+    return false;
+  }
   return provenance === 'REAL_EXTERNAL_OBSERVATION' || 
          provenance === 'REAL_VERIFIED_HISTORICAL_OBSERVATION' ||
          provenance === 'REAL_OBSERVATION';

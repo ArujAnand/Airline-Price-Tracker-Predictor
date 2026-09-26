@@ -21,11 +21,11 @@ export class DecisionEpisodeService {
    * If no ACTIVE background episode exists for this canonical flight, initializes one.
    * Otherwise, generates a factual StateTransitionObservation and updates recommendation history.
    */
-  public async processSnapshot(snapshot: LongitudinalObservation): Promise<void> {
+  public async processSnapshot(snapshot: LongitudinalObservation, allowTestFixture = false): Promise<void> {
     const canonicalId = snapshot.canonicalId;
 
     // Check empirical eligibility and synthetic isolation guard
-    if (!isEmpiricallyEligibleObservation(snapshot)) {
+    if (!allowTestFixture && !isEmpiricallyEligibleObservation(snapshot)) {
       console.log(`[DecisionEpisode] Snapshot for ${canonicalId} is not empirically eligible (provenance: ${snapshot.provenance}); skipping episode processing.`);
       return;
     }
@@ -73,7 +73,7 @@ export class DecisionEpisodeService {
         recommendationVersionIds: [versionId],
         marketOutcomeId: null,
         shadowPolicyOutcomeIds: [],
-        provenance: 'REAL_OBSERVATION',
+        provenance: (snapshot.provenance as any) || 'REAL_EXTERNAL_OBSERVATION',
         createdAt: nowISO,
         updatedAt: nowISO
       };

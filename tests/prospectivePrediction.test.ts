@@ -56,7 +56,7 @@ const predRecord: PredictionAuditRecord = {
   decisionModelId: 'candidate-insufficient-evidence-baseline',
   modelVersion: 'v1.0-empirical-real',
   maturityState: 'DATA_COLLECTION',
-  provenance: 'REAL_OBSERVATION',
+  provenance: 'ISOLATED_TEST_FIXTURE',
   forecast: {
     p10: 6400,
     p50: 7100,

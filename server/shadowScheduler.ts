@@ -70,6 +70,9 @@ export class ShadowPredictionDaemon {
     const candidateHorizons: HorizonPeriod[] = ['24h', '48h', '3d', '5d', '7d', '14d'];
     const targetRoutes = ['PNQ-LKO', 'LKO-PNQ'];
     let generatedCount = 0;
+    let persistCount = 0;
+    let stepCount = 0;
+    let timeNormalizedCount = 0;
 
     const today = new Date();
     const currentHourWindow = Math.floor(today.getHours() / 3) * 3;
@@ -119,6 +122,7 @@ export class ShadowPredictionDaemon {
 
             await firestoreDB.saveShadowPredictionRecord(shadowRecordPersist);
             generatedCount++;
+            persistCount++;
 
             // 2. Generate Trailing Step Baseline (Historical Semantics preserved)
             const stepOutputs = trailingStepBaseline.generateHorizonOutputs(
@@ -146,6 +150,7 @@ export class ShadowPredictionDaemon {
 
             await firestoreDB.saveShadowPredictionRecord(shadowRecordStep);
             generatedCount++;
+            stepCount++;
 
             // 3. Generate Time-Normalized Momentum Baseline Shadow Prediction
             const timeNormalizedOutputs = timeNormalizedMomentumBaseline.generateHorizonOutputs(
@@ -173,6 +178,7 @@ export class ShadowPredictionDaemon {
 
             await firestoreDB.saveShadowPredictionRecord(shadowRecordTimeNormalized);
             generatedCount++;
+            timeNormalizedCount++;
 
           } catch (itemErr) {
             console.warn('[Shadow Daemon] Error generating shadow prediction:', itemErr);
@@ -181,7 +187,11 @@ export class ShadowPredictionDaemon {
       }
     }
 
-    console.log(`🔮 [Shadow Daemon] Generated and persisted ${generatedCount} shadow predictions across baseline models.`);
+    console.log(`[Shadow Predictions by Model]`);
+    console.log(`  persistence: ${persistCount}`);
+    console.log(`  trailing-step: ${stepCount}`);
+    console.log(`  normalized-momentum: ${timeNormalizedCount}`);
+    console.log(`Total shadow predictions generated: ${generatedCount}`);
     return { shadowPredictionsGenerated: generatedCount };
   }
 }

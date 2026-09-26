@@ -8,6 +8,7 @@ import {
   where,
   orderBy,
   limit as fsLimit,
+  startAfter,
   deleteDoc,
   writeBatch
 } from 'firebase/firestore';
@@ -56,11 +57,24 @@ export class FirestorePersistenceService {
       snapshot.source?.includes('synthetic') || 
       snapshot.source?.includes('simulation');
 
-    const allowedProvenances = ['REAL_EXTERNAL_OBSERVATION', 'EXPERIMENTAL_EXTERNAL_OBSERVATION', 'ISOLATED_TEST_FIXTURE', 'REAL_OBSERVATION'];
+    // If provenance was not explicitly passed but source is a confirmed genuine external scraper, assign REAL_EXTERNAL_OBSERVATION
+    if (!snapshot.provenance) {
+      if (
+        snapshot.source === 'SerpApi (Google Flights)' ||
+        snapshot.source === 'SearchApi (Google Flights)' ||
+        snapshot.source === 'Google Flights (Live Scraping)'
+      ) {
+        snapshot.provenance = 'REAL_EXTERNAL_OBSERVATION';
+      }
+    }
+
+    // Production /snapshots must strictly only contain real empirical market observations.
+    // Isolated test fixtures and experimental provider observations are strictly forbidden from /snapshots.
+    const allowedProvenances = ['REAL_EXTERNAL_OBSERVATION', 'REAL_VERIFIED_HISTORICAL_OBSERVATION', 'REAL_OBSERVATION'];
     const hasAllowedProvenance = snapshot.provenance && allowedProvenances.includes(snapshot.provenance);
 
     if (isSynthetic || !hasAllowedProvenance) {
-      const errorMsg = `Data Integrity Violation: Attempted to save non-real price snapshot to database! Source: '${snapshot.source}', Provenance: '${snapshot.provenance}'`;
+      const errorMsg = `Data Integrity Violation: Attempted to save non-production-real snapshot to /snapshots! Source: '${snapshot.source}', Provenance: '${snapshot.provenance}'`;
       const isTestOrDev = process.env.NODE_ENV !== 'production' || process.argv.some(arg => arg.includes('test') || arg.includes('tsx'));
       if (isTestOrDev) {
         throw new Error(errorMsg);
@@ -157,10 +171,11 @@ export class FirestorePersistenceService {
     }
   }
 
-  public async getPredictionRecords(): Promise<TrackedPredictionRecord[]> {
+  public async getPredictionRecords(limitCount: number = 1000, oldestFirst = false): Promise<TrackedPredictionRecord[]> {
     try {
       const colRef = collection(db, 'prediction_records');
-      const q = query(colRef, orderBy('createdAt', 'desc'), fsLimit(200));
+      const orderDir = oldestFirst ? 'asc' : 'desc';
+      const q = query(colRef, orderBy('createdAt', orderDir), fsLimit(limitCount));
       const snap = await getDocs(q);
       const list: TrackedPredictionRecord[] = [];
       snap.forEach((docItem) => {
@@ -170,6 +185,31 @@ export class FirestorePersistenceService {
     } catch (err) {
       console.warn('[Firestore] getPredictionRecords warning:', err);
       return [];
+    }
+  }
+
+  public async getPagedPredictionRecords(
+    batchSize: number = 200,
+    startAfterCreatedAt?: string
+  ): Promise<{ records: TrackedPredictionRecord[]; lastCreatedAt?: string }> {
+    try {
+      const colRef = collection(db, 'prediction_records');
+      let q = query(colRef, orderBy('createdAt', 'asc'), fsLimit(batchSize));
+      if (startAfterCreatedAt) {
+        q = query(colRef, orderBy('createdAt', 'asc'), startAfter(startAfterCreatedAt), fsLimit(batchSize));
+      }
+      const snap = await getDocs(q);
+      const list: TrackedPredictionRecord[] = [];
+      let lastCreatedAt: string | undefined = undefined;
+      snap.forEach((docItem) => {
+        const data = docItem.data() as TrackedPredictionRecord;
+        list.push(data);
+        lastCreatedAt = data.createdAt;
+      });
+      return { records: list, lastCreatedAt };
+    } catch (err) {
+      console.warn('[Firestore] getPagedPredictionRecords warning:', err);
+      return { records: [] };
     }
   }
 

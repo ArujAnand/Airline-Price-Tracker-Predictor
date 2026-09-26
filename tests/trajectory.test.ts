@@ -29,7 +29,7 @@ const mockObservations: LongitudinalObservation[] = [
     isScheduleChanged: false,
     scheduleDriftMinutes: 0,
     isIdentityInferred: false,
-    provenance: 'REAL_OBSERVATION',
+    provenance: 'ISOLATED_TEST_FIXTURE',
     source: 'PERSISTED_FIRESTORE'
   },
   {
@@ -50,7 +50,7 @@ const mockObservations: LongitudinalObservation[] = [
     isScheduleChanged: false,
     scheduleDriftMinutes: 0,
     isIdentityInferred: false,
-    provenance: 'REAL_OBSERVATION',
+    provenance: 'ISOLATED_TEST_FIXTURE',
     source: 'PERSISTED_FIRESTORE'
   },
   {
@@ -71,13 +71,17 @@ const mockObservations: LongitudinalObservation[] = [
     isScheduleChanged: false,
     scheduleDriftMinutes: 0,
     isIdentityInferred: false,
-    provenance: 'REAL_OBSERVATION',
+    provenance: 'ISOLATED_TEST_FIXTURE',
     source: 'PERSISTED_FIRESTORE'
   }
 ];
 
-// Test 1: Reconstructing Full Trajectory Series
-const seriesMap = trajectoryService.buildTrajectorySeries(mockObservations);
+// Test 0: Production Trajectory Construction Strictly Excludes ISOLATED_TEST_FIXTURE
+const prodSeriesMap = trajectoryService.buildTrajectorySeries(mockObservations, false);
+assert(prodSeriesMap.size === 0, 'Production trajectory builder strictly excludes ISOLATED_TEST_FIXTURE');
+
+// Test 1: Reconstructing Full Trajectory Series (Explicitly in-test isolation)
+const seriesMap = trajectoryService.buildTrajectorySeries(mockObservations, true);
 const flightSeries = seriesMap.get('PNQ-LKO-6E-656-2026-10-18');
 assert(flightSeries !== undefined, 'Flight trajectory series found');
 assert(flightSeries?.observationCount === 3, 'All 3 observations grouped into series');

@@ -22,6 +22,7 @@ import {
   HorizonResolutionState,
   UnresolvedReason
 } from './types/mlPipeline';
+import { isEmpiricallyEligibleObservation } from './trajectoryService';
 
 /**
  * Configurable & Versioned Data-Quality Engineering Safeguards
@@ -51,15 +52,18 @@ export class OutcomeResolverEngine {
     prediction: PredictionAuditRecord,
     horizon: HorizonPeriod,
     allObservations: LongitudinalObservation[],
-    nowTimestampISO: string = new Date().toISOString()
+    nowTimestampISO: string = new Date().toISOString(),
+    allowTestFixtures = false
   ): {
     outcome: HorizonOutcome | null;
     state: HorizonResolutionState;
     unresolvedReason?: UnresolvedReason;
   } {
     // 1. Strict Data Purity Guard
-    if (prediction.provenance === 'ISOLATED_TEST_FIXTURE') {
-      throw new Error(`Data Integrity Violation: Isolated test fixture prediction rejected by production Outcome Resolver Engine.`);
+    if (prediction.provenance === 'ISOLATED_TEST_FIXTURE' || (prediction.provenance as any) === 'CONFIRMED_TEST_ARTIFACT') {
+      if (!allowTestFixtures) {
+        throw new Error(`Data Integrity Violation: Isolated test fixture prediction rejected by production Outcome Resolver Engine.`);
+      }
     }
 
     const predTimeMs = new Date(prediction.createdAt).getTime();
@@ -87,7 +91,13 @@ export class OutcomeResolverEngine {
 
     // 2. Filter canonical observations in window [T_pred, T_effEnd]
     const flightObs = allObservations
-      .filter(o => o.canonicalId === prediction.canonicalId && o.provenance !== 'ISOLATED_TEST_FIXTURE')
+      .filter(o => {
+        if (o.canonicalId !== prediction.canonicalId) return false;
+        if (o.provenance === 'ISOLATED_TEST_FIXTURE' || (o.provenance as any) === 'CONFIRMED_TEST_ARTIFACT') {
+          return allowTestFixtures;
+        }
+        return isEmpiricallyEligibleObservation(o);
+      })
       .sort((a, b) => new Date(a.observedAt).getTime() - new Date(b.observedAt).getTime());
 
     const windowObs = flightObs.filter(o => {

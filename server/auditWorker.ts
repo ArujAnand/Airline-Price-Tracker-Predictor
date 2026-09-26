@@ -59,8 +59,7 @@ export class AuditOutcomeResolutionWorker {
   }> {
     console.log(`🔍 [Audit Worker] Running outcome resolution sweep at ${nowISO}...`);
 
-    // 1. Load predictions & observations from persistent storage
-    const allPredictions = await firestoreDB.getPredictionRecords();
+    // 1. Load observations once for trajectory resolution
     const rawSnapshots = await firestoreDB.getSnapshots(undefined, 2000);
     const normalizedObs = rawSnapshots.map(s => trajectoryService.normalizeRawSnapshot(s));
 
@@ -68,53 +67,85 @@ export class AuditOutcomeResolutionWorker {
     let resolvedHorizonsTotal = 0;
     let updatedRecords = 0;
 
-    for (const predRaw of allPredictions) {
-      const pred = predRaw as unknown as PredictionAuditRecord;
-      if (pred.provenance === 'ISOLATED_TEST_FIXTURE') continue;
+    // 2. Paginate predictions oldest-first (batches of 200 up to 1000 records per hourly run)
+    // Ensures records created >24h ago are evaluated and never starved by newer records
+    let currentCursor: string | undefined = undefined;
+    const MAX_PAGES = 5;
 
-      evaluatedPredictions++;
-      const candidateHorizons: HorizonPeriod[] = pred.candidateHorizons || ['24h', '48h', '3d', '5d', '7d', '14d'];
-      const currentStates = pred.horizonResolutionStates || {};
-      const currentOutcomes = pred.horizonOutcomes || {};
-      let isRecordModified = false;
-      let newlyResolvedInCycle = 0;
+    for (let page = 0; page < MAX_PAGES; page++) {
+      const pageResult = await firestoreDB.getPagedPredictionRecords(200, currentCursor);
+      const batch = pageResult.records;
+      if (!batch || batch.length === 0) break;
 
-      for (const horizon of candidateHorizons) {
-        const currentState = currentStates[horizon] || 'PENDING';
-        
-        // Skip if already fully resolved unless force re-resolution is requested
-        if (currentState === 'RESOLVED' && currentOutcomes[horizon]?.isSufficientCoverage) {
+      currentCursor = pageResult.lastCreatedAt;
+
+      for (const predRaw of batch) {
+        const pred = predRaw as unknown as PredictionAuditRecord;
+        if (pred.provenance === 'ISOLATED_TEST_FIXTURE' || pred.provenance === 'CONFIRMED_TEST_ARTIFACT') continue;
+        if (pred.isResolved === true || pred.overallResolutionState === 'FULLY_RESOLVED') continue;
+
+        // Skip if earliest candidate horizon is not yet due
+        if (pred.nextResolutionEligibleAt && new Date(pred.nextResolutionEligibleAt).getTime() > new Date(nowISO).getTime()) {
           continue;
         }
 
-        const res = outcomeResolverEngine.resolveCandidateHorizon(pred, horizon, normalizedObs, nowISO);
+        evaluatedPredictions++;
+        const candidateHorizons: HorizonPeriod[] = pred.candidateHorizons || ['24h', '48h', '3d', '5d', '7d', '14d'];
+        const currentStates = pred.horizonResolutionStates || {};
+        const currentOutcomes = pred.horizonOutcomes || {};
+        let isRecordModified = false;
+        let newlyResolvedInCycle = 0;
 
-        if (res.state === 'RESOLVED' && res.outcome) {
-          currentStates[horizon] = 'RESOLVED';
-          currentOutcomes[horizon] = res.outcome;
-          isRecordModified = true;
-          newlyResolvedInCycle++;
+        for (const horizon of candidateHorizons) {
+          const currentState = currentStates[horizon] || 'PENDING';
+          
+          if (currentState === 'RESOLVED' && currentOutcomes[horizon]?.isSufficientCoverage) {
+            continue;
+          }
+
+          const res = outcomeResolverEngine.resolveCandidateHorizon(pred, horizon, normalizedObs, nowISO);
+
+          if (res.state === 'RESOLVED' && res.outcome) {
+            currentStates[horizon] = 'RESOLVED';
+            currentOutcomes[horizon] = res.outcome;
+            isRecordModified = true;
+            newlyResolvedInCycle++;
+          }
+        }
+
+        if (isRecordModified) {
+          const allResolved = candidateHorizons.every(h => currentStates[h] === 'RESOLVED' || currentStates[h] === 'UNRESOLVABLE_DUE_TO_DATA_QUALITY');
+          
+          // Calculate next resolution eligible timestamp for remaining pending horizons
+          const pendingHorizons = candidateHorizons.filter(h => currentStates[h] !== 'RESOLVED' && currentStates[h] !== 'UNRESOLVABLE_DUE_TO_DATA_QUALITY');
+          let nextEligibleAt: string | null = null;
+          if (pendingHorizons.length > 0) {
+            const predTime = new Date(pred.createdAt).getTime();
+            const horizonDurationsHours: Record<string, number> = {
+              '24h': 24, '48h': 48, '3d': 72, '5d': 120, '7d': 168, '14d': 336
+            };
+            const earliestPendingMs = Math.min(...pendingHorizons.map(h => predTime + (horizonDurationsHours[h] || 24) * 3600000));
+            nextEligibleAt = new Date(earliestPendingMs).toISOString();
+          }
+
+          const updatedPred: PredictionAuditRecord = {
+            ...pred,
+            horizonResolutionStates: currentStates,
+            horizonOutcomes: currentOutcomes,
+            overallResolutionState: allResolved ? 'FULLY_RESOLVED' : 'PENDING_HORIZONS',
+            isResolved: allResolved,
+            nextResolutionEligibleAt: nextEligibleAt,
+            resolvedAt: allResolved ? nowISO : pred.resolvedAt,
+            actualOutcome: currentOutcomes['7d'] || currentOutcomes[candidateHorizons[0]] || pred.actualOutcome
+          };
+
+          await firestoreDB.savePredictionRecord(updatedPred as any);
+          updatedRecords++;
+          resolvedHorizonsTotal += newlyResolvedInCycle;
         }
       }
 
-      if (isRecordModified) {
-        // Evaluate overall prediction resolution state
-        const allResolved = candidateHorizons.every(h => currentStates[h] === 'RESOLVED' || currentStates[h] === 'UNRESOLVABLE_DUE_TO_DATA_QUALITY');
-        
-        const updatedPred: PredictionAuditRecord = {
-          ...pred,
-          horizonResolutionStates: currentStates,
-          horizonOutcomes: currentOutcomes,
-          overallResolutionState: allResolved ? 'FULLY_RESOLVED' : 'PENDING_HORIZONS',
-          isResolved: allResolved,
-          resolvedAt: allResolved ? nowISO : pred.resolvedAt,
-          actualOutcome: currentOutcomes['7d'] || currentOutcomes[candidateHorizons[0]] || pred.actualOutcome
-        };
-
-        await firestoreDB.savePredictionRecord(updatedPred as any);
-        updatedRecords++;
-        resolvedHorizonsTotal += newlyResolvedInCycle;
-      }
+      if (batch.length < 200) break; // Reached last page
     }
 
     console.log(`🔍 [Audit Worker] Sweep complete: ${evaluatedPredictions} predictions evaluated, ${resolvedHorizonsTotal} candidate horizons newly resolved, ${updatedRecords} records persisted.`);

@@ -47,15 +47,31 @@ export class BackgroundSchedulerDaemon {
   /**
    * Runs a complete collection & prospective background prediction cycle
    */
-  public async runCycle(force = false): Promise<{ snapshotsCollected: number; prospectivePredictionsLogged: number }> {
-    console.log(`⏰ [Scheduler] Starting observation cycle at ${new Date().toISOString()} (force=${force})`);
+  public async runCycle(force = false): Promise<{
+    snapshotsCollected: number;
+    prospectivePredictionsLogged: number;
+    collectionCycleId: string;
+  }> {
+    const now = new Date();
+    const nowISO = now.toISOString();
+    const collectionCycleId = `cycle-${now.getTime()}-${Math.random().toString(36).substring(2, 7)}`;
+
+    console.log(`\n======================================================`);
+    console.log(`[Collection Cycle ${collectionCycleId}]`);
+    console.log(`Started at ${nowISO} (force=${force})`);
 
     // 1. Trigger live price collection across routes
-    const freshSnapshots = flightAggregator.triggerManualSync(force);
-    console.log(`⏰ [Scheduler] Captured ${freshSnapshots.length} fresh real price snapshots.`);
+    const collectionResult = await flightAggregator.executeCollectionCycle(force, collectionCycleId);
+    console.log(`Queries attempted: ${collectionResult.queriesAttempted}`);
+    console.log(`Successful route/date queries: ${collectionResult.successfulQueries}`);
+    console.log(`Failed queries: ${collectionResult.failedQueries}`);
+    console.log(`New genuine snapshots: ${collectionResult.snapshotsCollected}`);
+    console.log(`Unchanged fares re-observed: ${collectionResult.reobservedUnchangedCount}`);
+    console.log(`Skipped routes (< 180m threshold): ${collectionResult.skippedRoutes.join(', ') || 'None'}`);
+    console.log(`Collection attempts logged: ${collectionResult.queriesAttempted}`);
 
     // Process fresh snapshots into Decision Episodes
-    for (const rawS of freshSnapshots) {
+    for (const rawS of collectionResult.freshSnapshots) {
       try {
         const normS = trajectoryService.normalizeRawSnapshot(rawS);
         await decisionEpisodeService.processSnapshot(normS);
@@ -70,7 +86,8 @@ export class BackgroundSchedulerDaemon {
 
     // 3. Generate prospective background predictions for all active flights
     let prospectiveCount = 0;
-    const nowISO = new Date().toISOString();
+    let freshStateCount = 0;
+    let staleStateCount = 0;
     const targetRoutes = ['PNQ-LKO', 'LKO-PNQ'];
 
     // Target sample dates: 1 to 60 days out
@@ -82,6 +99,9 @@ export class BackgroundSchedulerDaemon {
       sampleDates.push(d.toISOString().split('T')[0]);
     }
 
+    // Index of fresh flight IDs captured this cycle
+    const freshFlightIdSet = new Set(collectionResult.freshSnapshots.map(s => s.flightId));
+
     for (const routeId of targetRoutes) {
       const [origin, destination] = routeId.split('-');
 
@@ -91,7 +111,24 @@ export class BackgroundSchedulerDaemon {
         for (const fl of flights) {
           try {
             const canonicalKey = buildCanonicalFlightKey(origin, destination, fl.flightNumber, dateStr, fl.airlineCode);
-            
+            const isFresh = freshFlightIdSet.has(canonicalKey.canonicalId);
+
+            // Determine latest observation timestamp and age
+            const matchingSnaps = allRawSnapshots.filter(s => s.flightId === canonicalKey.canonicalId);
+            let latestObsTime = nowISO;
+            let observationAgeMinutes = 0;
+            if (matchingSnaps.length > 0) {
+              const latestSnap = matchingSnaps.sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
+              latestObsTime = latestSnap.timestamp;
+              observationAgeMinutes = Math.max(0, Math.round((now.getTime() - new Date(latestSnap.timestamp).getTime()) / 60000));
+            }
+
+            if (isFresh) {
+              freshStateCount++;
+            } else {
+              staleStateCount++;
+            }
+
             // Extract point-in-time features strictly up to now (t <= now)
             const features: FactualContextFeatures = trajectoryService.extractPointInTimeFeatures(
               canonicalKey.canonicalId,
@@ -105,13 +142,20 @@ export class BackgroundSchedulerDaemon {
             const leadDays = features.leadTimeDays;
 
             // Deterministic, idempotent prediction ID based on canonical flight ID and 3-hour window
-            // Guarantees server restarts in the same window update the same document without creating duplicates
             const currentHourWindow = Math.floor(today.getHours() / 3) * 3;
             const windowKey = `${today.toISOString().split('T')[0]}-h${String(currentHourWindow).padStart(2, '0')}`;
             const predictionId = `pred-${canonicalKey.canonicalId}-${windowKey}`;
 
+            // Compute next resolution eligibility timestamp (earliest candidate horizon is 24h)
+            const nextResolutionEligibleAt = new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
+
             const prospectiveRecord: PredictionAuditRecord = {
               predictionId,
+              collectionCycleId,
+              freshObservationThisCycle: isFresh,
+              latestObservationTimestamp: latestObsTime,
+              observationAgeMinutes,
+              nextResolutionEligibleAt,
               originType: 'EXPERIMENTAL_BACKGROUND',
               createdAt: nowISO,
               canonicalId: canonicalKey.canonicalId,
@@ -161,10 +205,16 @@ export class BackgroundSchedulerDaemon {
       }
     }
 
-    console.log(`⏰ [Scheduler] Logged ${prospectiveCount} background prospective prediction records.`);
+    console.log(`[Prediction Generation]`);
+    console.log(`Eligible fresh flight states: ${freshStateCount}`);
+    console.log(`Stale states marked: ${staleStateCount}`);
+    console.log(`Prospective records created: ${prospectiveCount}`);
+    console.log(`======================================================\n`);
+
     return {
-      snapshotsCollected: freshSnapshots.length,
-      prospectivePredictionsLogged: prospectiveCount
+      snapshotsCollected: collectionResult.snapshotsCollected,
+      prospectivePredictionsLogged: prospectiveCount,
+      collectionCycleId
     };
   }
 }

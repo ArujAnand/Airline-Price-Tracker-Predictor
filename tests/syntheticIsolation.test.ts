@@ -21,7 +21,11 @@ for (const fixture of ISOLATED_TEST_FIXTURES) {
 // Test 2: ML Pipeline Ingestion Guard
 function simulateMLIngestion(records: { provenance: DataProvenance }[]) {
   for (const r of records) {
-    if (r.provenance !== 'REAL_OBSERVATION') {
+    if (
+      r.provenance !== 'REAL_EXTERNAL_OBSERVATION' &&
+      r.provenance !== 'REAL_VERIFIED_HISTORICAL_OBSERVATION' &&
+      r.provenance !== 'REAL_OBSERVATION'
+    ) {
       throw new Error(`Data Integrity Violation: Non-real observation rejected by ML training pipeline: ${r.provenance}`);
     }
   }
@@ -46,13 +50,13 @@ const realSnapshots = [
     routeId: 'PNQ-LKO',
     departureDate: '2026-10-18',
     price: 7200,
-    provenance: 'REAL_OBSERVATION'
+    provenance: 'REAL_EXTERNAL_OBSERVATION'
   },
   {
     routeId: 'PNQ-LKO',
     departureDate: '2026-10-18',
     price: 6800,
-    provenance: 'REAL_OBSERVATION'
+    provenance: 'REAL_EXTERNAL_OBSERVATION'
   }
 ];
 

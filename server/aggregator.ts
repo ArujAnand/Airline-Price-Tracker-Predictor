@@ -243,7 +243,6 @@ class FlightAggregatorEngine {
   constructor() {
     // Only hydrate genuine real snapshots from persistent Cloud Firestore
     this.hydrateFromFirestore();
-    this.startScheduledCollector();
     // Run initial auto-discovery immediately
     this.runAutomatedFlightDiscovery();
   }
@@ -261,16 +260,6 @@ class FlightAggregatorEngine {
           }
         }
         console.log(`[Firestore DB] Hydrated ${persisted.length} price snapshots from persistent Cloud Firestore.`);
-      }
-
-      // Auto-catchup if last snapshot is older than 3 hours (e.g. after container sleep or cold start)
-      const THREE_HOURS_MS = 3 * 60 * 60 * 1000;
-      const latestTime = this.snapshots.length > 0
-        ? Math.max(...this.snapshots.map((s) => new Date(s.timestamp).getTime()))
-        : 0;
-      if (latestTime === 0 || Date.now() - latestTime >= THREE_HOURS_MS) {
-        console.log('[Aggregator] Periodic sync due on startup / wake-up. Running catchup sync...');
-        this.triggerManualSync(true);
       }
     } catch (err) {
       console.warn('[Firestore DB] Hydration notice:', err);
@@ -525,6 +514,7 @@ class FlightAggregatorEngine {
             capturedHour: now.getHours(),
             type: 'hourly',
             source: fl.source || 'Google Flights (Live Scraping)',
+            provenance: 'REAL_EXTERNAL_OBSERVATION'
           };
           this.snapshots.push(snap);
           liveSnaps.push(snap);
@@ -730,16 +720,44 @@ class FlightAggregatorEngine {
   }
 
   // Capture fresh snapshots (scheduled every 3 hours; skips if route was updated < 3h ago unless force=true)
-  public triggerManualSync(force: boolean = false): PriceSnapshot[] {
+  public triggerManualSync(force: boolean = false, cycleId?: string): PriceSnapshot[] {
+    const cId = cycleId || `sync-${Date.now()}`;
+    this.executeCollectionCycle(force, cId).catch(err => {
+      console.error('[Aggregator] Background manual sync error:', err);
+    });
+    return [];
+  }
+
+  /**
+   * Authoritative Collection Execution Method
+   * Executes outbound live provider calls for target dates, awaits promises, tracks re-observed fares,
+   * and returns full cycle statistics.
+   */
+  public async executeCollectionCycle(force: boolean = false, cycleId?: string): Promise<{
+    queriesAttempted: number;
+    successfulQueries: number;
+    failedQueries: number;
+    snapshotsCollected: number;
+    reobservedUnchangedCount: number;
+    freshSnapshots: PriceSnapshot[];
+    skippedRoutes: string[];
+    collectionCycleId: string;
+  }> {
     const now = new Date();
     const THREE_HOURS_MS = 3 * 60 * 60 * 1000;
     this.lastRun = now;
     this.nextRun = new Date(now.getTime() + THREE_HOURS_MS);
+    const activeCycleId = cycleId || `cycle-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
 
     const targetDates = this.getTargetTrackingDates();
+    let queriesAttempted = 0;
+    let successfulQueries = 0;
+    let failedQueries = 0;
+    let reobservedUnchangedCount = 0;
+    const allCollectedSnapshots: PriceSnapshot[] = [];
+    const skippedRoutes: string[] = [];
 
     for (const routeId of this.monitoredRoutes) {
-      // Check when was the last time fare was updated for this route
       const routeSnapshots = this.snapshots.filter(
         (s) => s.routeId.toUpperCase() === routeId.toUpperCase()
       );
@@ -749,19 +767,39 @@ class FlightAggregatorEngine {
       }
 
       if (!force && lastUpdatedTime > 0 && now.getTime() - lastUpdatedTime < THREE_HOURS_MS) {
-        const minutesAgo = Math.round((now.getTime() - lastUpdatedTime) / 60000);
+        const elapsedMinutes = (now.getTime() - lastUpdatedTime) / 60000;
         console.log(
-          `[Aggregator] Route ${routeId} fare was updated ${minutesAgo}m ago (< 3 hours ago). Skipping fresh data call.`
+          `[Aggregator] Route ${routeId} fare was updated ${elapsedMinutes.toFixed(2)}m ago; refresh threshold is 180.00m. Skipping fresh data call.`
         );
+        skippedRoutes.push(routeId);
         continue;
       }
 
       const [origin, destination] = routeId.split('-');
 
       for (const departureDate of targetDates) {
-        this.runLiveCollectionForRouteDate(origin, destination, departureDate).catch(err => {
+        queriesAttempted++;
+        try {
+          const res = await this.runLiveCollectionForRouteDate(origin, destination, departureDate, activeCycleId);
+          if (res.success) {
+            successfulQueries++;
+            for (const snap of res.snapshots) {
+              const previousSnaps = routeSnapshots.filter(s => s.flightId === snap.flightId);
+              if (previousSnaps.length > 0) {
+                const latestPrev = previousSnaps.sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
+                if (latestPrev && latestPrev.price === snap.price) {
+                  reobservedUnchangedCount++;
+                }
+              }
+              allCollectedSnapshots.push(snap);
+            }
+          } else {
+            failedQueries++;
+          }
+        } catch (err) {
+          failedQueries++;
           console.error(`[Collection] Live collection error for ${origin}-${destination} on ${departureDate}:`, err);
-        });
+        }
       }
     }
 
@@ -771,11 +809,24 @@ class FlightAggregatorEngine {
       });
     }
 
-    // Return empty array synchronously (snapshots are persisted asynchronously upon genuine scraper success)
-    return [];
+    return {
+      queriesAttempted,
+      successfulQueries,
+      failedQueries,
+      snapshotsCollected: allCollectedSnapshots.length,
+      reobservedUnchangedCount,
+      freshSnapshots: allCollectedSnapshots,
+      skippedRoutes,
+      collectionCycleId: activeCycleId
+    };
   }
 
-  public async runLiveCollectionForRouteDate(origin: string, destination: string, departureDate: string): Promise<void> {
+  public async runLiveCollectionForRouteDate(
+    origin: string,
+    destination: string,
+    departureDate: string,
+    cycleId?: string
+  ): Promise<{ success: boolean; snapshots: PriceSnapshot[] }> {
     const routeId = `${origin.toUpperCase()}-${destination.toUpperCase()}`;
     const startTime = Date.now();
     const { currentProductionProvider } = await import('./providers');
@@ -795,6 +846,7 @@ class FlightAggregatorEngine {
     // Save factual collection attempt log to Firestore
     const attempt = {
       attemptId: `att-${Date.now()}-${origin}-${destination}-${departureDate}-${currentProductionProvider.providerId}`,
+      collectionCycleId: cycleId || null,
       attemptedAt: new Date().toISOString(),
       routeId,
       origin: origin.toUpperCase(),
@@ -819,6 +871,7 @@ class FlightAggregatorEngine {
         return {
           id: `snap-live-${Date.now()}-${cleanFlightNum}-${idx}`,
           flightId: `${origin.toUpperCase()}-${destination.toUpperCase()}-${cleanFlightNum}-${departureDate}`,
+          collectionCycleId: cycleId || null,
           routeId,
           origin: origin.toUpperCase(),
           destination: destination.toUpperCase(),
@@ -856,7 +909,11 @@ class FlightAggregatorEngine {
           console.error('[Experimental] Parallel scrape failed:', err);
         });
       }
+
+      return { success: true, snapshots: liveSnaps };
     }
+
+    return { success: false, snapshots: [] };
   }
 
   public async runExperimentalCollectionForRouteDate(
@@ -993,15 +1050,6 @@ class FlightAggregatorEngine {
 
   public onHourlySync(cb: () => Promise<any>) {
     this.hourlySyncCallback = cb;
-  }
-
-  private startScheduledCollector() {
-    // Run collector every 3 hours (180 minutes) as configured
-    const THREE_HOURS_MS = 3 * 60 * 60 * 1000;
-    this.timer = setInterval(() => {
-      this.runAutomatedFlightDiscovery();
-      this.triggerManualSync(false); // Skips any route updated < 3 hours ago
-    }, THREE_HOURS_MS);
   }
 }
 
