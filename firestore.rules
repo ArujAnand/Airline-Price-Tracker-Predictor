@@ -54,5 +54,59 @@ service cloud.firestore {
       allow read: if true;
       allow write: if true;
     }
+
+    // Phase 4 Sequential Decision Collections
+    match /decision_episodes/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
+    match /recommendation_versions/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
+    match /state_transition_observations/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
+    match /recommendation_transitions/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
+    match /opportunity_labels/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
+    match /downside_recovery_labels/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
+    match /market_outcomes/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
+    match /policy_outcomes/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
+    match /shadow_notifications/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
+    match /task_readiness_reports/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
+    match /collection_attempts/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
+    match /experimental_provider_observations/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
+    match /provider_comparisons/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
   }
 }

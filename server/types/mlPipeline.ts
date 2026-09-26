@@ -400,6 +400,7 @@ export interface HorizonOutput {
   dropProbability: number | null;         // null if model does not produce calibrated drop prob
   horizonScore: number | null;            // null if horizon selector inactive
   decisionPolicy: RecommendationAction | null; // null if decision policy inactive
+  predictionStatus?: string;              // Optional extrapolation status
 }
 
 export interface ShadowPredictionRecord {
@@ -470,4 +471,318 @@ export interface FeatureGroupEvidence {
     effectiveSampleSize: number;
   };
   rationale: string;
+}
+
+// ============================================================================
+// 10. SEQUENTIAL BOOKING DECISION SCHEMAS & INSTRUMENTATION
+// ============================================================================
+export type EpisodeOriginType = 'EXPERIMENTAL_BACKGROUND' | 'USER_REQUESTED';
+
+export interface DecisionEpisode {
+  episodeId: string;                     // 'ep-[canonicalId]-[originType]' for background, 'ep-[canonicalId]-[originType]-[timestamp]' for user
+  canonicalId: string;                   // 'DEL-BOM-6E-201-2026-10-18'
+  originType: EpisodeOriginType;
+  routeId: string;                       // 'DEL-BOM'
+  airline: string;                       // 'IndiGo'
+  flightNumber: string;                  // '6E-201'
+  scheduledDeparture: string;            // ISO-8601
+  trackingStartedAt: string;             // ISO-8601 (T0)
+  initialFareINR: number;                // P(T0)
+  currentEpisodeState: 'ACTIVE' | 'RESOLVED_BOUGHT' | 'RESOLVED_DEPARTED' | 'EXPIRED';
+  
+  // Sequential Recommendation Version IDs
+  recommendationVersionIds: string[];
+  
+  // Market & Policy Outcomes (Separated)
+  marketOutcomeId: string | null;
+  shadowPolicyOutcomeIds: string[];      // Map of policyId -> policyOutcomeId
+
+  provenance: DataProvenance;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RecommendationVersion {
+  versionId: string;                     // 'rec-[episodeId]-v[sequenceNumber]'
+  episodeId: string;
+  sequenceNumber: number;               // 1, 2, 3...
+  generatedAt: string;                  // ISO-8601 timestamp (T_gen)
+  spotFareINR: number;                  // P(T_gen)
+  
+  // Recommendation State (Strictly INSUFFICIENT_EVIDENCE during DATA_COLLECTION)
+  action: RecommendationAction;
+  selectedValidityHorizon: HorizonPeriod | null; // Strictly NULL during DATA_COLLECTION
+  validUntil: string | null;            // Strictly NULL during DATA_COLLECTION
+  
+  // Trigger Reason
+  triggerReason: 
+    | 'INITIAL_TRACKING'
+    | 'SCHEDULED_EXPIRY'
+    | 'OBSERVED_STATE_TRANSITION'
+    | 'MANUAL_REASSESSMENT';
+  
+  previousVersionId: string | null;
+  
+  // Conviction & Calibration (Strictly NULL during DATA_COLLECTION)
+  convictionProbability: number | null; // NULL
+  calibrationStatus: 'INSUFFICIENT_EVIDENCE';
+  
+  createdAt: string;
+}
+
+export interface StateTransitionObservation {
+  transitionObservationId: string;      // 'sto-[episodeId]-[currentSnapshotId]'
+  episodeId: string;
+  previousRecommendationVersionId: string | null;
+  canonicalFlightId: string;
+
+  // Timestamps
+  previousObservationTimestamp: string;
+  currentObservationTimestamp: string;
+  elapsedMinutes: number;
+  previousSnapshotId: string;
+  currentSnapshotId: string;
+
+  // Fare Metrics
+  previousFareINR: number;
+  currentFareINR: number;
+  absoluteFareChangeINR: number;         // currentFareINR - previousFareINR
+  percentageFareChange: number;          // (currentFareINR - previousFareINR) / previousFareINR
+
+  // Lead Time & Context
+  previousDTD: number;
+  currentDTD: number;
+  
+  // Point-in-Time Features & Context (t <= currentObservationTimestamp)
+  pointInTimeTrajectoryFeatures: {
+    trailing24hDeltaINR: number | null;
+    trailing72hDeltaINR: number | null;
+    snapshotCountPast7d: number;
+    volatilityINR: number | null;
+  };
+  factualContextAtCurrentObservation: {
+    isWeekendDeparture: boolean;
+    nearbyFestivalName: string | null;
+    daysToNearbyFestival: number | null;
+    scheduleDelayMinutes: number;
+  };
+
+  previousRecommendationAction: RecommendationAction;
+  provenance: DataProvenance;
+  createdAt: string;
+}
+
+export type RecommendationStateTransition =
+  | 'WAIT_TO_WAIT'
+  | 'WAIT_TO_BUY_NOW'
+  | 'WAIT_TO_INSUFFICIENT_EVIDENCE'
+  | 'BUY_NOW_TO_BUY_NOW'
+  | 'BUY_NOW_TO_WAIT'
+  | 'BUY_NOW_TO_INSUFFICIENT_EVIDENCE'
+  | 'INSUFFICIENT_EVIDENCE_TO_WAIT'
+  | 'INSUFFICIENT_EVIDENCE_TO_BUY_NOW'
+  | 'INSUFFICIENT_EVIDENCE_TO_INSUFFICIENT_EVIDENCE';
+
+export interface RecommendationTransition {
+  transitionId: string;
+  episodeId: string;
+  policyId: string;
+  fromVersionId: string;
+  toVersionId: string;
+  transitionType: RecommendationStateTransition;
+  timestamp: string;
+  fromFareINR: number;
+  toFareINR: number;
+  deltaFareINR: number;
+  elapsedMinutes: number;
+  associatedStateTransitionObservationId: string;
+}
+
+export type AsymmetricSavingState = 
+  | 'CONFIRMED_TRUE'              // >₹50 saving observed (valid under any coverage)
+  | 'CONFIRMED_FALSE'             // No saving observed AND coverage is sufficient
+  | 'UNKNOWN_DUE_TO_COVERAGE';    // No saving observed BUT coverage is poor
+
+export interface TrajectoryProvenanceReference {
+  snapshotIds: string[];
+  windowStartTimestamp: string;
+  windowEndTimestamp: string;
+  resolverVersion: string;
+}
+
+export interface OpportunityLabel {
+  labelId: string;                      // 'opp-[versionId]-[horizon]'
+  versionId: string;
+  canonicalId: string;
+  startTimestamp: string;               // T_gen
+  evaluationEndTimestamp: string;       // End of candidate evaluation horizon
+  startingFareINR: number;              // P(T_gen)
+  
+  // Real Opportunity Outcomes (Observed)
+  minimumObservedFareINR: number;
+  timeToMinimumObservedFareMinutes: number;
+  firstMeaningfulSavingTimestamp: string | null;
+  timeToFirstMeaningfulSavingMinutes: number | null;
+  bestObservedOpportunityINR: number;   // max(0, startingFareINR - minimumObservedFareINR)
+  
+  // Tri-State Asymmetric Observability
+  meaningfulSavingState: AsymmetricSavingState;
+  meaningfulSavingOccurred: boolean | null; // Compatibility field: true / false / null
+  
+  // Quality & Sampling Audit
+  snapshotCountInWindow: number;
+  isSufficientCoverage: boolean;
+  largestObservationGapMinutes: number;
+  coverageRatio: number;                // Observed hours / window hours
+  
+  // Trajectory Source Provenance Reference (No duplicated full arrays)
+  trajectoryProvenance: TrajectoryProvenanceReference;
+}
+
+export interface DownsideRecoveryLabel {
+  labelId: string;                      // 'down-[versionId]-[horizon]'
+  versionId: string;
+  canonicalId: string;
+  startTimestamp: string;
+  evaluationEndTimestamp: string;
+  startingFareINR: number;
+  
+  // Surge / Adverse Movement
+  maximumObservedFareINR: number;
+  maxAdverseSurgeINR: number;           // max(0, maximumObservedFareINR - startingFareINR)
+  timeToMaxAdverseSurgeMinutes: number | null;
+  didSurgeOccur: boolean;               // maxAdverseSurgeINR > 0
+  
+  // Expanded Multi-Level Recovery Metrics
+  returnedToStartFare: boolean;
+  timeToReturnToStartFareMinutes: number | null;
+  
+  returnedBelowStartFare: boolean;
+  bestObservedFareAfterSurgeINR: number | null;
+  timeToBestObservedFareAfterSurgeMinutes: number | null;
+  
+  returnedToMeaningfulSaving: boolean;  // Achieved <= startingFareINR - 51 after surge
+  timeToMeaningfulSavingAfterSurgeMinutes: number | null;
+
+  isSufficientCoverage: boolean;
+  resolutionStatus: 'CONFIRMED' | 'UNKNOWN_DUE_TO_COVERAGE';
+
+  // Trajectory Source Provenance Reference
+  trajectoryProvenance: TrajectoryProvenanceReference;
+}
+
+export interface MarketOutcome {
+  marketOutcomeId: string;              // 'mkt-[canonicalId]'
+  canonicalId: string;
+  departureTimestamp: string;
+  trackingStartTimestamp: string;
+  trackingEndTimestamp: string;
+  
+  // Factual Market Trajectory Statistics
+  initialObservedFareINR: number;
+  finalObservedFareINR: number;
+  minimumObservedFareINR: number;
+  maximumObservedFareINR: number;
+  minimumObservedFareTimestamp: string;
+  maximumObservedFareTimestamp: string;
+  
+  // Trajectory Integrity
+  totalSnapshotsCollected: number;
+  overallCoverageRatio: number;
+  largestObservationGapMinutes: number;
+  
+  trajectoryProvenance: TrajectoryProvenanceReference;
+  createdAt: string;
+}
+
+export interface PolicyOutcome {
+  policyOutcomeId: string;              // 'pol-[policyId]-[episodeId]'
+  episodeId: string;
+  policyId: string;                     // e.g. 'shadow-policy-persistence-stop'
+  policyVersion: string;
+  
+  // Shadow Policy Execution Facts
+  stoppedAtTimestamp: string | null;    // Moment shadow policy issued BUY_NOW
+  fareAtStoppingINR: number | null;
+  wasStoppedBeforeDeparture: boolean;
+  
+  // Counterfactual Comparison vs Real Market Trajectory
+  opportunityCapturedINR: number | null;  // initialFare - fareAtStopping
+  subsequentMinFareAfterStopINR: number | null; // Did fare drop further after BUY?
+  opportunityMissedAfterStopINR: number | null;
+  downsideAvoidedByStopINR: number | null;      // Did fare surge after BUY?
+  downsideIncurredWhileWaitingINR: number | null; // Surge suffered before BUY
+  
+  // Evaluation Mode
+  evaluationType: 'PROSPECTIVE_SHADOW' | 'RETROSPECTIVE_SIMULATION';
+  createdAt: string;
+}
+
+export interface NotificationCandidate {
+  candidateId: string;                  // 'notif-[versionId]-[timestamp]'
+  episodeId: string;
+  versionId: string;
+  canonicalId: string;
+  eventType: 
+    | 'RECOMMENDATION_INVALIDATED'
+    | 'BETTER_PRICE_OBSERVED'
+    | 'WAIT_STILL_SUPPORTED'
+    | 'BUY_OPPORTUNITY_DETECTED'
+    | 'CONVICTION_CHANGED'
+    | 'VALIDITY_EXPIRED';
+  
+  generatedAt: string;
+  triggerFareINR: number;
+  previousFareINR: number;
+  headlineText: string;
+  bodyText: string;
+  
+  // Shadow Mode Audit
+  isShadowOnly: true;                   // ALWAYS true during DATA_COLLECTION
+  wouldHaveBeenActionable: boolean | null;
+  timeToNextSnapshotMinutes: number | null;
+}
+
+export type ReadinessTaskName = 
+  | 'BETTER_OPPORTUNITY'
+  | 'OPPORTUNITY_MAGNITUDE'
+  | 'OPPORTUNITY_TIMING'
+  | 'DOWNSIDE_RECOVERY'
+  | 'STOPPING_DECISION'
+  | 'VALIDITY_ESTIMATION'
+  | 'INVALIDATION_DETECTION'
+  | 'CONVICTION_CALIBRATION';
+
+export type ReadinessStatus = 'NOT_EVALUABLE' | 'INSUFFICIENT_EVIDENCE' | 'EXPERIMENT_READY' | 'VALIDATION_READY';
+
+export interface TaskReadinessReport {
+  taskName: ReadinessTaskName;
+  status: ReadinessStatus;
+  evaluatedAt: string;
+  
+  // Logical Precondition Checks (Minimum Computability)
+  minimumComputabilityMet: boolean;
+  computabilityBlockers: string[];
+  
+  // Raw Factual Diagnostics (No opaque composite scores)
+  rawDiagnostics: {
+    confirmedPositiveCount: number;
+    confirmedNegativeCount: number;
+    unknownCount: number;
+    effectiveIndependentSampleCount: number;
+    uniqueFlightLifecycleCount: number;
+    uniqueDepartureDateCount: number;
+    calendarSpanDays: number;
+    routeDirectionCounts: Record<string, number>;
+    leadTimeDistribution: { minDTD: number; maxDTD: number; medianDTD: number };
+    coverageRatioDistribution: { min: number; avg: number; max: number };
+    largestObservationGapDistributionHours: { min: number; avg: number; max: number };
+    walkForwardFoldCount: number;
+    trainingSamplesByFold: number[];
+    evaluationSamplesByFold: number[];
+    baselineComparisonFeasible: boolean;
+    calibrationBinSupport: number[];
+  };
+
+  justificationSummary: string;
 }

@@ -13,6 +13,7 @@ import { trajectoryService } from './trajectoryService';
 import { firestoreDB } from './firestoreService';
 import { PredictionAuditRecord, FactualContextFeatures } from './types/mlPipeline';
 import { buildCanonicalFlightKey } from './flightIdentity';
+import { decisionEpisodeService } from './decisionEpisodeService';
 
 export class BackgroundSchedulerDaemon {
   private intervalTimer: NodeJS.Timeout | null = null;
@@ -52,6 +53,16 @@ export class BackgroundSchedulerDaemon {
     // 1. Trigger live price collection across routes
     const freshSnapshots = flightAggregator.triggerManualSync(force);
     console.log(`⏰ [Scheduler] Captured ${freshSnapshots.length} fresh real price snapshots.`);
+
+    // Process fresh snapshots into Decision Episodes
+    for (const rawS of freshSnapshots) {
+      try {
+        const normS = trajectoryService.normalizeRawSnapshot(rawS);
+        await decisionEpisodeService.processSnapshot(normS);
+      } catch (err) {
+        console.error('[Scheduler] Error processing snapshot into decision episode:', err);
+      }
+    }
 
     // 2. Fetch all real prior snapshots for point-in-time feature generation
     const allRawSnapshots = await firestoreDB.getSnapshots(undefined, 1000);

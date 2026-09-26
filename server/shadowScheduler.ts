@@ -1,5 +1,5 @@
 /**
- * Phase 3: Shadow Prediction Daemon
+ * Phase 3 & 4: Shadow Prediction Daemon
  * 
  * Periodically generates prospective shadow predictions for registered baseline models
  * BEFORE outcomes occur.
@@ -16,7 +16,11 @@
 import { flightAggregator } from './aggregator';
 import { trajectoryService } from './trajectoryService';
 import { firestoreDB } from './firestoreService';
-import { persistenceBaseline, trailingMomentumBaseline } from './baselines';
+import {
+  persistenceBaseline,
+  trailingStepBaseline,
+  timeNormalizedMomentumBaseline
+} from './baselines';
 import { buildCanonicalFlightKey } from './flightIdentity';
 import {
   HorizonPeriod,
@@ -116,17 +120,17 @@ export class ShadowPredictionDaemon {
             await firestoreDB.saveShadowPredictionRecord(shadowRecordPersist);
             generatedCount++;
 
-            // 2. Generate Trailing Momentum Baseline Shadow Prediction
-            const momentumOutputs = trailingMomentumBaseline.generateHorizonOutputs(
+            // 2. Generate Trailing Step Baseline (Historical Semantics preserved)
+            const stepOutputs = trailingStepBaseline.generateHorizonOutputs(
               currentFare,
               candidateHorizons,
               flightPriors,
               nowISO,
               24
             );
-            const shadowRecordMomentum: ShadowPredictionRecord = {
-              shadowPredictionId: `shadow-baseline-trailing-momentum-${canonicalKey.canonicalId}-${windowKey}`,
-              modelId: 'baseline-trailing-momentum',
+            const shadowRecordStep: ShadowPredictionRecord = {
+              shadowPredictionId: `shadow-baseline-trailing-step-v1-${canonicalKey.canonicalId}-${windowKey}`,
+              modelId: 'baseline-trailing-step-v1',
               modelVersion: 'v1.0-empirical',
               predictionTimestamp: nowISO,
               canonicalId: canonicalKey.canonicalId,
@@ -135,13 +139,41 @@ export class ShadowPredictionDaemon {
               destination,
               departureDate: dateStr,
               currentSpotFareINR: currentFare,
-              horizonOutputs: momentumOutputs,
+              horizonOutputs: stepOutputs,
               provenance: 'REAL_OBSERVATION',
               createdAt: nowISO
             };
 
-            await firestoreDB.saveShadowPredictionRecord(shadowRecordMomentum);
+            await firestoreDB.saveShadowPredictionRecord(shadowRecordStep);
             generatedCount++;
+
+            // 3. Generate Time-Normalized Momentum Baseline Shadow Prediction
+            const timeNormalizedOutputs = timeNormalizedMomentumBaseline.generateHorizonOutputs(
+              currentFare,
+              candidateHorizons,
+              flightPriors,
+              nowISO,
+              24
+            );
+            const shadowRecordTimeNormalized: ShadowPredictionRecord = {
+              shadowPredictionId: `shadow-baseline-trailing-momentum-time-normalized-v1-${canonicalKey.canonicalId}-${windowKey}`,
+              modelId: 'baseline-trailing-momentum-time-normalized-v1',
+              modelVersion: 'v1.0-empirical',
+              predictionTimestamp: nowISO,
+              canonicalId: canonicalKey.canonicalId,
+              routeId,
+              origin,
+              destination,
+              departureDate: dateStr,
+              currentSpotFareINR: currentFare,
+              horizonOutputs: timeNormalizedOutputs,
+              provenance: 'REAL_OBSERVATION',
+              createdAt: nowISO
+            };
+
+            await firestoreDB.saveShadowPredictionRecord(shadowRecordTimeNormalized);
+            generatedCount++;
+
           } catch (itemErr) {
             console.warn('[Shadow Daemon] Error generating shadow prediction:', itemErr);
           }

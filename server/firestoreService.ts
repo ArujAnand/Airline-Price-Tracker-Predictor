@@ -47,7 +47,35 @@ export class FirestorePersistenceService {
   }
 
   // --- Snapshots ---
+  private validateSnapshotPurity(snapshot: PriceSnapshot): boolean {
+    const isSynthetic = 
+      snapshot.source?.includes('Yield') || 
+      snapshot.source?.includes('Collector') || 
+      snapshot.source?.includes('Calibrator') || 
+      snapshot.source?.includes('fallback') || 
+      snapshot.source?.includes('synthetic') || 
+      snapshot.source?.includes('simulation');
+
+    const allowedProvenances = ['REAL_EXTERNAL_OBSERVATION', 'EXPERIMENTAL_EXTERNAL_OBSERVATION', 'ISOLATED_TEST_FIXTURE', 'REAL_OBSERVATION'];
+    const hasAllowedProvenance = snapshot.provenance && allowedProvenances.includes(snapshot.provenance);
+
+    if (isSynthetic || !hasAllowedProvenance) {
+      const errorMsg = `Data Integrity Violation: Attempted to save non-real price snapshot to database! Source: '${snapshot.source}', Provenance: '${snapshot.provenance}'`;
+      const isTestOrDev = process.env.NODE_ENV !== 'production' || process.argv.some(arg => arg.includes('test') || arg.includes('tsx'));
+      if (isTestOrDev) {
+        throw new Error(errorMsg);
+      } else {
+        console.warn(`[Purity Guard ALERT] ${errorMsg} - Skipping save to preserve empirical purity.`);
+        return false;
+      }
+    }
+    return true;
+  }
+
   public async saveSnapshot(snapshot: PriceSnapshot): Promise<void> {
+    if (!this.validateSnapshotPurity(snapshot)) {
+      return;
+    }
     try {
       const snapshotId = snapshot.id || (snapshot as any).observationId;
       if (!snapshotId) {
@@ -63,10 +91,12 @@ export class FirestorePersistenceService {
 
   public async saveSnapshotsBatch(snapshots: PriceSnapshot[]): Promise<void> {
     if (!snapshots || snapshots.length === 0) return;
+    const validSnapshots = snapshots.filter(s => this.validateSnapshotPurity(s));
+    if (validSnapshots.length === 0) return;
     try {
-      for (let i = 0; i < snapshots.length; i += 250) {
+      for (let i = 0; i < validSnapshots.length; i += 250) {
         const batch = writeBatch(db);
-        const chunk = snapshots.slice(i, i + 250);
+        const chunk = validSnapshots.slice(i, i + 250);
         for (const s of chunk) {
           const snapshotId = s.id || (s as any).observationId;
           if (!snapshotId) continue;
@@ -75,7 +105,7 @@ export class FirestorePersistenceService {
         }
         await batch.commit();
       }
-      console.log(`[Firestore] Persisted ${snapshots.length} price snapshots to database.`);
+      console.log(`[Firestore] Persisted ${validSnapshots.length} price snapshots to database.`);
     } catch (err) {
       console.warn('[Firestore] Batch save snapshots warning:', err);
     }
@@ -267,6 +297,243 @@ export class FirestorePersistenceService {
     }
   }
 
+  // --- Sequential Booking Decision persistence ---
+  public async saveDecisionEpisode(episode: any): Promise<void> {
+    try {
+      const docRef = doc(db, 'decision_episodes', episode.episodeId);
+      await setDoc(docRef, sanitizeForFirestore(episode), { merge: true });
+    } catch (err) {
+      console.warn(`[Firestore] Failed to save decision episode ${episode?.episodeId}:`, err);
+    }
+  }
+
+  public async getDecisionEpisode(episodeId: string): Promise<any | null> {
+    try {
+      const docRef = doc(db, 'decision_episodes', episodeId);
+      const snap = await getDoc(docRef);
+      return snap.exists() ? snap.data() : null;
+    } catch (err) {
+      console.warn(`[Firestore] Failed to get decision episode ${episodeId}:`, err);
+      return null;
+    }
+  }
+
+  public async getActiveBackgroundEpisode(canonicalId: string): Promise<any | null> {
+    try {
+      const colRef = collection(db, 'decision_episodes');
+      const q = query(
+        colRef,
+        where('canonicalId', '==', canonicalId),
+        where('originType', '==', 'EXPERIMENTAL_BACKGROUND'),
+        where('currentEpisodeState', '==', 'ACTIVE')
+      );
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        return snap.docs[0].data();
+      }
+      return null;
+    } catch (err) {
+      console.warn(`[Firestore] Failed to query active background episode for ${canonicalId}:`, err);
+      return null;
+    }
+  }
+
+  public async saveRecommendationVersion(version: any): Promise<void> {
+    try {
+      const docRef = doc(db, 'recommendation_versions', version.versionId);
+      await setDoc(docRef, sanitizeForFirestore(version), { merge: true });
+    } catch (err) {
+      console.warn(`[Firestore] Failed to save recommendation version ${version?.versionId}:`, err);
+    }
+  }
+
+  public async getRecommendationVersion(versionId: string): Promise<any | null> {
+    try {
+      const docRef = doc(db, 'recommendation_versions', versionId);
+      const snap = await getDoc(docRef);
+      return snap.exists() ? snap.data() : null;
+    } catch (err) {
+      console.warn(`[Firestore] Failed to get recommendation version ${versionId}:`, err);
+      return null;
+    }
+  }
+
+  public async saveStateTransitionObservation(observation: any): Promise<void> {
+    try {
+      const docRef = doc(db, 'state_transition_observations', observation.transitionObservationId);
+      await setDoc(docRef, sanitizeForFirestore(observation), { merge: true });
+    } catch (err) {
+      console.warn(`[Firestore] Failed to save state transition observation ${observation?.transitionObservationId}:`, err);
+    }
+  }
+
+  public async getStateTransitionObservations(episodeId?: string): Promise<any[]> {
+    try {
+      const colRef = collection(db, 'state_transition_observations');
+      let q = query(colRef, orderBy('currentObservationTimestamp', 'asc'));
+      if (episodeId) {
+        q = query(colRef, where('episodeId', '==', episodeId), orderBy('currentObservationTimestamp', 'asc'));
+      }
+      const snap = await getDocs(q);
+      const list: any[] = [];
+      snap.forEach(d => list.push(d.data()));
+      return list;
+    } catch (err) {
+      console.warn('[Firestore] Failed to get state transition observations:', err);
+      return [];
+    }
+  }
+
+  public async saveRecommendationTransition(transition: any): Promise<void> {
+    try {
+      const docRef = doc(db, 'recommendation_transitions', transition.transitionId);
+      await setDoc(docRef, sanitizeForFirestore(transition), { merge: true });
+    } catch (err) {
+      console.warn(`[Firestore] Failed to save recommendation transition ${transition?.transitionId}:`, err);
+    }
+  }
+
+  public async getRecommendationTransitions(episodeId?: string): Promise<any[]> {
+    try {
+      const colRef = collection(db, 'recommendation_transitions');
+      let q = query(colRef, orderBy('timestamp', 'asc'));
+      if (episodeId) {
+        q = query(colRef, where('episodeId', '==', episodeId), orderBy('timestamp', 'asc'));
+      }
+      const snap = await getDocs(q);
+      const list: any[] = [];
+      snap.forEach(d => list.push(d.data()));
+      return list;
+    } catch (err) {
+      console.warn('[Firestore] Failed to get recommendation transitions:', err);
+      return [];
+    }
+  }
+
+  public async saveOpportunityLabel(label: any): Promise<void> {
+    try {
+      const docRef = doc(db, 'opportunity_labels', label.labelId);
+      await setDoc(docRef, sanitizeForFirestore(label), { merge: true });
+    } catch (err) {
+      console.warn(`[Firestore] Failed to save opportunity label ${label?.labelId}:`, err);
+    }
+  }
+
+  public async getOpportunityLabel(labelId: string): Promise<any | null> {
+    try {
+      const docRef = doc(db, 'opportunity_labels', labelId);
+      const snap = await getDoc(docRef);
+      return snap.exists() ? snap.data() : null;
+    } catch (err) {
+      console.warn('[Firestore] Failed to get opportunity label:', err);
+      return null;
+    }
+  }
+
+  public async saveDownsideRecoveryLabel(label: any): Promise<void> {
+    try {
+      const docRef = doc(db, 'downside_recovery_labels', label.labelId);
+      await setDoc(docRef, sanitizeForFirestore(label), { merge: true });
+    } catch (err) {
+      console.warn(`[Firestore] Failed to save downside recovery label ${label?.labelId}:`, err);
+    }
+  }
+
+  public async getDownsideRecoveryLabel(labelId: string): Promise<any | null> {
+    try {
+      const docRef = doc(db, 'downside_recovery_labels', labelId);
+      const snap = await getDoc(docRef);
+      return snap.exists() ? snap.data() : null;
+    } catch (err) {
+      console.warn('[Firestore] Failed to get downside recovery label:', err);
+      return null;
+    }
+  }
+
+  public async saveMarketOutcome(outcome: any): Promise<void> {
+    try {
+      const docRef = doc(db, 'market_outcomes', outcome.marketOutcomeId);
+      await setDoc(docRef, sanitizeForFirestore(outcome), { merge: true });
+    } catch (err) {
+      console.warn(`[Firestore] Failed to save market outcome ${outcome?.marketOutcomeId}:`, err);
+    }
+  }
+
+  public async getMarketOutcome(marketOutcomeId: string): Promise<any | null> {
+    try {
+      const docRef = doc(db, 'market_outcomes', marketOutcomeId);
+      const snap = await getDoc(docRef);
+      return snap.exists() ? snap.data() : null;
+    } catch (err) {
+      console.warn('[Firestore] Failed to get market outcome:', err);
+      return null;
+    }
+  }
+
+  public async savePolicyOutcome(outcome: any): Promise<void> {
+    try {
+      const docRef = doc(db, 'policy_outcomes', outcome.policyOutcomeId);
+      await setDoc(docRef, sanitizeForFirestore(outcome), { merge: true });
+    } catch (err) {
+      console.warn(`[Firestore] Failed to save policy outcome ${outcome?.policyOutcomeId}:`, err);
+    }
+  }
+
+  public async getPolicyOutcome(policyOutcomeId: string): Promise<any | null> {
+    try {
+      const docRef = doc(db, 'policy_outcomes', policyOutcomeId);
+      const snap = await getDoc(docRef);
+      return snap.exists() ? snap.data() : null;
+    } catch (err) {
+      console.warn('[Firestore] Failed to get policy outcome:', err);
+      return null;
+    }
+  }
+
+  public async saveNotificationCandidate(candidate: any): Promise<void> {
+    try {
+      const docRef = doc(db, 'shadow_notifications', candidate.candidateId);
+      await setDoc(docRef, sanitizeForFirestore(candidate), { merge: true });
+    } catch (err) {
+      console.warn(`[Firestore] Failed to save notification candidate ${candidate?.candidateId}:`, err);
+    }
+  }
+
+  public async getNotificationCandidates(): Promise<any[]> {
+    try {
+      const colRef = collection(db, 'shadow_notifications');
+      const snap = await getDocs(colRef);
+      const list: any[] = [];
+      snap.forEach(d => list.push(d.data()));
+      return list;
+    } catch (err) {
+      console.warn('[Firestore] Failed to get notification candidates:', err);
+      return [];
+    }
+  }
+
+  public async saveTaskReadinessReport(report: any): Promise<void> {
+    try {
+      const docRef = doc(db, 'task_readiness_reports', report.taskName);
+      await setDoc(docRef, sanitizeForFirestore(report), { merge: true });
+    } catch (err) {
+      console.warn(`[Firestore] Failed to save readiness report ${report?.taskName}:`, err);
+    }
+  }
+
+  public async getTaskReadinessReports(): Promise<any[]> {
+    try {
+      const colRef = collection(db, 'task_readiness_reports');
+      const snap = await getDocs(colRef);
+      const list: any[] = [];
+      snap.forEach(d => list.push(d.data()));
+      return list;
+    } catch (err) {
+      console.warn('[Firestore] Failed to get readiness reports:', err);
+      return [];
+    }
+  }
+
   // --- Daily AI Briefings (Persisted once per calendar day) ---
   public async getDailyCorridorAnalysis(route: string, dateKey: string): Promise<any | null> {
     try {
@@ -292,6 +559,36 @@ export class FirestorePersistenceService {
       console.log(`[Firestore] Saved persistent daily AI briefing for ${docId}`);
     } catch (err) {
       console.warn(`[Firestore] Failed to save daily analysis for ${route}:`, err);
+    }
+  }
+
+  // --- Collection Attempts ---
+  public async saveCollectionAttempt(attempt: any): Promise<void> {
+    try {
+      const docRef = doc(db, 'collection_attempts', attempt.attemptId);
+      await setDoc(docRef, sanitizeForFirestore(attempt), { merge: true });
+    } catch (err) {
+      console.warn(`[Firestore] Failed to save collection attempt ${attempt?.attemptId}:`, err);
+    }
+  }
+
+  // --- Experimental Provider Observations ---
+  public async saveExperimentalObservation(obs: any): Promise<void> {
+    try {
+      const docRef = doc(db, 'experimental_provider_observations', obs.id);
+      await setDoc(docRef, sanitizeForFirestore(obs), { merge: true });
+    } catch (err) {
+      console.warn(`[Firestore] Failed to save experimental observation ${obs?.id}:`, err);
+    }
+  }
+
+  // --- Provider Comparisons ---
+  public async saveProviderComparison(comp: any): Promise<void> {
+    try {
+      const docRef = doc(db, 'provider_comparisons', comp.comparisonId);
+      await setDoc(docRef, sanitizeForFirestore(comp), { merge: true });
+    } catch (err) {
+      console.warn(`[Firestore] Failed to save provider comparison ${comp?.comparisonId}:`, err);
     }
   }
 }

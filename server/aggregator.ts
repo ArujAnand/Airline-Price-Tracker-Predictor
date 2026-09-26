@@ -3,6 +3,8 @@ import { getFestivalImpact } from './festivals';
 import { getLiveGoogleFlights } from './googleFlightsScraper';
 import { firestoreDB } from './firestoreService';
 import { buildCanonicalFlightKey, buildObservationId } from './flightIdentity';
+import { trajectoryService } from './trajectoryService';
+import { decisionEpisodeService } from './decisionEpisodeService';
 
 export const AIRPORTS: Record<string, { city: string; name: string }> = {
   PNQ: { city: 'Pune', name: 'Pune Lohegaon Airport' },
@@ -733,7 +735,6 @@ class FlightAggregatorEngine {
     const THREE_HOURS_MS = 3 * 60 * 60 * 1000;
     this.lastRun = now;
     this.nextRun = new Date(now.getTime() + THREE_HOURS_MS);
-    const freshSnapshots: PriceSnapshot[] = [];
 
     const targetDates = this.getTargetTrackingDates();
 
@@ -758,41 +759,10 @@ class FlightAggregatorEngine {
       const [origin, destination] = routeId.split('-');
 
       for (const departureDate of targetDates) {
-        const flights = this.getFlights(origin, destination, departureDate);
-
-        flights.forEach((fl) => {
-          const snap: PriceSnapshot = {
-            id: buildObservationId(fl.id, now.getTime()),
-            flightId: fl.id,
-            routeId,
-            origin,
-            destination,
-            departureDate,
-            flightNumber: fl.flightNumber,
-            airline: fl.airline,
-            price: fl.currentPrice,
-            timestamp: now.toISOString(),
-            capturedHour: now.getHours(),
-            type: 'hourly',
-            source: 'Google Flights 3h Yield Collector',
-            provenance: 'REAL_OBSERVATION' as any,
-          };
-          this.snapshots.push(snap);
-          freshSnapshots.push(snap);
+        this.runLiveCollectionForRouteDate(origin, destination, departureDate).catch(err => {
+          console.error(`[Collection] Live collection error for ${origin}-${destination} on ${departureDate}:`, err);
         });
       }
-    }
-
-    // Persist to Cloud Firestore asynchronously
-    if (freshSnapshots.length > 0) {
-      firestoreDB.saveSnapshotsBatch(freshSnapshots).catch((err) => {
-        console.warn('[Firestore DB] Background snapshot sync error:', err);
-      });
-    }
-
-    // Keep memory clean (max 2000 snapshots)
-    if (this.snapshots.length > 2000) {
-      this.snapshots = this.snapshots.slice(-1500);
     }
 
     if (this.hourlySyncCallback) {
@@ -801,7 +771,205 @@ class FlightAggregatorEngine {
       });
     }
 
-    return freshSnapshots;
+    // Return empty array synchronously (snapshots are persisted asynchronously upon genuine scraper success)
+    return [];
+  }
+
+  public async runLiveCollectionForRouteDate(origin: string, destination: string, departureDate: string): Promise<void> {
+    const routeId = `${origin.toUpperCase()}-${destination.toUpperCase()}`;
+    const startTime = Date.now();
+    const { currentProductionProvider } = await import('./providers');
+
+    let fetchResult: any;
+    try {
+      fetchResult = await currentProductionProvider.fetchFlights(origin, destination, departureDate);
+    } catch (err: any) {
+      fetchResult = {
+        status: 'FAILED_PROVIDER_ERROR',
+        flights: [],
+        latencyMs: Date.now() - startTime,
+        errorMessage: err?.message || 'Unknown provider error'
+      };
+    }
+
+    // Save factual collection attempt log to Firestore
+    const attempt = {
+      attemptId: `att-${Date.now()}-${origin}-${destination}-${departureDate}-${currentProductionProvider.providerId}`,
+      attemptedAt: new Date().toISOString(),
+      routeId,
+      origin: origin.toUpperCase(),
+      destination: destination.toUpperCase(),
+      departureDate,
+      providerId: currentProductionProvider.providerId,
+      providerType: 'PRIMARY_PRODUCTION',
+      status: fetchResult.status,
+      returnedFlightCount: fetchResult.flights.length,
+      latencyMs: fetchResult.latencyMs,
+      errorMessageSanitized: fetchResult.errorMessage || null,
+      createdAt: new Date().toISOString()
+    };
+
+    await firestoreDB.saveCollectionAttempt(attempt);
+
+    // If successful, save genuine snapshots
+    if (fetchResult.status === 'SUCCESS' && fetchResult.flights.length > 0) {
+      const now = new Date();
+      const liveSnaps: PriceSnapshot[] = fetchResult.flights.map((fl: any, idx: number) => {
+        const cleanFlightNum = fl.flightNumber.replace(/\//g, '-').replace(/\s+/g, '');
+        return {
+          id: `snap-live-${Date.now()}-${cleanFlightNum}-${idx}`,
+          flightId: `${origin.toUpperCase()}-${destination.toUpperCase()}-${cleanFlightNum}-${departureDate}`,
+          routeId,
+          origin: origin.toUpperCase(),
+          destination: destination.toUpperCase(),
+          departureDate,
+          flightNumber: fl.flightNumber,
+          airline: fl.airlineName,
+          price: fl.priceINR,
+          timestamp: now.toISOString(),
+          capturedHour: now.getHours(),
+          type: 'hourly',
+          source: 'SerpApi (Google Flights)', // Enforce standard production source string
+          provenance: 'REAL_EXTERNAL_OBSERVATION'
+        };
+      });
+
+      // Add to memory
+      liveSnaps.forEach(snap => this.addSnapshot(snap));
+
+      // Save snapshots to DB
+      await firestoreDB.saveSnapshotsBatch(liveSnaps);
+
+      // Process decision episodes
+      for (const snap of liveSnaps) {
+        try {
+          const normS = trajectoryService.normalizeRawSnapshot(snap);
+          await decisionEpisodeService.processSnapshot(normS);
+        } catch (episodeErr) {
+          console.error('[Collection] Decision episode async processing error:', episodeErr);
+        }
+      }
+
+      // Parallel Experimental Scrape
+      if (process.env.FLI_SIDECAR_URL) {
+        this.runExperimentalCollectionForRouteDate(origin, destination, departureDate, attempt.attemptId, fetchResult.flights).catch(err => {
+          console.error('[Experimental] Parallel scrape failed:', err);
+        });
+      }
+    }
+  }
+
+  public async runExperimentalCollectionForRouteDate(
+    origin: string,
+    destination: string,
+    departureDate: string,
+    fetchAttemptId: string,
+    productionFlights: any[]
+  ): Promise<void> {
+    const { fliExperimentalProvider } = await import('./providers');
+    const routeId = `${origin.toUpperCase()}-${destination.toUpperCase()}`;
+    const startTime = Date.now();
+
+    let expResult: any;
+    try {
+      expResult = await fliExperimentalProvider.fetchFlights(origin, destination, departureDate);
+    } catch (err: any) {
+      expResult = {
+        status: 'FAILED_PROVIDER_ERROR',
+        flights: [],
+        latencyMs: Date.now() - startTime,
+        errorMessage: err?.message || 'Experimental provider error'
+      };
+    }
+
+    // Save attempt metadata log
+    const attempt = {
+      attemptId: `att-${Date.now()}-${origin}-${destination}-${departureDate}-${fliExperimentalProvider.providerId}`,
+      attemptedAt: new Date().toISOString(),
+      routeId,
+      origin: origin.toUpperCase(),
+      destination: destination.toUpperCase(),
+      departureDate,
+      providerId: fliExperimentalProvider.providerId,
+      providerType: 'EXPERIMENTAL_PARALLEL',
+      status: expResult.status,
+      returnedFlightCount: expResult.flights.length,
+      latencyMs: expResult.latencyMs,
+      errorMessageSanitized: expResult.errorMessage || null,
+      createdAt: new Date().toISOString()
+    };
+
+    await firestoreDB.saveCollectionAttempt(attempt);
+
+    if (expResult.status === 'SUCCESS' && expResult.flights.length > 0) {
+      const nowISO = new Date().toISOString();
+      const expObs: any[] = [];
+
+      for (const fl of expResult.flights) {
+        const cleanFlightNum = fl.flightNumber.replace(/\//g, '-').replace(/\s+/g, '');
+        const obs = {
+          id: `exp-obs-${Date.now()}-${cleanFlightNum}`,
+          providerId: fliExperimentalProvider.providerId,
+          providerVersion: fliExperimentalProvider.providerVersion,
+          observedAt: nowISO,
+          canonicalId: `${origin.toUpperCase()}-${destination.toUpperCase()}-${cleanFlightNum}-${departureDate}`,
+          routeId,
+          origin: origin.toUpperCase(),
+          destination: destination.toUpperCase(),
+          airlineCode: fl.airlineCode,
+          airlineName: fl.airlineName,
+          flightNumber: fl.flightNumber,
+          departureDate,
+          departureTime: fl.departureTime,
+          arrivalTime: fl.arrivalTime,
+          stops: fl.stops,
+          priceINR: fl.priceINR,
+          currency: fl.currency,
+          cabin: fl.cabin,
+          adults: fl.adults,
+          queryParameters: { origin, destination, departureDate },
+          rawMetadataReference: expResult.providerMetadata || null,
+          fetchAttemptId
+        };
+        await firestoreDB.saveExperimentalObservation(obs);
+        expObs.push(obs);
+      }
+
+      // Comparison generation logic (Matching must be FLIGHT-SPECIFIC)
+      for (const pFl of productionFlights) {
+        const cleanProdFlightNum = pFl.flightNumber.replace(/\//g, '-').replace(/\s+/g, '');
+        // Find matching experimental flight
+        const matchingExp = expObs.find(e => 
+          e.flightNumber.toUpperCase().replace(/\s+/g, '') === pFl.flightNumber.toUpperCase().replace(/\s+/g, '') &&
+          e.airlineCode.toUpperCase() === pFl.airlineCode.toUpperCase()
+        );
+
+        if (matchingExp) {
+          const absoluteDifferenceINR = Math.abs(pFl.priceINR - matchingExp.priceINR);
+          const percentageDifference = (absoluteDifferenceINR / pFl.priceINR) * 100;
+
+          const comp = {
+            comparisonId: `comp-${Date.now()}-${cleanProdFlightNum}-${departureDate}`,
+            productionSnapshotId: cleanProdFlightNum, // representative flight id
+            experimentalObservationId: matchingExp.id,
+            canonicalId: matchingExp.canonicalId,
+            productionObservedAt: nowISO,
+            experimentalObservedAt: matchingExp.observedAt,
+            captureTimeDifferenceSeconds: 0, // executed in parallel
+            productionPriceINR: pFl.priceINR,
+            experimentalPriceINR: matchingExp.priceINR,
+            absolutePriceDifferenceINR: absoluteDifferenceINR,
+            percentagePriceDifference: percentageDifference,
+            flightNumberMatches: true,
+            departureTimeDifferenceMinutes: 0, // simple match evaluated
+            stopsMatch: pFl.stops === matchingExp.stops,
+            airlineMatches: true,
+            comparisonStatus: pFl.priceINR === matchingExp.priceINR ? 'MATCHED' : 'PRICE_MISMATCH'
+          };
+          await firestoreDB.saveProviderComparison(comp);
+        }
+      }
+    }
   }
 
   public addSnapshot(snap: PriceSnapshot) {

@@ -37,10 +37,21 @@ export class LongitudinalTrajectoryService {
 
     const drift = detectScheduleDrift(raw.scheduledDepartureTime || scheduledTime, scheduledTime);
 
+    const isSyntheticSource = 
+      raw.source?.includes('Yield') || 
+      raw.source?.includes('Collector') || 
+      raw.source?.includes('Calibrator') || 
+      raw.source?.includes('fallback') || 
+      raw.source?.includes('synthetic') || 
+      raw.source?.includes('simulation') ||
+      raw.purityClassification === 'POTENTIALLY_NON_REAL';
+
     // Enforce provenance
-    const provenance: DataProvenance = raw.provenance === 'ISOLATED_TEST_FIXTURE' 
+    const provenance: any = raw.provenance === 'ISOLATED_TEST_FIXTURE' 
       ? 'ISOLATED_TEST_FIXTURE' 
-      : 'REAL_OBSERVATION';
+      : isSyntheticSource
+      ? 'POTENTIALLY_NON_REAL'
+      : (raw.provenance || 'REAL_OBSERVATION');
 
     return {
       observationId: raw.id || `obs-${new Date(observedAt).getTime()}-${key.canonicalId}`,
@@ -61,7 +72,7 @@ export class LongitudinalTrajectoryService {
       scheduleDriftMinutes: drift.scheduleDriftMinutes,
       isIdentityInferred: raw.isIdentityInferred === true,
       provenance,
-      source: raw.source?.includes('SerpApi') ? 'GOOGLE_FLIGHTS_SCRAPER' : 'PERSISTED_FIRESTORE'
+      source: raw.source?.includes('SerpApi') ? 'GOOGLE_FLIGHTS_SCRAPER' : (raw.source || 'PERSISTED_FIRESTORE')
     };
   }
 
@@ -74,6 +85,9 @@ export class LongitudinalTrajectoryService {
 
     for (const raw of rawSnapshots) {
       const obs = this.normalizeRawSnapshot(raw);
+      if (!isEmpiricallyEligibleObservation(obs)) {
+        continue; // Strictly quarantine non-real and potentially non-real observations!
+      }
       
       let series = trajectories.get(obs.canonicalId);
       if (!series) {
@@ -210,3 +224,20 @@ export class LongitudinalTrajectoryService {
 }
 
 export const trajectoryService = new LongitudinalTrajectoryService();
+
+export type SnapshotProvenance =
+  | 'REAL_EXTERNAL_OBSERVATION'          // Genuine live scraped/API observations from production
+  | 'REAL_VERIFIED_HISTORICAL_OBSERVATION' // Verified audited real historical snapshots
+  | 'EXPERIMENTAL_EXTERNAL_OBSERVATION'    // Raw parallel experimental observations (Fli sidecar)
+  | 'UNKNOWN_PROVENANCE'                 // Unverified snapshots with ambiguous harvest paths
+  | 'CONFIRMED_NON_REAL'                 // Artificially generated/calculated yield fallback prices
+  | 'ISOLATED_TEST_FIXTURE'              // Isolated test snapshots (Strictly prohibited from live pipelines/training)
+  | 'REAL_OBSERVATION';                  // Legacy real observations (for backwards compatibility)
+
+export function isEmpiricallyEligibleObservation(snapshot: any): boolean {
+  const provenance = snapshot.provenance;
+  return provenance === 'REAL_EXTERNAL_OBSERVATION' || 
+         provenance === 'REAL_VERIFIED_HISTORICAL_OBSERVATION' ||
+         provenance === 'REAL_OBSERVATION';
+}
+
