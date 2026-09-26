@@ -438,15 +438,22 @@ const Pillar2SubSegments: React.FC<{ segments: SubSegmentData[] }> = ({ segments
         <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">
           Advance Booking Sweet Spots
         </span>
-        <span className="text-[9px] text-slate-400 font-semibold">T-30d Lead</span>
+        <span className="text-[9px] text-slate-400 font-semibold">T-90d to T-1d Lead</span>
       </div>
       <div className="grid grid-cols-1 gap-1.5">
         {segments.map((seg) => (
           <div key={seg.id} className="bg-slate-50 border border-slate-200 rounded-xl p-2 flex items-center justify-between">
             <div>
               <div className="text-[11px] font-bold text-slate-900">{seg.name}</div>
-              <div className="text-[9px] text-slate-500 font-medium">
-                {seg.bookingWindow.t30Avg ? `~30d: ₹${seg.bookingWindow.t30Avg.toLocaleString()}` : `Gathering windows`}
+              <div className="text-[9px] text-slate-500 font-medium flex flex-wrap gap-1">
+                {seg.bookingWindow.t90Avg ? <span>T-90d: ₹{seg.bookingWindow.t90Avg.toLocaleString()} • </span> : null}
+                {seg.bookingWindow.t80Avg ? <span>T-80d: ₹{seg.bookingWindow.t80Avg.toLocaleString()} • </span> : null}
+                {seg.bookingWindow.t70Avg ? <span>T-70d: ₹{seg.bookingWindow.t70Avg.toLocaleString()} • </span> : null}
+                {seg.bookingWindow.t60Avg ? <span>T-60d: ₹{seg.bookingWindow.t60Avg.toLocaleString()} • </span> : null}
+                {seg.bookingWindow.t50Avg ? <span>T-50d: ₹{seg.bookingWindow.t50Avg.toLocaleString()} • </span> : null}
+                {seg.bookingWindow.t40Avg ? <span>T-40d: ₹{seg.bookingWindow.t40Avg.toLocaleString()} • </span> : null}
+                {seg.bookingWindow.t30Avg ? <span>T-30d: ₹{seg.bookingWindow.t30Avg.toLocaleString()}</span> : null}
+                {!seg.bookingWindow.t90Avg && !seg.bookingWindow.t30Avg && <span>Gathering advance windows</span>}
               </div>
             </div>
             <div className="text-right">

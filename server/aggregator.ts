@@ -705,8 +705,8 @@ class FlightAggregatorEngine {
       dates.add(d.toISOString().split('T')[0]);
     }
 
-    // 2. Booking window milestones (T-14d, T-21d, T-30d, T-40d, T-45d, T-50d, T-60d, T-70d, T-80d, T-90d)
-    const milestones = [14, 21, 28, 30, 40, 45, 50, 60, 70, 80, 90];
+    // 2. Booking window milestones (T-14d, T-30d, T-40d, T-45d, T-50d, T-60d, T-70d, T-80d, T-90d)
+    const milestones = [14, 30, 40, 45, 50, 60, 70, 80, 90];
     for (const m of milestones) {
       const d = new Date(today.getTime() + m * 24 * 60 * 60 * 1000);
       dates.add(d.toISOString().split('T')[0]);

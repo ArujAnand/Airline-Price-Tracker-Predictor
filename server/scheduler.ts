@@ -93,7 +93,7 @@ export class BackgroundSchedulerDaemon {
     // Target sample dates: 1 to 90 days out matching aggregator milestones
     const sampleDates: string[] = [];
     const today = new Date();
-    for (const offset of [1, 3, 7, 14, 21, 28, 30, 35, 40, 45, 50, 60, 70, 80, 90]) {
+    for (const offset of [1, 3, 7, 14, 30, 35, 40, 45, 50, 60, 70, 80, 90]) {
       const d = new Date(today);
       d.setDate(d.getDate() + offset);
       sampleDates.push(d.toISOString().split('T')[0]);
