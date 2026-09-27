@@ -26,12 +26,17 @@ async function runCacheRecoveryTests() {
   
   const snap: PriceSnapshot = {
     id: testSnapId,
+    flightId: '6E-656',
     routeId: 'PNQ-LKO',
+    origin: 'PNQ',
+    destination: 'LKO',
     timestamp: new Date(Date.now() + 5000).toISOString(), // newer than checkpoint
     price: 6400,
     airline: 'IndiGo',
     flightNumber: '6E-656',
     departureDate: '2026-10-18',
+    capturedHour: 10,
+    type: 'hourly',
     source: 'SerpApi (Google Flights)',
     provenance: 'REAL_EXTERNAL_OBSERVATION'
   };
@@ -58,24 +63,34 @@ async function runCacheRecoveryTests() {
   const duplicateTimestamp = new Date(Date.now() + 10000).toISOString();
   const snapCollisionA: PriceSnapshot = {
     id: 'snap-collision-aaa',
+    flightId: '6E-656',
     routeId: 'PNQ-LKO',
+    origin: 'PNQ',
+    destination: 'LKO',
     timestamp: duplicateTimestamp,
     price: 6400,
     airline: 'IndiGo',
     flightNumber: '6E-656',
     departureDate: '2026-10-18',
+    capturedHour: 10,
+    type: 'hourly',
     source: 'SerpApi (Google Flights)',
     provenance: 'REAL_EXTERNAL_OBSERVATION'
   };
 
   const snapCollisionB: PriceSnapshot = {
     id: 'snap-collision-bbb',
+    flightId: '6E-656',
     routeId: 'PNQ-LKO',
+    origin: 'PNQ',
+    destination: 'LKO',
     timestamp: duplicateTimestamp,
     price: 6600,
     airline: 'IndiGo',
     flightNumber: '6E-656',
     departureDate: '2026-10-18',
+    capturedHour: 10,
+    type: 'hourly',
     source: 'SerpApi (Google Flights)',
     provenance: 'REAL_EXTERNAL_OBSERVATION'
   };

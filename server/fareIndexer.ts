@@ -47,12 +47,26 @@ class FareIndexingService {
     ]);
 
     const filterValid = (list: PriceSnapshot[]) =>
-      list.filter(
-        (s) =>
-          !s.id.startsWith('hist-') &&
-          !(s.source && s.source.includes('Historical')) &&
-          Boolean(s.timestamp)
-      );
+      list.filter((s) => {
+        if (!s.timestamp) return false;
+        
+        let prov = s.provenance;
+        if (!prov) {
+          if (
+            s.source === 'SerpApi (Google Flights)' ||
+            s.source === 'SearchApi (Google Flights)' ||
+            s.source === 'Google Flights (Live Scraping)'
+          ) {
+            prov = 'REAL_EXTERNAL_OBSERVATION';
+          }
+        }
+        
+        return (
+          prov === 'REAL_EXTERNAL_OBSERVATION' ||
+          prov === 'REAL_VERIFIED_HISTORICAL_OBSERVATION' ||
+          prov === 'REAL_OBSERVATION'
+        );
+      });
 
     const pnqLkoSnaps = filterValid(rawPnqLko);
     const lkoPnqSnaps = filterValid(rawLkoPnq);
