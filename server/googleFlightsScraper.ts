@@ -25,6 +25,128 @@ function normalizeAirline(rawAirline: string): { name: string; code: string; air
   return { name: norm.name, code: norm.code, aircraft: 'Airbus A320neo' };
 }
 
+function hashCode(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return Math.abs(hash);
+}
+
+export interface SerpApiQuotaStatus {
+  serpApiMonthlyLimit: number;
+  serpApiSearchesUsed: number;
+  serpApiSearchesRemaining: number;
+  serpApiUsagePercentage: number;
+  serpApiRenewalDate: string;
+  serpApiQuotaCheckedAt: string;
+  serpApiQuotaStatus: 'HEALTHY' | 'CONSERVATION' | 'CRITICAL' | 'EXHAUSTED';
+  sustainableSearchesPerDay: number;
+  sustainableSearchesPerCycle: number;
+}
+
+let cachedQuota: SerpApiQuotaStatus = {
+  serpApiMonthlyLimit: 100,
+  serpApiSearchesUsed: 75,
+  serpApiSearchesRemaining: 25,
+  serpApiUsagePercentage: 75.0,
+  serpApiRenewalDate: new Date(Date.now() + 15 * 24 * 3600 * 1000).toISOString().split('T')[0],
+  serpApiQuotaCheckedAt: new Date().toISOString(),
+  serpApiQuotaStatus: 'CONSERVATION',
+  sustainableSearchesPerDay: 1.6,
+  sustainableSearchesPerCycle: 0.2
+};
+
+export async function getSerpApiQuota(): Promise<SerpApiQuotaStatus> {
+  const apiKey = process.env.SERPAPI_API_KEY;
+  if (!apiKey) return cachedQuota;
+
+  const tenMins = 10 * 60 * 1000;
+  if (Date.now() - new Date(cachedQuota.serpApiQuotaCheckedAt).getTime() < tenMins) {
+    return cachedQuota;
+  }
+
+  try {
+    const res = await fetch(`https://serpapi.com/account?api_key=${apiKey}`);
+    if (res.ok) {
+      const data = await res.json();
+      const monthlyLimit = data.plan_search_limit || 100;
+      const remaining = data.searches_left || 0;
+      const used = monthlyLimit - remaining;
+      const pct = parseFloat(((used / monthlyLimit) * 100).toFixed(1));
+      
+      const renewalStr = data.plan_renewal_date || new Date(Date.now() + 15 * 24 * 3600 * 1000).toISOString().split('T')[0];
+      
+      const daysLeft = Math.max(1, Math.round((new Date(renewalStr).getTime() - Date.now()) / (24 * 3600 * 1000)));
+      const safetyReserve = Math.floor(remaining * 0.1);
+      const safeRemaining = Math.max(0, remaining - safetyReserve);
+      const sustainablePerDay = parseFloat((safeRemaining / daysLeft).toFixed(2));
+      const sustainablePerCycle = parseFloat((sustainablePerDay / 8).toFixed(2));
+
+      let statusStr: 'HEALTHY' | 'CONSERVATION' | 'CRITICAL' | 'EXHAUSTED' = 'HEALTHY';
+      if (remaining <= 5) statusStr = 'EXHAUSTED';
+      else if (pct >= 95.0) statusStr = 'EXHAUSTED';
+      else if (pct >= 85.0) statusStr = 'CRITICAL';
+      else if (pct >= 50.0) statusStr = 'CONSERVATION';
+
+      cachedQuota = {
+        serpApiMonthlyLimit: monthlyLimit,
+        serpApiSearchesUsed: used,
+        serpApiSearchesRemaining: remaining,
+        serpApiUsagePercentage: pct,
+        serpApiRenewalDate: renewalStr,
+        serpApiQuotaCheckedAt: new Date().toISOString(),
+        serpApiQuotaStatus: statusStr,
+        sustainableSearchesPerDay: sustainablePerDay,
+        sustainableSearchesPerCycle: sustainablePerCycle
+      };
+    }
+  } catch (err) {
+    console.warn('[SerpApi Quota] Failed programmatic check:', err);
+  }
+  return cachedQuota;
+}
+
+export function shouldSampleSerpApi(
+  origin: string,
+  destination: string,
+  outboundDate: string,
+  status: 'HEALTHY' | 'CONSERVATION' | 'CRITICAL' | 'EXHAUSTED'
+): { sample: boolean; reason: 'SERPAPI_QUERIED' | 'SERPAPI_SKIPPED_QUOTA_CONSERVATION' | 'SERPAPI_QUOTA_EXHAUSTED' } {
+  if (status === 'EXHAUSTED') {
+    return { sample: false, reason: 'SERPAPI_QUOTA_EXHAUSTED' };
+  }
+  if (status === 'HEALTHY') {
+    return { sample: true, reason: 'SERPAPI_QUERIED' };
+  }
+
+  const hashKey = `${origin.toUpperCase()}-${destination.toUpperCase()}-${outboundDate}`;
+  const hashVal = hashCode(hashKey);
+
+  const depTime = new Date(outboundDate).getTime();
+  const dtd = Math.max(0, Math.round((depTime - Date.now()) / (24 * 3600 * 1000)));
+
+  const cycleHour = new Date().getUTCHours();
+  const cycleIndex = Math.floor(cycleHour / 3);
+
+  let modulo = 2; // Conservation: Sample 50%
+  if (status === 'CRITICAL') {
+    modulo = 5; // Critical: Sample 20%
+  }
+
+  const isSelected = (hashVal + cycleIndex) % modulo === 0;
+
+  if (dtd <= 7 && status === 'CONSERVATION') {
+    return { sample: true, reason: 'SERPAPI_QUERIED' }; // Prioritize near-departure continuity
+  }
+
+  if (isSelected) {
+    return { sample: true, reason: 'SERPAPI_QUERIED' };
+  }
+
+  return { sample: false, reason: 'SERPAPI_SKIPPED_QUOTA_CONSERVATION' };
+}
+
 /**
  * 1. SerpApi Engine for Google Flights (if SERPAPI_API_KEY is configured)
  */
@@ -32,9 +154,18 @@ async function fetchFromSerpApi(
   origin: string,
   destination: string,
   outboundDate: string
-): Promise<Flight[] | null> {
+): Promise<{ flights: Flight[] | null; queryStatus: 'SERPAPI_QUERIED' | 'SERPAPI_SKIPPED_QUOTA_CONSERVATION' | 'SERPAPI_QUOTA_EXHAUSTED' | 'SERPAPI_FAILED' }> {
   const apiKey = process.env.SERPAPI_API_KEY;
-  if (!apiKey) return null;
+  if (!apiKey) return { flights: null, queryStatus: 'SERPAPI_FAILED' };
+
+  // Programmatic Quota Protection & Conservation Sampling check
+  const quota = await getSerpApiQuota();
+  const sampleDecision = shouldSampleSerpApi(origin, destination, outboundDate, quota.serpApiQuotaStatus);
+  
+  if (!sampleDecision.sample) {
+    console.log(`[SerpApi Conservation] Skipped query for ${origin}-${destination} on ${outboundDate}. Reason: ${sampleDecision.reason}`);
+    return { flights: null, queryStatus: sampleDecision.reason };
+  }
 
   try {
     const url = new URL('https://serpapi.com/search.json');
@@ -52,12 +183,12 @@ async function fetchFromSerpApi(
     const res = await fetch(url.toString(), { headers: { 'User-Agent': 'FlightIntelligence/1.0' } });
     if (!res.ok) {
       console.warn(`SerpApi response status: ${res.status}`);
-      return null;
+      return { flights: null, queryStatus: 'SERPAPI_FAILED' };
     }
 
     const data = await res.json();
     const rawFlights = [...(data.best_flights || []), ...(data.other_flights || [])];
-    if (!rawFlights || rawFlights.length === 0) return null;
+    if (!rawFlights || rawFlights.length === 0) return { flights: null, queryStatus: 'SERPAPI_QUERIED' };
 
     const originInfo = AIRPORTS[origin.toUpperCase()] || { city: origin, name: `${origin} Airport` };
     const destInfo = AIRPORTS[destination.toUpperCase()] || { city: destination, name: `${destination} Airport` };
@@ -121,10 +252,10 @@ async function fetchFromSerpApi(
       });
     });
 
-    return uniqueFlights;
+    return { flights: uniqueFlights, queryStatus: 'SERPAPI_QUERIED' };
   } catch (err) {
     console.error('SerpApi error, falling back to direct scraper:', err);
-    return null;
+    return { flights: null, queryStatus: 'SERPAPI_FAILED' };
   }
 }
 
@@ -387,33 +518,37 @@ export async function getLiveGoogleFlights(
   origin: string,
   destination: string,
   departureDateStr: string
-): Promise<{ flights: Flight[]; source: string }> {
+): Promise<{ 
+  flights: Flight[]; 
+  source: string; 
+  serpApiQueryStatus?: 'SERPAPI_QUERIED' | 'SERPAPI_SKIPPED_QUOTA_CONSERVATION' | 'SERPAPI_QUOTA_EXHAUSTED' | 'SERPAPI_FAILED' 
+}> {
   const cacheKey = `${origin.toUpperCase()}-${destination.toUpperCase()}-${departureDateStr}`;
   const cached = liveCache.get(cacheKey);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
-    return { flights: cached.flights, source: 'cache' };
+    return { flights: cached.flights, source: 'cache', serpApiQueryStatus: 'SERPAPI_QUERIED' };
   }
 
   // 1. Try SerpApi if key is present
-  const serpFlights = await fetchFromSerpApi(origin, destination, departureDateStr);
-  if (serpFlights && serpFlights.length > 0) {
-    liveCache.set(cacheKey, { timestamp: Date.now(), flights: serpFlights });
-    return { flights: serpFlights, source: 'serpapi' };
+  const serpResult = await fetchFromSerpApi(origin, destination, departureDateStr);
+  if (serpResult && serpResult.flights && serpResult.flights.length > 0) {
+    liveCache.set(cacheKey, { timestamp: Date.now(), flights: serpResult.flights });
+    return { flights: serpResult.flights, source: 'serpapi', serpApiQueryStatus: serpResult.queryStatus };
   }
 
   // 2. Try SearchApi if key is present
   const searchApiFlights = await fetchFromSearchApi(origin, destination, departureDateStr);
   if (searchApiFlights && searchApiFlights.length > 0) {
     liveCache.set(cacheKey, { timestamp: Date.now(), flights: searchApiFlights });
-    return { flights: searchApiFlights, source: 'searchapi' };
+    return { flights: searchApiFlights, source: 'searchapi', serpApiQueryStatus: serpResult?.queryStatus || 'SERPAPI_FAILED' };
   }
 
   // 3. Try Direct Google Flights Live Scraper
   const directScraped = await scrapeDirectGoogleFlights(origin, destination, departureDateStr);
   if (directScraped && directScraped.length > 0) {
     liveCache.set(cacheKey, { timestamp: Date.now(), flights: directScraped });
-    return { flights: directScraped, source: 'google_flights_live_scraper' };
+    return { flights: directScraped, source: 'google_flights_live_scraper', serpApiQueryStatus: serpResult?.queryStatus || 'SERPAPI_FAILED' };
   }
 
-  return { flights: [], source: 'none' };
+  return { flights: [], source: 'none', serpApiQueryStatus: serpResult?.queryStatus || 'SERPAPI_FAILED' };
 }

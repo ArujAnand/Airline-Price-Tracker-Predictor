@@ -69,7 +69,7 @@ export class CurrentProductionProvider implements FlightDataProvider {
           status: 'EMPTY_CONFIRMED',
           flights: [],
           latencyMs,
-          providerMetadata: { source: result.source }
+          providerMetadata: { source: result.source, serpApiQueryStatus: result.serpApiQueryStatus }
         };
       }
 
@@ -95,7 +95,7 @@ export class CurrentProductionProvider implements FlightDataProvider {
         status: 'SUCCESS',
         flights: mappedFlights,
         latencyMs,
-        providerMetadata: { source: result.source }
+        providerMetadata: { source: result.source, serpApiQueryStatus: result.serpApiQueryStatus }
       };
     } catch (err: any) {
       return {

@@ -617,7 +617,7 @@ class FareIndexingService {
     isPreliminary: boolean,
     cleanRouteId: string
   ): { points: BookingWindowPoint[]; insight: string } {
-    const targetWindows = [1, 7, 14, 30, 60, 90];
+    const targetWindows = [1, 7, 14, 30, 40, 50, 60, 70, 80, 90];
     const bucketMap: Record<number, { sum: number; count: number; prices: number[]; distinctDates: Set<string> }> = {};
     targetWindows.forEach((w) => {
       bucketMap[w] = { sum: 0, count: 0, prices: [], distinctDates: new Set<string>() };
@@ -633,8 +633,12 @@ class FareIndexingService {
       if (daysBefore <= 2) tw = 1;
       else if (daysBefore <= 9) tw = 7;
       else if (daysBefore <= 18) tw = 14;
-      else if (daysBefore <= 45) tw = 30;
-      else if (daysBefore <= 75) tw = 60;
+      else if (daysBefore <= 35) tw = 30;
+      else if (daysBefore <= 45) tw = 40;
+      else if (daysBefore <= 55) tw = 50;
+      else if (daysBefore <= 65) tw = 60;
+      else if (daysBefore <= 75) tw = 70;
+      else if (daysBefore <= 85) tw = 80;
       else tw = 90;
 
       bucketMap[tw].sum += s.price;

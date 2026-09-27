@@ -49,6 +49,43 @@ export class FirestorePersistenceService {
   private inMemoryNotifications = new Map<string, AppNotification>();
   private lastQuotaWarningTimestamp = 0;
 
+  public readCounters = {
+    snapshots: 0,
+    prediction_records: 0,
+    shadow_predictions: 0,
+    decision_episodes: 0,
+    recommendation_versions: 0,
+    system_state: 0,
+    other: 0
+  };
+
+  public getEstimatedReadsToday(): number {
+    return (
+      this.readCounters.snapshots +
+      this.readCounters.prediction_records +
+      this.readCounters.shadow_predictions +
+      this.readCounters.decision_episodes +
+      this.readCounters.recommendation_versions +
+      this.readCounters.system_state +
+      this.readCounters.other
+    );
+  }
+
+  private incrementReadCounter(collectionName: string, count = 1) {
+    if (collectionName === 'snapshots') this.readCounters.snapshots += count;
+    else if (collectionName === 'prediction_records') this.readCounters.prediction_records += count;
+    else if (collectionName === 'shadow_predictions') this.readCounters.shadow_predictions += count;
+    else if (collectionName === 'decision_episodes') this.readCounters.decision_episodes += count;
+    else if (collectionName === 'recommendation_versions') this.readCounters.recommendation_versions += count;
+    else if (collectionName === 'system_state') this.readCounters.system_state += count;
+    else this.readCounters.other += count;
+
+    // Periodically emit summarized logs to terminal console
+    if (this.getEstimatedReadsToday() % 20 === 0) {
+      console.log(`[Firestore telemetry] Summary total reads count tracker:`, JSON.stringify(this.readCounters));
+    }
+  }
+
   private async runWithWriteTimeout<T>(fn: () => Promise<T>, timeoutMs = 2500): Promise<T | null> {
     let timer: NodeJS.Timeout;
     const timeoutPromise = new Promise<null>((resolve) => {
@@ -109,6 +146,7 @@ export class FirestorePersistenceService {
     try {
       const docRef = doc(db, 'system_state', 'materializedState');
       const snap = await getDoc(docRef);
+      this.incrementReadCounter('system_state', 1);
       if (snap.exists()) {
         const data = snap.data();
         
@@ -150,6 +188,7 @@ export class FirestorePersistenceService {
         const snapshotsRef = collection(db, 'snapshots');
         const qSnap = query(snapshotsRef, where('timestamp', '>=', checkpointTimestamp));
         const snapNew = await getDocs(qSnap);
+        this.incrementReadCounter('snapshots', snapNew.size);
         const snapsList: PriceSnapshot[] = [];
         snapNew.forEach((docItem) => {
           snapsList.push(docItem.data() as PriceSnapshot);
@@ -173,6 +212,7 @@ export class FirestorePersistenceService {
         const predictionsRef = collection(db, 'prediction_records');
         const qPred = query(predictionsRef, where('createdAt', '>=', checkpointTimestamp));
         const predNew = await getDocs(qPred);
+        this.incrementReadCounter('prediction_records', predNew.size);
         const predsList: TrackedPredictionRecord[] = [];
         predNew.forEach((docItem) => {
           predsList.push(docItem.data() as TrackedPredictionRecord);
@@ -377,6 +417,14 @@ export class FirestorePersistenceService {
   }
 
   public async getSnapshots(routeId?: string, limitCount = 100): Promise<PriceSnapshot[]> {
+    if (this.isInitialized) {
+      let list = Array.from(this.inMemorySnapshots.values());
+      if (routeId) {
+        list = list.filter(s => s.routeId.toUpperCase() === routeId.toUpperCase());
+      }
+      return list.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, limitCount);
+    }
+
     try {
       const snapshotsRef = collection(db, 'snapshots');
       let q = query(snapshotsRef, orderBy('timestamp', 'desc'), fsLimit(limitCount));
@@ -391,6 +439,7 @@ export class FirestorePersistenceService {
       }
 
       const snap = await getDocs(q);
+      this.incrementReadCounter('snapshots', snap.size);
       const list: PriceSnapshot[] = [];
       snap.forEach((docItem) => {
         const data = docItem.data() as PriceSnapshot;
@@ -430,11 +479,21 @@ export class FirestorePersistenceService {
   }
 
   public async getPredictionRecords(limitCount: number = 1000, oldestFirst = false): Promise<TrackedPredictionRecord[]> {
+    if (this.isInitialized) {
+      const list = Array.from(this.inMemoryPredictionRecords.values());
+      list.sort((a, b) => {
+        const diff = new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+        return oldestFirst ? diff : -diff;
+      });
+      return list.slice(0, limitCount);
+    }
+
     try {
       const colRef = collection(db, 'prediction_records');
       const orderDir = oldestFirst ? 'asc' : 'desc';
       const q = query(colRef, orderBy('createdAt', orderDir), fsLimit(limitCount));
       const snap = await getDocs(q);
+      this.incrementReadCounter('prediction_records', snap.size);
       const list: TrackedPredictionRecord[] = [];
       snap.forEach((docItem) => {
         const data = docItem.data() as TrackedPredictionRecord;
@@ -645,10 +704,15 @@ export class FirestorePersistenceService {
   }
 
   public async getShadowPredictionRecords(): Promise<any[]> {
+    if (this.isInitialized) {
+      return Array.from(this.inMemoryShadowPredictions.values()).sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+    }
+
     try {
       const colRef = collection(db, 'shadow_predictions');
       const q = query(colRef, orderBy('createdAt', 'desc'), fsLimit(500));
       const snap = await getDocs(q);
+      this.incrementReadCounter('shadow_predictions', snap.size);
       const list: any[] = [];
       snap.forEach(d => {
         const item = d.data();
@@ -713,11 +777,13 @@ export class FirestorePersistenceService {
     try {
       const docRef = doc(db, 'decision_episodes', episodeId);
       const snap = await getDoc(docRef);
+      this.incrementReadCounter('decision_episodes', 1);
       if (snap.exists()) {
         const data = snap.data();
         this.inMemoryDecisionEpisodes.set(episodeId, data);
         return data;
       }
+      this.inMemoryDecisionEpisodes.set(episodeId, null);
       return null;
     } catch (err) {
       this.logQuotaWarningThrottled(`getDecisionEpisode (${episodeId})`, err);
@@ -740,11 +806,14 @@ export class FirestorePersistenceService {
         where('currentEpisodeState', '==', 'ACTIVE')
       );
       const snap = await getDocs(q);
+      this.incrementReadCounter('decision_episodes', snap.size || 1);
       if (!snap.empty) {
         const data = snap.docs[0].data();
         this.inMemoryActiveBackgroundEpisodes.set(canonicalId, data);
         return data;
       }
+      // Store negative cache to prevent querying Firestore again for non-existent background episodes
+      this.inMemoryActiveBackgroundEpisodes.set(canonicalId, null);
       return null;
     } catch (err) {
       this.logQuotaWarningThrottled(`getActiveBackgroundEpisode (${canonicalId})`, err);

@@ -14,6 +14,7 @@ import { auditOutcomeWorker } from './server/auditWorker';
 import { modelRegistryService } from './server/modelRegistryService';
 import { shadowSchedulerDaemon } from './server/shadowScheduler';
 import { firestoreDB } from './server/firestoreService';
+import { getSerpApiQuota } from './server/googleFlightsScraper';
 
 async function startServer() {
   const app = express();
@@ -266,6 +267,7 @@ async function startServer() {
       }
 
       const mSizeBytes = await firestoreDB.getMaterializedSizeBytes();
+      const serpQuota = await getSerpApiQuota();
 
       // Dynamic approx Pacific midnight countdown
       const now = new Date();
@@ -288,12 +290,17 @@ async function startServer() {
           quotaResetInfo: 'Firestore daily free quota resets AROUND midnight Pacific time.',
           approxTimeUntilReset
         },
+        readBudgetTelemetry: {
+          estimatedFirestoreReadsToday: firestoreDB.getEstimatedReadsToday(),
+          readCounters: firestoreDB.readCounters
+        },
         productionMetrics: {
           cleanGenuineSnapshots: cleanSnapshots,
           cleanPredictionsCount: cleanPredictions,
           cleanShadowPredictionsCount: shadows.filter((s: any) => s.evaluationEligibility === 'ELIGIBLE_REAL').length,
           primaryProvider: 'CurrentProductionProvider (SerpApi / Direct Google Flights)',
-          materializedStateSizeBytes: mSizeBytes
+          materializedStateSizeBytes: mSizeBytes,
+          serpApiQuota: serpQuota
         },
         fliExperimentalMetrics: {
           status: 'ACTIVE_PARALLEL',

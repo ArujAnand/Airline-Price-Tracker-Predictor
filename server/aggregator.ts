@@ -498,10 +498,12 @@ class FlightAggregatorEngine {
 
         // Store live snapshot records
         const now = new Date();
+        const hourString = now.toISOString().split(':')[0]; // e.g. "2026-09-27T00"
         const liveSnaps: PriceSnapshot[] = [];
         liveResult.flights.forEach((fl) => {
+          const cleanFlightNum = fl.flightNumber.replace(/\//g, '-').replace(/\s+/g, '');
           const snap: PriceSnapshot = {
-            id: `snap-live-${Date.now()}-${fl.flightNumber}`,
+            id: `snap-live-${origin.toUpperCase()}-${destination.toUpperCase()}-${cleanFlightNum}-${departureDateStr}-${hourString}`,
             flightId: fl.id,
             routeId: `${origin.toUpperCase()}-${destination.toUpperCase()}`,
             origin: fl.origin,
@@ -866,10 +868,11 @@ class FlightAggregatorEngine {
     // If successful, save genuine snapshots
     if (fetchResult.status === 'SUCCESS' && fetchResult.flights.length > 0) {
       const now = new Date();
+      const hourString = now.toISOString().split(':')[0]; // e.g. "2026-09-27T00"
       const liveSnaps: PriceSnapshot[] = fetchResult.flights.map((fl: any, idx: number) => {
         const cleanFlightNum = fl.flightNumber.replace(/\//g, '-').replace(/\s+/g, '');
         return {
-          id: `snap-live-${Date.now()}-${cleanFlightNum}-${idx}`,
+          id: `snap-live-${origin.toUpperCase()}-${destination.toUpperCase()}-${cleanFlightNum}-${departureDate}-${hourString}`,
           flightId: `${origin.toUpperCase()}-${destination.toUpperCase()}-${cleanFlightNum}-${departureDate}`,
           collectionCycleId: cycleId || null,
           routeId,
