@@ -95,6 +95,14 @@ export class ShadowPredictionDaemon {
         for (const fl of flights) {
           try {
             const canonicalKey = buildCanonicalFlightKey(origin, destination, fl.flightNumber, dateStr, fl.airlineCode);
+            
+            // Only generate shadow predictions for flights actively observed in recent collection window
+            const recentObs = normalizedSnapshots.find(s => 
+              s.canonicalId === canonicalKey.canonicalId && 
+              (new Date(nowISO).getTime() - new Date(s.observedAt).getTime()) < 3.5 * 3600 * 1000
+            );
+            if (!recentObs) continue;
+
             const currentFare = fl.currentPrice;
 
             // Prior snapshots strictly t <= nowISO

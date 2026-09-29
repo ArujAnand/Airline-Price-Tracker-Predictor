@@ -280,6 +280,10 @@ async function startServer() {
       const approxTimeUntilReset = `${diffHrs}h ${diffMins}m (approximate)`;
 
       res.json({
+        processInstance: {
+          instanceId: firestoreDB.processInstanceId,
+          startedAt: firestoreDB.processStartedAt
+        },
         cleanProspectiveEra: {
           startedAt: '2026-09-26T10:30:00.000Z',
           collectorVersion: 'v2.0-clean-prospective',
@@ -291,8 +295,13 @@ async function startServer() {
           approxTimeUntilReset
         },
         readBudgetTelemetry: {
-          estimatedFirestoreReadsToday: firestoreDB.getEstimatedReadsToday(),
-          readCounters: firestoreDB.readCounters
+          estimatedTodayReads: firestoreDB.getEstimatedReadsToday(),
+          estimatedTodayWrites: firestoreDB.getEstimatedWritesToday(),
+          readCounters: firestoreDB.readCounters,
+          writeCounters: firestoreDB.writeCounters,
+          repositoryTelemetry: firestoreDB.repositoryTelemetry,
+          realtimeListenersActiveInApp: 0,
+          quotaScopeNote: 'Spark Plan (No Cost): 50,000 reads/day, 20,000 writes/day, 1GB stored, 10GB egress.'
         },
         productionMetrics: {
           cleanGenuineSnapshots: cleanSnapshots,

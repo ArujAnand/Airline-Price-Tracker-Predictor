@@ -72,7 +72,7 @@ export class AuditOutcomeResolutionWorker {
     const MAX_PAGES = 10;
 
     for (let page = 0; page < MAX_PAGES; page++) {
-      const pageResult = await firestoreDB.getDeterministicallyPagedPredictionRecords(200, currentCursor);
+      const pageResult = await firestoreDB.getDeterministicallyPagedPredictionRecords(200, currentCursor, nowISO);
       const batch = pageResult.records;
       if (!batch || batch.length === 0) break;
 

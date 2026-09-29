@@ -226,6 +226,27 @@ export interface LongitudinalObservation {
   source: 'GOOGLE_FLIGHTS_SCRAPER' | 'LIVE_AGGREGATOR' | 'PERSISTED_FIRESTORE';
 }
 
+export interface FlightSegment {
+  carrierCode: string;
+  flightNumber: string;
+  origin: string;
+  destination: string;
+  departureTime: string;
+  arrivalTime: string;
+}
+
+export interface ItineraryObservation {
+  itineraryId: string;
+  origin: string;
+  destination: string;
+  totalFareINR: number;
+  stops: number;
+  segments: FlightSegment[];
+  departureDate: string;
+  observedAt: string;
+  provenance: DataProvenance;
+}
+
 export interface FlightTrajectorySeries {
   canonicalId: string;
   origin: string;

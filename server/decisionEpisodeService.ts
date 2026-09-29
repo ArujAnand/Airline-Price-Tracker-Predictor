@@ -11,9 +11,28 @@ import {
   MarketOutcome,
   PolicyOutcome,
   AsymmetricSavingState,
-  HorizonPeriod
+  HorizonPeriod,
+  RecommendationAction
 } from './types/mlPipeline';
 import { isEmpiricallyEligibleObservation } from './trajectoryService';
+
+/**
+ * Computes a deterministic state fingerprint from recommendation-relevant point-in-time state.
+ * Uses exact normalized decision state as consumed by feature extraction and policies.
+ * Excludes operational metadata (timestamps, attempt counts, cursor, processInstanceId).
+ */
+export function computeRecommendationStateFingerprint(
+  fareINR: number,
+  leadTimeDays: number,
+  scheduleDriftMinutes: number,
+  action: string,
+  policyId = 'shadow-decision-policy-v1',
+  selectedHorizon: string | null = null
+): string {
+  const normDTD = Number(leadTimeDays).toFixed(2);
+  const normDrift = Math.round(scheduleDriftMinutes);
+  return `fp-fare${fareINR}-dtd${normDTD}-drift${normDrift}-${action}-${policyId}-${selectedHorizon || 'none'}`;
+}
 
 export class DecisionEpisodeService {
   /**
@@ -98,13 +117,41 @@ export class DecisionEpisodeService {
         return;
       }
 
+      // Compute deterministic state fingerprint of decision-relevant inputs
+      const currentAction: RecommendationAction = 'INSUFFICIENT_EVIDENCE';
+      const currentFingerprint = computeRecommendationStateFingerprint(
+        snapshot.priceINR,
+        snapshot.leadTimeDays,
+        snapshot.scheduleDriftMinutes || 0,
+        currentAction,
+        'shadow-decision-policy-v1',
+        null
+      );
+
+      const previousFingerprint = (prevVersion as any).stateFingerprint || computeRecommendationStateFingerprint(
+        prevVersion.spotFareINR,
+        (prevVersion as any).leadTimeDays || snapshot.leadTimeDays,
+        0,
+        prevVersion.action,
+        'shadow-decision-policy-v1',
+        prevVersion.selectedValidityHorizon
+      );
+
+      // If state fingerprint is unchanged (no fare change, no schedule drift, no DTD boundary crossing, same action),
+      // update episode timestamp in memory and avoid writing redundant duplicate version
+      if (currentFingerprint === previousFingerprint) {
+        episode.updatedAt = nowISO;
+        return;
+      }
+
+      const absoluteFareChangeINR = snapshot.priceINR - prevVersion.spotFareINR;
+
       // Generate StateTransitionObservation
       const transitionObservationId = `sto-${episodeId}-${snapshot.observationId}`;
       const previousObsTime = prevVersion.generatedAt;
       const currentObsTime = snapshot.observedAt;
       const elapsedMinutes = Math.max(1, Math.round((new Date(currentObsTime).getTime() - new Date(previousObsTime).getTime()) / 60000));
 
-      const absoluteFareChangeINR = snapshot.priceINR - prevVersion.spotFareINR;
       const percentageFareChange = prevVersion.spotFareINR > 0 ? absoluteFareChangeINR / prevVersion.spotFareINR : 0;
 
       const observation: StateTransitionObservation = {
@@ -157,8 +204,9 @@ export class DecisionEpisodeService {
         previousVersionId,
         convictionProbability: null,
         calibrationStatus: 'INSUFFICIENT_EVIDENCE',
-        createdAt: nowISO
-      };
+        createdAt: nowISO,
+        stateFingerprint: currentFingerprint
+      } as any;
 
       await firestoreDB.saveRecommendationVersion(newVersion);
 

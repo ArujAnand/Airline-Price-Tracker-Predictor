@@ -135,11 +135,11 @@ export class BackgroundSchedulerDaemon {
               observationAgeMinutes = Math.max(0, Math.round((now.getTime() - new Date(latestSnap.timestamp).getTime()) / 60000));
             }
 
-            if (isFresh) {
-              freshStateCount++;
-            } else {
+            if (!isFresh) {
               staleStateCount++;
+              continue;
             }
+            freshStateCount++;
 
             // Extract point-in-time features strictly up to now (t <= now)
             const features: FactualContextFeatures = trajectoryService.extractPointInTimeFeatures(

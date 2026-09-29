@@ -11,7 +11,7 @@ import {
   FactualContextFeatures,
   DataProvenance
 } from './types/mlPipeline';
-import { parseCanonicalFlightId, detectScheduleDrift, buildCanonicalFlightKey } from './flightIdentity';
+import { parseCanonicalFlightId, detectScheduleDrift, buildCanonicalFlightKey, classifyFlightObservation } from './flightIdentity';
 import { getFactualNearbyEvents } from './festivals';
 
 export class LongitudinalTrajectoryService {
@@ -272,6 +272,23 @@ export function isEmpiricallyEligibleObservation(snapshot: any): boolean {
   ) {
     return false;
   }
+  // Authoritative structured classification: only valid single physical flights are eligible
+  const classification = classifyFlightObservation({
+    flightNumber: snapshot.flightNumber,
+    canonicalId: snapshot.canonicalId,
+    stops: (snapshot as any).stops,
+    segments: (snapshot as any).segments,
+    operatingCarrier: (snapshot as any).operatingCarrier,
+    operatingFlightNumber: (snapshot as any).operatingFlightNumber,
+    marketingCarrier: (snapshot as any).marketingCarrier,
+    marketingFlightNumber: (snapshot as any).marketingFlightNumber,
+    isCodeshare: (snapshot as any).isCodeshare
+  });
+
+  if (classification !== 'VALID_SINGLE_FLIGHT') {
+    return false;
+  }
+
   if (provenance === 'REAL_EXTERNAL_OBSERVATION' || provenance === 'REAL_VERIFIED_HISTORICAL_OBSERVATION') {
     return true;
   }

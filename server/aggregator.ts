@@ -501,10 +501,11 @@ class FlightAggregatorEngine {
         const hourString = now.toISOString().split(':')[0]; // e.g. "2026-09-27T00"
         const liveSnaps: PriceSnapshot[] = [];
         liveResult.flights.forEach((fl) => {
-          const cleanFlightNum = fl.flightNumber.replace(/\//g, '-').replace(/\s+/g, '');
+          const canonicalKey = buildCanonicalFlightKey(origin, destination, fl.flightNumber, departureDateStr, fl.airlineCode || fl.airline);
+          const cleanFlightNum = canonicalKey.flightNumber;
           const snap: PriceSnapshot = {
             id: `snap-live-${origin.toUpperCase()}-${destination.toUpperCase()}-${cleanFlightNum}-${departureDateStr}-${hourString}`,
-            flightId: fl.id,
+            flightId: canonicalKey.canonicalId,
             routeId: `${origin.toUpperCase()}-${destination.toUpperCase()}`,
             origin: fl.origin,
             destination: fl.destination,
@@ -870,10 +871,11 @@ class FlightAggregatorEngine {
       const now = new Date();
       const hourString = now.toISOString().split(':')[0]; // e.g. "2026-09-27T00"
       const liveSnaps: PriceSnapshot[] = fetchResult.flights.map((fl: any, idx: number) => {
-        const cleanFlightNum = fl.flightNumber.replace(/\//g, '-').replace(/\s+/g, '');
+        const canonicalKey = buildCanonicalFlightKey(origin, destination, fl.flightNumber, departureDate, fl.airlineCode || fl.carrierCode);
+        const cleanFlightNum = canonicalKey.flightNumber;
         return {
           id: `snap-live-${origin.toUpperCase()}-${destination.toUpperCase()}-${cleanFlightNum}-${departureDate}-${hourString}`,
-          flightId: `${origin.toUpperCase()}-${destination.toUpperCase()}-${cleanFlightNum}-${departureDate}`,
+          flightId: canonicalKey.canonicalId,
           collectionCycleId: cycleId || null,
           routeId,
           origin: origin.toUpperCase(),
