@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { LkoPnqTrendSummary, FlightFareTrajectory, AuthenticFareObservation } from '../types/fareTracker';
 import { BookingWindowCurveChart } from './BookingWindowCurveChart';
+import { FlightFareHistoryChart } from './FlightFareHistoryChart';
 
 interface Props {
   isOpen: boolean;
@@ -699,36 +700,14 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                     </table>
                   </div>
 
-                  {/* Selected Trajectory Detail Modal / Drawer */}
+                  {/* Dedicated Observed Fare History Modal */}
                   {selectedTrajectory && (
-                    <div className="p-4 rounded-xl border border-blue-200 bg-blue-50/30 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="font-bold text-slate-900 text-sm">
-                            Observation History: {selectedTrajectory.flightNumber} ({selectedTrajectory.airline})
-                          </div>
-                          <div className="text-xs text-slate-600">
-                            Departure Date: {selectedTrajectory.departureDate} • {selectedTrajectory.history.length} snapshots recorded
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => setSelectedTrajectory(null)}
-                          className="text-xs text-slate-500 hover:text-slate-800 underline"
-                        >
-                          Close
-                        </button>
-                      </div>
-
-                      <div className="max-h-48 overflow-y-auto space-y-1.5 pr-2">
-                        {selectedTrajectory.history.map((h, i) => (
-                          <div key={i} className="flex items-center justify-between text-xs py-1.5 px-3 bg-white rounded border border-slate-200">
-                            <div className="font-mono text-slate-600">{new Date(h.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST</div>
-                            <div className="font-bold text-slate-900">₹{h.price.toLocaleString('en-IN')}</div>
-                            <div className="text-[11px] text-slate-500">{h.source}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                    <FlightFareHistoryChart
+                      flightNumber={selectedTrajectory.flightNumber}
+                      departureDate={selectedTrajectory.departureDate}
+                      airline={selectedTrajectory.airline}
+                      onClose={() => setSelectedTrajectory(null)}
+                    />
                   )}
                 </div>
               )}

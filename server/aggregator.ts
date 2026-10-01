@@ -5,6 +5,7 @@ import { firestoreDB } from './firestoreService';
 import { buildCanonicalFlightKey, buildObservationId } from './flightIdentity';
 import { trajectoryService } from './trajectoryService';
 import { decisionEpisodeService } from './decisionEpisodeService';
+import { fareObservationRepository } from './repositories/fareObservationRepository';
 
 export const AIRPORTS: Record<string, { city: string; name: string }> = {
   PNQ: { city: 'Pune', name: 'Pune Lohegaon Airport' },
@@ -524,9 +525,9 @@ class FlightAggregatorEngine {
           liveSnaps.push(snap);
         });
 
-        // Persist on-demand live snapshots asynchronously to Firestore
-        firestoreDB.saveSnapshotsBatch(liveSnaps).catch((err) => {
-          console.warn('[Firestore DB] Failed to save live scraped snapshots batch:', err);
+        // Persist on-demand live snapshots asynchronously to Supabase
+        fareObservationRepository.saveNewObservationsBatch(liveSnaps).catch((err) => {
+          console.warn('[Supabase DB] Failed to save live scraped snapshots batch:', err);
         });
 
         return liveResult.flights;
@@ -896,8 +897,8 @@ class FlightAggregatorEngine {
       // Add to memory
       liveSnaps.forEach(snap => this.addSnapshot(snap));
 
-      // Save snapshots to DB
-      await firestoreDB.saveSnapshotsBatch(liveSnaps);
+      // Save snapshots directly to Supabase primary write path
+      await fareObservationRepository.saveNewObservationsBatch(liveSnaps);
 
       // Process decision episodes
       for (const snap of liveSnaps) {

@@ -18,6 +18,8 @@ import { shadowSchedulerDaemon } from './server/shadowScheduler';
 import { firestoreDB } from './server/firestoreService';
 import { getSerpApiQuota } from './server/googleFlightsScraper';
 import { lkoPnqFareTrackerService } from './server/fareTrackerService';
+import { fareObservationRepository } from './server/repositories/fareObservationRepository';
+import { historicalMigrationService } from './server/migration/historicalMigrationService';
 
 async function startServer() {
   const app = express();
@@ -125,6 +127,49 @@ async function startServer() {
     } catch (err: any) {
       console.error('LKO-PNQ Fare Tracker error:', err);
       res.status(500).json({ error: err?.message || 'Failed to load LKO-PNQ authentic fare data' });
+    }
+  });
+
+  // Dedicated Flight Fare History Query (Ordered by actual observation timestamp)
+  app.get('/api/fare-tracker/history', async (req, res) => {
+    const flightNumber = (req.query.flightNumber as string) || '';
+    const departureDate = (req.query.departureDate as string) || '';
+
+    if (!flightNumber || !departureDate) {
+      return res.status(400).json({ error: 'flightNumber and departureDate are required parameters' });
+    }
+
+    try {
+      const history = await fareObservationRepository.getFlightFareHistory(flightNumber, departureDate);
+      res.json(history);
+    } catch (err: any) {
+      console.error('Flight history lookup error:', err);
+      res.status(500).json({ error: err?.message || 'Failed to retrieve flight fare history' });
+    }
+  });
+
+  // Supabase Incremental Historical Migration Diagnostics Endpoint
+  app.get('/api/migration/status', async (req, res) => {
+    try {
+      const diagnostics = await historicalMigrationService.getDiagnostics();
+      res.json(diagnostics);
+    } catch (err: any) {
+      res.status(500).json({ error: err?.message || 'Failed to load migration status' });
+    }
+  });
+
+  // Trigger Manual / Resume Migration Batch
+  app.post('/api/migration/trigger', async (req, res) => {
+    try {
+      const batchSize = Number(req.body?.batchSize || req.query?.batchSize) || 100;
+      const result = await historicalMigrationService.runMigrationBatch(batchSize);
+      res.json({
+        success: true,
+        batchResult: result,
+        diagnostics: await historicalMigrationService.getDiagnostics()
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: err?.message || 'Failed to execute migration batch' });
     }
   });
 

@@ -1,7 +1,6 @@
-import { db } from '../src/firebaseClient';
-import { collection, getDocs, query, where } from 'firebase/firestore';
 import fs from 'fs';
 import path from 'path';
+import { fareObservationRepository, StandardFareObservation } from './repositories/fareObservationRepository';
 
 export interface AuthenticFareObservation {
   id: string;
@@ -363,51 +362,22 @@ class LkoPnqFareTrackerService {
     }
 
     try {
-      const colRef = collection(db, 'snapshots');
-      const q = query(
-        colRef,
-        where('routeId', '==', 'LKO-PNQ'),
-        where('departureDate', '>=', '2026-11-09'),
-        where('departureDate', '<=', '2026-11-23')
-      );
+      // 1. Query unified observations via Repository (Supabase -> Cache -> Firestore fallback)
+      const repoObservations = await fareObservationRepository.getObservationsForRoute('LKO-PNQ', '2026-11-09', '2026-11-23');
 
-      const snapshot = await getDocs(q);
-      const rawObs: AuthenticFareObservation[] = [];
-
-      const allowedProvenances = new Set([
-        'REAL_EXTERNAL_OBSERVATION',
-        'REAL_VERIFIED_HISTORICAL_OBSERVATION',
-        'REAL_OBSERVATION',
-        undefined
-      ]);
-
-      const forbiddenSources = new Set(['SYNTHETIC_FIXTURE', 'MOCK_GENERATOR', 'HISTORICAL_ESTIMATOR']);
-
-      snapshot.forEach((docSnap) => {
-        const data = docSnap.data() as any;
-        if (data.isSynthetic === true || data.provenance === 'ISOLATED_TEST_FIXTURE' || forbiddenSources.has(data.source)) {
-          return;
-        }
-        if (!allowedProvenances.has(data.provenance) && data.provenance !== undefined) {
-          return;
-        }
-
-        rawObs.push({
-          id: docSnap.id,
-          flightNumber: data.flightNumber || 'UNKNOWN',
-          flightId: data.flightId || `${data.routeId}-${data.flightNumber}-${data.departureDate}`,
-          airline: data.airline || 'Unknown',
-          origin: data.origin || 'LKO',
-          destination: data.destination || 'PNQ',
-          departureDate: data.departureDate,
-          price: Number(data.price),
-          timestamp: data.timestamp || new Date().toISOString(),
-          source: data.source || 'Direct Observation',
-          provenance: data.provenance || 'REAL_OBSERVATION',
-          type: data.type,
-          capturedHour: data.capturedHour
-        });
-      });
+      const rawObs: AuthenticFareObservation[] = repoObservations.map(o => ({
+        id: o.id,
+        flightNumber: o.flightNumber,
+        flightId: o.flightId,
+        airline: o.airline,
+        origin: o.origin,
+        destination: o.destination,
+        departureDate: o.departureDate,
+        price: o.price,
+        timestamp: o.timestamp,
+        source: o.source,
+        provenance: o.provenance
+      }));
 
       // Merge with disk cache
       if (this.cachedData && this.cachedData.rawObservations) {
@@ -599,11 +569,27 @@ class LkoPnqFareTrackerService {
     rawObs.push(newObs);
     rawObs.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
+    // Save directly to Supabase primary write path
+    fareObservationRepository.saveNewObservation({
+      id: newObs.id,
+      routeId: 'LKO-PNQ',
+      origin: 'LKO',
+      destination: 'PNQ',
+      flightNumber: newObs.flightNumber,
+      airline: newObs.airline,
+      departureDate: depDate,
+      price: newObs.price,
+      timestamp: newObs.timestamp,
+      source: newObs.source,
+      provenance: newObs.provenance,
+      isSynthetic: false
+    }).catch(err => console.warn('[FareTracker] Notice saving to Supabase:', err));
+
     summary.rawObservations = rawObs;
     const enriched = this.enrichSummaryWithTMinus(summary);
     this.cachedData = enriched;
     this.saveDiskCache(enriched);
-    console.log(`[FareTracker] Incorporated new authentic observation for LKO-PNQ ${depDate} (₹${newObs.price}). Total: ${enriched.totalAuthenticObservations}. T-minus recalculated.`);
+    console.log(`[FareTracker] Incorporated new authentic observation for LKO-PNQ ${depDate} (₹${newObs.price}) into Supabase. Total: ${enriched.totalAuthenticObservations}. T-minus recalculated.`);
     return true;
   }
 }
