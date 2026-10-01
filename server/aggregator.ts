@@ -717,9 +717,15 @@ class FlightAggregatorEngine {
       dates.add(d.toISOString().split('T')[0]);
     }
 
-    // 3. Anchor festival dates
+    // 3. Anchor festival dates & LKO-PNQ dedicated tracking corridor (9 Nov – 23 Nov 2026)
     dates.add('2026-10-18'); // Dussehra
     dates.add('2026-11-08'); // Diwali
+    
+    // Explicitly track all 15 consecutive corridor dates
+    for (let day = 9; day <= 23; day++) {
+      const dayStr = day < 10 ? `0${day}` : `${day}`;
+      dates.add(`2026-11-${dayStr}`);
+    }
 
     return Array.from(dates);
   }
