@@ -33,8 +33,20 @@ export class HistoricalMigrationService {
     
     // Automatically trigger initial batch pass on startup
     setTimeout(() => {
-      this.runMigrationBatch(100).catch(err => console.warn('[HistoricalMigration] Initial batch pass error:', err));
+      this.runMigrationBatch(150).catch(err => console.warn('[HistoricalMigration] Initial batch pass error:', err));
     }, 2000);
+
+    // Continuous recurring background worker (every 60 seconds until 100% verified)
+    setInterval(async () => {
+      try {
+        const diag = await this.getDiagnostics();
+        if (diag.remainingCount > 0) {
+          await this.runMigrationBatch(150);
+        }
+      } catch (err) {
+        // silent recovery
+      }
+    }, 60 * 1000);
   }
 
   /**

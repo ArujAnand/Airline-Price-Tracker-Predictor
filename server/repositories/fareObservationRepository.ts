@@ -216,6 +216,7 @@ export class FareObservationRepository {
     const obsMap = new Map<string, StandardFareObservation>();
 
     // 1. Read from Supabase (Authoritative)
+    let supaCount = 0;
     try {
       const supaRecords = await supabaseManager.queryObservations({
         route,
@@ -223,6 +224,7 @@ export class FareObservationRepository {
         departure_date_end: departureDateEnd
       });
 
+      supaCount = supaRecords.length;
       for (const s of supaRecords) {
         obsMap.set(s.id, {
           id: s.id,
@@ -243,10 +245,10 @@ export class FareObservationRepository {
         });
       }
     } catch (err) {
-      console.warn('[Repository] Supabase query error, relying on cache:', err);
+      console.warn('[Repository] Supabase query error, falling back to cache:', err);
     }
 
-    // 2. Read from Verified Cache for unmigrated records
+    // 2. Read from Verified Cache for any unmigrated records during transition
     for (const [id, cached] of this.cachedHistoricalObservations.entries()) {
       if (!obsMap.has(id)) {
         if (departureDateStart && cached.departureDate < departureDateStart) continue;
@@ -255,7 +257,7 @@ export class FareObservationRepository {
       }
     }
 
-    // 3. Fallback to Firestore only if cache and Supabase have fewer than expected records and quota not exhausted
+    // 3. Fallback to Firestore ONLY if cache and Supabase have 0 records and quota is not exhausted
     if (obsMap.size === 0 && Date.now() - this.lastFirestoreQuotaError > 10 * 60 * 1000) {
       try {
         const colRef = collection(db, 'snapshots');
@@ -288,7 +290,7 @@ export class FareObservationRepository {
         });
       } catch (err: any) {
         this.lastFirestoreQuotaError = Date.now();
-        console.warn('[Repository] Firestore fallback skipped due to quota notice:', err?.message);
+        console.warn('[Repository] Firestore quota limit reached or unavailable; serving data strictly from Supabase and verified cache.');
       }
     }
 
