@@ -38,11 +38,11 @@ export class BackgroundSchedulerDaemon {
     console.log(`⏰ [Scheduler] Next collection cycle scheduled in ${Math.round(remainingDelay / 1000)} seconds.`);
 
     setTimeout(() => {
-      this.runCycle().catch(err => console.error('[Scheduler] Initial cycle error:', err));
+      this.runCycle(true).catch(err => console.error('[Scheduler] Initial cycle error:', err));
     }, remainingDelay);
 
     this.intervalTimer = setInterval(() => {
-      this.runCycle().catch(err => console.error('[Scheduler] Periodic cycle error:', err));
+      this.runCycle(true).catch(err => console.error('[Scheduler] Periodic cycle error:', err));
     }, this.INTERVAL_MS);
   }
 
