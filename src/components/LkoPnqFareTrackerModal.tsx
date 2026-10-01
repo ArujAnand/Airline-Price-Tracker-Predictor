@@ -660,6 +660,36 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                             };
                           });
 
+                          const AIRLINE_CONFIG: Record<string, { stroke: string; fill: string; bg: string; text: string }> = {
+                            'IndiGo': { stroke: '#2563eb', fill: '#3b82f6', bg: 'bg-blue-600', text: 'text-blue-600' },
+                            'Air India': { stroke: '#dc2626', fill: '#ef4444', bg: 'bg-red-600', text: 'text-red-600' },
+                            'Air India Express': { stroke: '#ea580c', fill: '#f97316', bg: 'bg-orange-600', text: 'text-orange-600' },
+                            'Akasa Air': { stroke: '#059669', fill: '#10b981', bg: 'bg-emerald-600', text: 'text-emerald-600' },
+                            'SpiceJet': { stroke: '#d97706', fill: '#f59e0b', bg: 'bg-amber-600', text: 'text-amber-600' }
+                          };
+
+                          const distinctAirlines = Array.from(new Set(obsList.map(o => o.airline)));
+
+                          const airlineSeries = distinctAirlines.map(airlineName => {
+                            const points = obsList
+                              .filter(o => o.airline === airlineName)
+                              .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+                              .map((obs, idx) => {
+                                const t = new Date(obs.timestamp).getTime();
+                                const x = padLeft + (timeSpan > 0 ? ((t - minTime) / timeSpan) : 0.5) * chartW;
+                                const y = padTop + (priceSpan > 0 ? (1 - (obs.price - minP) / priceSpan) : 0.5) * chartH;
+                                return { x, y, obs, id: obs.id || `${airlineName}-${idx}` };
+                              });
+
+                            const pathD = points.length > 0
+                              ? points.map((p, idx) => `${idx === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ')
+                              : '';
+
+                            const cfg = AIRLINE_CONFIG[airlineName] || { stroke: '#64748b', fill: '#94a3b8', bg: 'bg-slate-600', text: 'text-slate-600' };
+
+                            return { airlineName, points, pathD, cfg };
+                          });
+
                           return (
                             <>
                               <svg
@@ -667,6 +697,15 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                                 className="w-full h-full"
                                 preserveAspectRatio="none"
                               >
+                                <defs>
+                                  {airlineSeries.map(s => (
+                                    <linearGradient key={`grad-${s.airlineName}`} id={`grad-${s.airlineName.replace(/\s+/g, '')}`} x1="0" y1="0" x2="0" y2="1">
+                                      <stop offset="0%" stopColor={s.cfg.stroke} stopOpacity="0.25" />
+                                      <stop offset="100%" stopColor={s.cfg.stroke} stopOpacity="0.0" />
+                                    </linearGradient>
+                                  ))}
+                                </defs>
+
                                 {/* Vertical Time Grid lines & Date Labels */}
                                 {timeTicks.map((tick, idx) => (
                                   <g key={idx}>
@@ -732,59 +771,64 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                                   );
                                 })}
 
-                                {/* Data points */}
-                                {obsList.map((obs, idx) => {
-                                  const t = new Date(obs.timestamp).getTime();
-                                  const x = padLeft + ((t - minTime) / timeSpan) * chartW;
-                                  const y = padTop + (1 - (obs.price - minP) / priceSpan) * chartH;
-
-                                  const color = obs.airline === 'IndiGo'
-                                    ? '#2563eb'
-                                    : obs.airline === 'Air India'
-                                    ? '#dc2626'
-                                    : obs.airline === 'Air India Express'
-                                    ? '#ea580c'
-                                    : '#059669';
-
+                                {/* Multi-Airline Connected Trajectory Lines */}
+                                {airlineSeries.map(series => {
+                                  if (!series.pathD) return null;
                                   return (
+                                    <g key={`line-${series.airlineName}`}>
+                                      <path
+                                        d={series.pathD}
+                                        fill="none"
+                                        stroke={series.cfg.stroke}
+                                        strokeWidth="2.5"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="transition-all opacity-85 hover:opacity-100"
+                                      />
+                                    </g>
+                                  );
+                                })}
+
+                                {/* Observation Data point nodes */}
+                                {airlineSeries.map(series =>
+                                  series.points.map(pt => (
                                     <circle
-                                      key={obs.id || idx}
-                                      cx={x}
-                                      cy={y}
-                                      r="4.5"
-                                      fill={color}
-                                      fillOpacity="0.85"
+                                      key={pt.id}
+                                      cx={pt.x}
+                                      cy={pt.y}
+                                      r="4"
+                                      fill={series.cfg.fill}
                                       stroke="#ffffff"
                                       strokeWidth="1.5"
-                                      className="cursor-pointer hover:r-6 hover:fill-opacity-100 transition-all"
+                                      className="cursor-pointer hover:r-6 hover:stroke-2 transition-all shadow-sm"
                                       onMouseEnter={(e) => {
                                         const rect = e.currentTarget.ownerSVGElement?.getBoundingClientRect() || e.currentTarget.getBoundingClientRect();
                                         const pointRect = e.currentTarget.getBoundingClientRect();
                                         setHoveredPoint({
                                           x: pointRect.left - rect.left + pointRect.width / 2,
                                           y: pointRect.top - rect.top,
-                                          price: obs.price,
-                                          timestamp: obs.timestamp,
-                                          flightNumber: obs.flightNumber,
-                                          airline: obs.airline,
-                                          departureDate: obs.departureDate
+                                          price: pt.obs.price,
+                                          timestamp: pt.obs.timestamp,
+                                          flightNumber: pt.obs.flightNumber,
+                                          airline: pt.obs.airline,
+                                          departureDate: pt.obs.departureDate
                                         });
                                       }}
                                       onClick={() => {
                                         setHoveredPoint({
-                                          x: x,
-                                          y: y,
-                                          price: obs.price,
-                                          timestamp: obs.timestamp,
-                                          flightNumber: obs.flightNumber,
-                                          airline: obs.airline,
-                                          departureDate: obs.departureDate
+                                          x: pt.x,
+                                          y: pt.y,
+                                          price: pt.obs.price,
+                                          timestamp: pt.obs.timestamp,
+                                          flightNumber: pt.obs.flightNumber,
+                                          airline: pt.obs.airline,
+                                          departureDate: pt.obs.departureDate
                                         });
                                       }}
                                       onMouseLeave={() => setHoveredPoint(null)}
                                     />
-                                  );
-                                })}
+                                  ))
+                                )}
                               </svg>
 
                               {/* Floating Tooltip displaying exact Date & Time of Observation */}
@@ -831,25 +875,42 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                       )}
                     </div>
 
-                    {/* Legend */}
-                    <div className="flex items-center justify-between text-xs text-slate-500 mt-2 px-1">
-                      <div className="flex items-center space-x-4">
-                        <span className="flex items-center space-x-1.5">
-                          <span className="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block" />
-                          <span>IndiGo</span>
-                        </span>
-                        <span className="flex items-center space-x-1.5">
-                          <span className="w-2.5 h-2.5 rounded-full bg-red-600 inline-block" />
-                          <span>Air India</span>
-                        </span>
-                        <span className="flex items-center space-x-1.5">
-                          <span className="w-2.5 h-2.5 rounded-full bg-orange-600 inline-block" />
-                          <span>Air India Express</span>
-                        </span>
-                        <span className="flex items-center space-x-1.5">
-                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block" />
-                          <span>Akasa Air</span>
-                        </span>
+                    {/* Interactive Airline Legend */}
+                    <div className="flex flex-wrap items-center justify-between text-xs text-slate-500 mt-3 px-1 gap-2 border-t border-slate-100 pt-2.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-[11px] font-semibold text-slate-400 mr-1">Airlines:</span>
+                        <button
+                          onClick={() => setSelectedAirline('ALL')}
+                          className={`px-2 py-0.5 rounded-full text-[11px] font-medium transition ${
+                            selectedAirline === 'ALL'
+                              ? 'bg-slate-800 text-white shadow-xs'
+                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          }`}
+                        >
+                          All Airlines
+                        </button>
+                        {[
+                          { name: 'IndiGo', bg: 'bg-blue-600', text: 'text-blue-700' },
+                          { name: 'Air India', bg: 'bg-red-600', text: 'text-red-700' },
+                          { name: 'Air India Express', bg: 'bg-orange-600', text: 'text-orange-700' },
+                          { name: 'Akasa Air', bg: 'bg-emerald-600', text: 'text-emerald-700' }
+                        ].map(airline => {
+                          const isAct = selectedAirline === airline.name;
+                          return (
+                            <button
+                              key={airline.name}
+                              onClick={() => setSelectedAirline(isAct ? 'ALL' : airline.name)}
+                              className={`flex items-center space-x-1.5 px-2 py-0.5 rounded-full text-[11px] transition ${
+                                isAct
+                                  ? 'bg-slate-900 text-white font-semibold shadow-xs'
+                                  : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
+                              }`}
+                            >
+                              <span className={`w-2 h-2 rounded-full ${airline.bg} inline-block`} />
+                              <span>{airline.name}</span>
+                            </button>
+                          );
+                        })}
                       </div>
                       <div className="text-[11px] text-slate-400">
                         Earliest: {data.earliestObservationTimestamp.slice(0, 10)} • Latest: {data.latestObservationTimestamp.slice(0, 10)}

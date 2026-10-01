@@ -379,6 +379,18 @@ class LkoPnqFareTrackerService {
     }
 
     try {
+      // If explicit manual refresh requested, trigger a fresh live scraping sweep across the corridor
+      if (forceRefresh) {
+        try {
+          const { flightAggregator } = await import('./aggregator');
+          for (const d of ALL_15_DATES) {
+            await flightAggregator.runLiveCollectionForRouteDate('LKO', 'PNQ', d);
+          }
+        } catch (scrapeErr) {
+          console.warn('[FareTracker] Live scrape sweep notice on refresh:', scrapeErr);
+        }
+      }
+
       // 1. Query unified observations via Repository (Supabase -> Cache -> Firestore fallback)
       const repoObservations = await fareObservationRepository.getObservationsForRoute('LKO-PNQ', '2026-11-09', '2026-11-23');
 
