@@ -422,61 +422,134 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                     </div>
                   </div>
 
-                  {/* Daily Minimum Fare Comparison Curve */}
+                  {/* Daily Fare Metrics (Max, Current, Min) Comparison Curve */}
                   <div className="p-4 sm:p-5 bg-white border border-slate-200 rounded-xl">
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                       <div>
-                        <h3 className="text-sm font-bold text-slate-900">
-                          Corridor Minimum Fare by Departure Date
+                        <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                          <span>Corridor Fare Dynamics by Departure Date</span>
+                          <span className="text-[11px] font-normal px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-100">
+                            Min • Current • Max
+                          </span>
                         </h3>
-                        <p className="text-xs text-slate-500">
-                          Lowest authentic fare observed on Google Flights for each departure date in 9–23 Nov 2026
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          Authentic fare range showing all-time Minimum, all-time Maximum, and Current lowest fare for each date (9–23 Nov 2026)
                         </p>
                       </div>
-                      <div className="text-xs text-slate-500 font-mono">
-                        LKO ➔ PNQ
+                      <div className="flex items-center gap-3 text-xs">
+                        <span className="flex items-center gap-1.5 text-slate-600">
+                          <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block" />
+                          <span>Max</span>
+                        </span>
+                        <span className="flex items-center gap-1.5 text-slate-600 font-medium">
+                          <span className="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block shadow-sm" />
+                          <span>Current</span>
+                        </span>
+                        <span className="flex items-center gap-1.5 text-slate-600">
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
+                          <span>Min</span>
+                        </span>
                       </div>
                     </div>
 
-                    <div className="h-56 flex items-end gap-1 sm:gap-2 pt-6 pb-2 px-1 sm:px-2 border-b border-slate-100">
+                    {/* Interactive 15-Date Range & Price Matrix */}
+                    <div className="h-64 flex items-end gap-1 sm:gap-2 pt-8 pb-2 px-1 sm:px-2 border-b border-slate-100">
                       {data.dateBreakdown.map(d => {
-                        const validPrices = data.dateBreakdown.filter(x => x.minPrice !== null).map(x => x.minPrice as number);
-                        const maxVal = (validPrices.length > 0 ? Math.max(...validPrices) : 10000) * 1.1;
-                        const heightPct = d.minPrice !== null ? Math.max(15, Math.round((d.minPrice / maxVal) * 100)) : 4;
+                        const allMaxes = data.dateBreakdown.filter(x => x.maxPrice !== null).map(x => x.maxPrice as number);
+                        const globalMax = (allMaxes.length > 0 ? Math.max(...allMaxes) : 35000) * 1.05;
                         const isSelected = selectedDate === d.date;
+                        const hasData = d.minPrice !== null && d.maxPrice !== null;
+                        
+                        const minVal = d.minPrice || 0;
+                        const maxVal = d.maxPrice || 0;
+                        const curVal = d.currentPrice ?? d.minPrice ?? 0;
+
+                        const minPct = hasData ? Math.max(6, Math.round((minVal / globalMax) * 100)) : 0;
+                        const maxPct = hasData ? Math.max(minPct + 8, Math.round((maxVal / globalMax) * 100)) : 0;
+                        const curPct = hasData ? Math.max(minPct, Math.min(maxPct, Math.round((curVal / globalMax) * 100))) : 0;
+                        const barHeightPct = Math.max(10, maxPct - minPct);
+
                         return (
                           <div
                             key={d.date}
                             onClick={() => setSelectedDate(d.date)}
-                            className="flex-1 flex flex-col items-center cursor-pointer group h-full justify-end"
+                            className={`flex-1 flex flex-col items-center cursor-pointer group h-full justify-end relative rounded-lg p-0.5 transition-all ${
+                              isSelected ? 'bg-blue-50/70 ring-1 ring-blue-400' : 'hover:bg-slate-50'
+                            }`}
                           >
-                            <span className={`text-[9px] sm:text-[10px] font-bold mb-1 transition text-center whitespace-nowrap ${
-                              isSelected
-                                ? 'text-blue-700'
-                                : d.minPrice !== null
-                                  ? 'text-slate-700 group-hover:text-blue-600'
-                                  : 'text-slate-400'
-                            }`}>
-                              {d.minPrice !== null ? (
+                            {/* Max Fare Label */}
+                            <span className="text-[8px] sm:text-[9px] font-semibold text-rose-600 mb-0.5 whitespace-nowrap text-center">
+                              {hasData ? (
                                 <>
-                                  <span className="hidden md:inline">₹{d.minPrice.toLocaleString('en-IN')}</span>
-                                  <span className="md:hidden">₹{(d.minPrice / 1000).toFixed(1)}k</span>
+                                  <span className="hidden lg:inline">₹{maxVal.toLocaleString('en-IN')}</span>
+                                  <span className="lg:hidden">₹{(maxVal / 1000).toFixed(1)}k</span>
                                 </>
                               ) : (
                                 '—'
                               )}
                             </span>
-                            <div
-                              style={{ height: `${heightPct}%` }}
-                              className={`w-full max-w-[40px] rounded-t-md transition-all ${
-                                isSelected
-                                  ? 'bg-blue-600 shadow-md'
-                                  : d.minPrice !== null
-                                    ? 'bg-blue-100 group-hover:bg-blue-400'
-                                    : 'bg-slate-100 border border-dashed border-slate-200'
-                              }`}
-                            />
-                            <span className={`text-[10px] font-medium mt-2 whitespace-nowrap ${
+
+                            {/* Range Bar & Current Indicator */}
+                            <div className="w-full max-w-[34px] h-full flex flex-col justify-end relative my-1">
+                              {hasData ? (
+                                <div
+                                  style={{
+                                    height: `${barHeightPct}%`,
+                                    marginBottom: `${minPct}%`
+                                  }}
+                                  className={`w-full rounded-md relative transition-all shadow-sm ${
+                                    isSelected
+                                      ? 'bg-gradient-to-t from-emerald-400 via-blue-500 to-rose-400'
+                                      : 'bg-gradient-to-t from-emerald-200 via-blue-200 to-rose-200 group-hover:from-emerald-300 group-hover:to-rose-300'
+                                  }`}
+                                >
+                                  {/* Current Price Marker Pin */}
+                                  <div
+                                    style={{
+                                      bottom: `${barHeightPct > 0 ? Math.min(100, Math.max(0, ((curVal - minVal) / Math.max(1, maxVal - minVal)) * 100)) : 50}%`
+                                    }}
+                                    className="absolute left-1/2 transform -translate-x-1/2 translate-y-1/2 z-10 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-blue-600 border-2 border-white rounded-full shadow-md flex items-center justify-center"
+                                    title={`Current: ₹${curVal.toLocaleString('en-IN')}`}
+                                  />
+                                </div>
+                              ) : (
+                                <div className="w-full h-8 rounded border border-dashed border-slate-200 bg-slate-50 flex items-center justify-center">
+                                  <span className="text-[8px] text-slate-300">No data</span>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Current & Min Fare Combined Footers */}
+                            <div className="flex flex-col items-center gap-0.5 mt-0.5">
+                              {/* Current Price */}
+                              <span className={`text-[8px] sm:text-[9.5px] font-bold whitespace-nowrap text-center ${
+                                isSelected ? 'text-blue-700' : 'text-blue-600'
+                              }`}>
+                                {hasData ? (
+                                  <>
+                                    <span className="hidden lg:inline">₹{curVal.toLocaleString('en-IN')}</span>
+                                    <span className="lg:hidden">₹{(curVal / 1000).toFixed(1)}k</span>
+                                  </>
+                                ) : (
+                                  '—'
+                                )}
+                              </span>
+
+                              {/* Min Price */}
+                              <span className="text-[8px] sm:text-[9px] font-semibold text-emerald-600 whitespace-nowrap text-center">
+                                {hasData ? (
+                                  <>
+                                    <span className="hidden lg:inline">₹{minVal.toLocaleString('en-IN')}</span>
+                                    <span className="lg:hidden">₹{(minVal / 1000).toFixed(1)}k</span>
+                                  </>
+                                ) : (
+                                  '—'
+                                )}
+                              </span>
+                            </div>
+
+                            {/* Date Label */}
+                            <span className={`text-[10px] font-medium mt-1 whitespace-nowrap ${
                               isSelected ? 'text-blue-700 font-bold' : 'text-slate-600'
                             }`}>
                               {d.date.slice(8)} Nov
@@ -485,6 +558,46 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                         );
                       })}
                     </div>
+
+                    {/* Selected Date Metric Highlight Bar */}
+                    {(() => {
+                      const selectedItem = data.dateBreakdown.find(d => d.date === selectedDate);
+                      if (!selectedItem || selectedItem.minPrice === null) return null;
+                      const min = selectedItem.minPrice;
+                      const max = selectedItem.maxPrice || min;
+                      const cur = selectedItem.currentPrice ?? min;
+                      const spread = max - min;
+                      return (
+                        <div className="mt-3 p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex flex-wrap items-center justify-between gap-3 text-xs">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-slate-800">
+                              {new Date(selectedItem.date).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}
+                            </span>
+                            <span className="text-[11px] text-slate-500">
+                              ({selectedItem.observationCount} observations across {selectedItem.flightCount} flights)
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div>
+                              <span className="text-slate-400 text-[10px] block">MIN RECORDED</span>
+                              <span className="font-bold text-emerald-600 font-mono">₹{min.toLocaleString('en-IN')}</span>
+                            </div>
+                            <div>
+                              <span className="text-slate-400 text-[10px] block">CURRENT LOWEST</span>
+                              <span className="font-bold text-blue-600 font-mono">₹{cur.toLocaleString('en-IN')}</span>
+                            </div>
+                            <div>
+                              <span className="text-slate-400 text-[10px] block">MAX RECORDED</span>
+                              <span className="font-bold text-rose-600 font-mono">₹{max.toLocaleString('en-IN')}</span>
+                            </div>
+                            <div>
+                              <span className="text-slate-400 text-[10px] block">HISTORICAL SPREAD</span>
+                              <span className="font-bold text-slate-700 font-mono">₹{spread.toLocaleString('en-IN')}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* Multi-Flight Trajectory Scatter / Time-Series */}

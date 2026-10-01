@@ -51,6 +51,7 @@ export interface DateBreakdownItem {
   observationCount: number;
   minPrice: number | null;
   maxPrice: number | null;
+  currentPrice: number | null;
   avgPrice: number | null;
   flightCount: number;
   tMinusPoints: TMinusPoint[];

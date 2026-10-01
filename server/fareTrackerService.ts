@@ -55,6 +55,7 @@ export interface DateBreakdownItem {
   observationCount: number;
   minPrice: number | null;
   maxPrice: number | null;
+  currentPrice: number | null;
   avgPrice: number | null;
   flightCount: number;
   tMinusPoints: TMinusPoint[];
@@ -267,14 +268,18 @@ class LkoPnqFareTrackerService {
     const rawObs = summary.rawObservations || [];
     const dateStatsMap = new Map<string, { count: number; prices: number[]; flights: Set<string> }>();
 
+    const dateObsMap = new Map<string, AuthenticFareObservation[]>();
+
     for (const obs of rawObs) {
       if (!dateStatsMap.has(obs.departureDate)) {
         dateStatsMap.set(obs.departureDate, { count: 0, prices: [], flights: new Set() });
+        dateObsMap.set(obs.departureDate, []);
       }
       const dStat = dateStatsMap.get(obs.departureDate)!;
       dStat.count++;
       dStat.prices.push(obs.price);
       dStat.flights.add(obs.flightNumber);
+      dateObsMap.get(obs.departureDate)!.push(obs);
     }
 
     const dateBreakdown: DateBreakdownItem[] = ALL_15_DATES.map((date) => {
@@ -291,6 +296,17 @@ class LkoPnqFareTrackerService {
       const avgPrice = stat && stat.prices.length > 0
         ? Math.round(stat.prices.reduce((a, b) => a + b, 0) / stat.prices.length)
         : (baseline.count > 0 ? baseline.avgPrice : null);
+      
+      const dateObs = dateObsMap.get(date) || [];
+      let currentPrice: number | null = null;
+      if (dateObs.length > 0) {
+        const latestTime = Math.max(...dateObs.map(o => new Date(o.timestamp).getTime()));
+        const latestBatch = dateObs.filter(o => new Date(o.timestamp).getTime() >= latestTime - 60000);
+        currentPrice = Math.min(...latestBatch.map(o => o.price));
+      } else if (baseline.count > 0) {
+        currentPrice = baseline.minPrice;
+      }
+
       const flightCount = Math.max(stat ? stat.flights.size : 0, baseline.flightCount);
 
       // Compute exact T-minus curve for this departure date
@@ -301,6 +317,7 @@ class LkoPnqFareTrackerService {
         observationCount: count,
         minPrice,
         maxPrice,
+        currentPrice,
         avgPrice,
         flightCount,
         tMinusPoints
