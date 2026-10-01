@@ -133,8 +133,9 @@ export type PredictionOrigin =
 export type HorizonPeriod = '24h' | '48h' | '3d' | '5d' | '7d' | '14d' | 'DEPARTURE';
 
 export type SavingEventState = 
-  | 'CONFIRMED_TRUE'           // Observed at least one snapshot where P_obs < P_0 - 50
+  | 'CONFIRMED_TRUE'           // Observed at least one snapshot where P_obs < P_0 - 50 inside target window
   | 'CONFIRMED_FALSE'          // No snapshot < P_0 - 50 observed AND isSufficientCoverage === true
+  | 'RIGHT_DIRECTION_WRONG_TIMING' // Drop observed (> ₹50), but outside the declared target window
   | 'UNKNOWN_DUE_TO_COVERAGE'; // No snapshot < P_0 - 50 observed BUT isSufficientCoverage === false
 
 export type HorizonResolutionState = 
@@ -387,6 +388,21 @@ export interface PredictionAuditRecord {
   // Declared Recommendation & Horizon Research Windows
   selectedValidityHorizon: HorizonPeriod | null; // Null when INSUFFICIENT_EVIDENCE or unselected
   candidateHorizons: HorizonPeriod[];            // Evaluation windows: ['24h', '48h', '3d', '5d', '7d', '14d']
+  declaredTargetWindow?: {
+    startDaysOut: number;
+    endDaysOut: number;
+    targetStartDate?: string;
+    targetEndDate?: string;
+    label?: string;
+  };
+  decisionOutcome?: {
+    classification: 'CORRECT_TIMING_AND_DIRECTION' | 'RIGHT_DIRECTION_WRONG_TIMING' | 'WRONG_DIRECTION' | 'UNKNOWN_DUE_TO_COVERAGE';
+    realizedSavingsINR: number | null;
+    evaluatedAt: string;
+    evaluatedHorizon: string;
+    isSealed: boolean;
+    notes: string;
+  };
   validUntil: string | null;
   meaningfulDropProbability: number | null; // Calibrated probability of >₹50 drop (null if uncalibrated)
   rawDropFrequency: number | null;          // Empirical uncalibrated rate

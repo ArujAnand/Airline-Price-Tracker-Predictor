@@ -146,13 +146,24 @@ export class OutcomeResolverEngine {
     let timeToFirstSavingHours: number | null = null;
 
     if (savingObs.length > 0) {
-      // Confirmed True: observed at least one snapshot with > ₹50 drop (regardless of overall coverage ratio!)
+      // Confirmed True: observed at least one snapshot with > ₹50 drop inside horizon window
       savingState = 'CONFIRMED_TRUE';
       const firstSavingTimeMs = new Date(savingObs[0].observedAt).getTime();
       timeToFirstSavingHours = Number(((firstSavingTimeMs - predTimeMs) / (3600 * 1000)).toFixed(2));
     } else if (isSufficientCoverage) {
-      // Confirmed False: adequate coverage and zero drop observed
-      savingState = 'CONFIRMED_FALSE';
+      // Check if a drop occurred LATER (outside this horizon window) before departure
+      const postHorizonSavingObs = flightObs.filter(o => {
+        const t = new Date(o.observedAt).getTime();
+        return t > effectiveEndMs && t <= depTimeMs && o.priceINR < initialPrice - 50;
+      });
+
+      if (postHorizonSavingObs.length > 0) {
+        // Drop occurred outside this predicted horizon window: Right direction, wrong timing
+        savingState = 'RIGHT_DIRECTION_WRONG_TIMING';
+      } else {
+        // Confirmed False: adequate coverage and zero drop observed inside or after
+        savingState = 'CONFIRMED_FALSE';
+      }
     } else {
       // Unknown due to coverage: poor coverage and zero drop observed
       savingState = 'UNKNOWN_DUE_TO_COVERAGE';
@@ -242,6 +253,130 @@ export class OutcomeResolverEngine {
       outcome,
       state: 'RESOLVED'
     };
+  }
+
+  /**
+   * Resolves the decision recommendation against the model's declared target window
+   * with plain immutability (preserves already sealed outcomes).
+   */
+  public resolveDecisionOutcome(
+    prediction: PredictionAuditRecord,
+    allObservations: LongitudinalObservation[],
+    nowTimestampISO: string = new Date().toISOString()
+  ): {
+    classification: 'CORRECT_TIMING_AND_DIRECTION' | 'RIGHT_DIRECTION_WRONG_TIMING' | 'WRONG_DIRECTION' | 'UNKNOWN_DUE_TO_COVERAGE';
+    realizedSavingsINR: number | null;
+    evaluatedAt: string;
+    evaluatedHorizon: string;
+    isSealed: boolean;
+    notes: string;
+  } {
+    // Plain immutability: If already sealed, return existing outcome without mutation
+    if (prediction.decisionOutcome && prediction.decisionOutcome.isSealed) {
+      return prediction.decisionOutcome;
+    }
+
+    const predTimeMs = new Date(prediction.createdAt).getTime();
+    const depTimeMs = new Date(prediction.departureTimestampAtPrediction || `${prediction.departureDate}T10:00:00.000Z`).getTime();
+    const nowMs = new Date(nowTimestampISO).getTime();
+    const initialPrice = prediction.currentFareINR;
+    const action = prediction.recommendation;
+
+    // Filter eligible authentic observations for this flight
+    const flightObs = allObservations
+      .filter(o => o.canonicalId === prediction.canonicalId && isEmpiricallyEligibleObservation(o))
+      .sort((a, b) => new Date(a.observedAt).getTime() - new Date(b.observedAt).getTime());
+
+    // Determine declared target window:
+    // If BUY_NOW, target window is immediate 48 hours.
+    // If WAIT / WAIT_AND_WATCH, target window is 7-14 days forward or 25-38d sweet spot.
+    let windowDurationHours = 168; // Default 7 days
+    let windowLabel = '7d';
+
+    if (action === 'BUY_NOW') {
+      windowDurationHours = 48; // 48h
+      windowLabel = '48h';
+    } else if (prediction.declaredTargetWindow) {
+      const days = Math.max(1, prediction.declaredTargetWindow.endDaysOut - prediction.declaredTargetWindow.startDaysOut);
+      windowDurationHours = days * 24;
+      windowLabel = prediction.declaredTargetWindow.label || `${days}d`;
+    } else if (prediction.leadTimeDays > 38) {
+      windowDurationHours = Math.min(prediction.leadTimeDays * 24, 336); // 14 days
+      windowLabel = '14d';
+    }
+
+    const windowEndMs = Math.min(predTimeMs + windowDurationHours * 3600 * 1000, depTimeMs);
+    const isWindowElapsed = nowMs >= windowEndMs;
+    const isFlightDeparted = nowMs >= depTimeMs;
+
+    // Observations inside declared window
+    const inWindowObs = flightObs.filter(o => {
+      const t = new Date(o.observedAt).getTime();
+      return t >= predTimeMs - 5 * 60 * 1000 && t <= windowEndMs + 5 * 60 * 1000;
+    });
+
+    const inWindowSavingObs = inWindowObs.filter(o => o.priceINR < initialPrice - 50);
+    const minInWindowPrice = inWindowObs.length > 0 ? Math.min(...inWindowObs.map(o => o.priceINR)) : null;
+
+    // Observations outside declared window (between window end and departure)
+    const postWindowObs = flightObs.filter(o => {
+      const t = new Date(o.observedAt).getTime();
+      return t > windowEndMs && t <= depTimeMs;
+    });
+    const postWindowSavingObs = postWindowObs.filter(o => o.priceINR < initialPrice - 50);
+
+    const hasInWindowDrop = inWindowSavingObs.length > 0;
+    const hasPostWindowDrop = postWindowSavingObs.length > 0;
+    const hasAdequateCoverage = inWindowObs.length >= 2;
+
+    let classification: 'CORRECT_TIMING_AND_DIRECTION' | 'RIGHT_DIRECTION_WRONG_TIMING' | 'WRONG_DIRECTION' | 'UNKNOWN_DUE_TO_COVERAGE' = 'UNKNOWN_DUE_TO_COVERAGE';
+    let realizedSavingsINR: number | null = null;
+    let notes = '';
+
+    if (action === 'BUY_NOW') {
+      const maxSurge = inWindowObs.length > 0 ? Math.max(...inWindowObs.map(o => o.priceINR)) : initialPrice;
+      if (maxSurge >= initialPrice + 50) {
+        classification = 'CORRECT_TIMING_AND_DIRECTION';
+        realizedSavingsINR = Math.max(0, maxSurge - initialPrice);
+        notes = `BUY NOW verified: Price surged to ₹${maxSurge.toLocaleString()} within ${windowLabel}. Immediate execution locked in lower fare.`;
+      } else if (hasInWindowDrop) {
+        classification = 'WRONG_DIRECTION';
+        realizedSavingsINR = 0;
+        notes = `Diverged: Price dropped within ${windowLabel} after BUY NOW recommendation.`;
+      } else if (isWindowElapsed) {
+        classification = hasAdequateCoverage ? 'WRONG_DIRECTION' : 'UNKNOWN_DUE_TO_COVERAGE';
+        notes = 'Price remained flat without predicted surge.';
+      }
+    } else {
+      // WAIT or WAIT_AND_WATCH
+      if (hasInWindowDrop) {
+        classification = 'CORRECT_TIMING_AND_DIRECTION';
+        realizedSavingsINR = minInWindowPrice !== null ? Math.max(0, initialPrice - minInWindowPrice) : 0;
+        notes = `WAIT verified: Price dropped to ₹${minInWindowPrice?.toLocaleString()} within declared ${windowLabel} window (saved ₹${realizedSavingsINR}).`;
+      } else if (hasPostWindowDrop) {
+        classification = 'RIGHT_DIRECTION_WRONG_TIMING';
+        realizedSavingsINR = 0;
+        notes = `Right direction, wrong timing: Price dropped, but outside declared ${windowLabel} window. Model missed timing estimate.`;
+      } else if (isFlightDeparted || isWindowElapsed) {
+        classification = hasAdequateCoverage ? 'WRONG_DIRECTION' : 'UNKNOWN_DUE_TO_COVERAGE';
+        realizedSavingsINR = 0;
+        notes = hasAdequateCoverage
+          ? `Wrong direction: No price drop occurred during ${windowLabel} window or prior to departure.`
+          : 'Insufficient observation coverage during target window.';
+      }
+    }
+
+    const isSealed = (isWindowElapsed && hasAdequateCoverage) || isFlightDeparted;
+
+    return {
+      classification,
+      realizedSavingsINR,
+      evaluatedAt: nowTimestampISO,
+      evaluatedHorizon: windowLabel,
+      isSealed,
+      notes
+    };
+  }
   }
 }
 

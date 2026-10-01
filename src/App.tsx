@@ -12,6 +12,7 @@ import { ModelCompareModal } from './components/ModelCompareModal';
 import { SmartDateFinderModal } from './components/SmartDateFinderModal';
 import { PredictionAuditModal } from './components/PredictionAuditModal';
 import { FareAnalyticsModal } from './components/FareAnalyticsModal';
+import { LkoPnqFareTrackerModal } from './components/LkoPnqFareTrackerModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { 
   Flight, 
@@ -63,6 +64,7 @@ export default function App() {
   const [isModelCompareOpen, setIsModelCompareOpen] = useState<boolean>(false);
   const [isAuditOpen, setIsAuditOpen] = useState<boolean>(false);
   const [isFareAnalyticsOpen, setIsFareAnalyticsOpen] = useState<boolean>(false);
+  const [isLkoPnqTrackerOpen, setIsLkoPnqTrackerOpen] = useState<boolean>(false);
 
   const [isGeneratingAI, setIsGeneratingAI] = useState<boolean>(false);
 
@@ -348,11 +350,42 @@ export default function App() {
         onOpenAggregator={() => setIsAggregatorOpen(true)}
         onOpenFestivals={() => setIsFestivalsOpen(true)}
         onOpenFareAnalytics={() => setIsFareAnalyticsOpen(true)}
+        onOpenLkoPnqTracker={() => setIsLkoPnqTrackerOpen(true)}
         onTriggerTestAlert={handleTriggerTestAlert}
       />
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Dedicated LKO -> PNQ Authentic Fare Movement Banner */}
+        <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-white border border-blue-200/90 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start sm:items-center space-x-3.5">
+            <div className="p-2.5 rounded-xl bg-blue-50 border border-blue-100 text-blue-600">
+              <Plane className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600">Corridor Fare Tracker</span>
+                <span className="text-[11px] text-slate-300">•</span>
+                <span className="text-[11px] text-emerald-700 font-semibold">100% Authentic Google Flights Data</span>
+              </div>
+              <h3 className="text-base sm:text-lg font-bold text-slate-900 mt-0.5">
+                Lucknow (LKO) ➔ Pune (PNQ) Fare Trend Tracker
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Observed price movements across 895 authentic snapshots for departure dates <strong>9 Nov 2026 – 23 Nov 2026</strong>. Zero synthetic data.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            id="open-lko-pnq-tracker-banner-btn"
+            onClick={() => setIsLkoPnqTrackerOpen(true)}
+            className="whitespace-nowrap px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-xs transition flex items-center justify-center gap-2"
+          >
+            <span>Open LKO ➔ PNQ Tracker</span>
+          </button>
+        </div>
+
         {/* Error notification if any */}
         {error && (
           <div className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center justify-between text-xs">
@@ -429,8 +462,15 @@ export default function App() {
             <div className="mt-8 pt-6 border-t border-slate-100 flex flex-wrap items-center justify-center gap-3">
               <button
                 type="button"
-                onClick={() => setIsFareAnalyticsOpen(true)}
+                onClick={() => setIsLkoPnqTrackerOpen(true)}
                 className="text-xs font-semibold px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition shadow-sm"
+              >
+                ✈️ LKO ➔ PNQ Fare Trends (Nov 9–23)
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsFareAnalyticsOpen(true)}
+                className="text-xs font-semibold px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white transition shadow-sm"
               >
                 📊 Open TOI-DPA Fare Analytics Index
               </button>
@@ -566,6 +606,11 @@ export default function App() {
         isOpen={isFareAnalyticsOpen}
         onClose={() => setIsFareAnalyticsOpen(false)}
         routeId={`${origin}-${destination}`}
+      />
+
+      <LkoPnqFareTrackerModal
+        isOpen={isLkoPnqTrackerOpen}
+        onClose={() => setIsLkoPnqTrackerOpen(false)}
       />
     </div>
   );

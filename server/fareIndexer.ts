@@ -740,14 +740,19 @@ class FareIndexingService {
     });
 
     snapshots.forEach((snap) => {
-      let depH = schedMap[snap.flightNumber];
-      if (depH === undefined && snap.flightId) {
-        const m = snap.flightId.match(/-(\d{2})(\d{2})-/);
-        if (m) depH = parseInt(m[1], 10);
+      let depH: number | undefined = schedMap[snap.flightNumber];
+      if (depH === undefined && (snap as any).departureTime && typeof (snap as any).departureTime === 'string') {
+        const parsed = parseInt((snap as any).departureTime.split(':')[0], 10);
+        if (!isNaN(parsed) && parsed >= 0 && parsed < 24) depH = parsed;
       }
-      if (depH === undefined) depH = snap.capturedHour ?? new Date(snap.timestamp).getHours();
+      if (depH === undefined || isNaN(depH) || depH < 0 || depH > 23) {
+        depH = snap.capturedHour ?? (snap.timestamp ? new Date(snap.timestamp).getHours() : 12);
+      }
+      if (depH === undefined || isNaN(depH) || depH < 0 || depH > 23) {
+        depH = 12; // Safe midday default
+      }
 
-      const matchedSlot = slots.find((sl) => depH >= sl.start && depH < sl.end);
+      const matchedSlot = slots.find((sl) => depH! >= sl.start && depH! < sl.end) || slots[slots.length - 1];
       if (matchedSlot && slotMap[matchedSlot.start]) {
         slotMap[matchedSlot.start].sum += snap.price;
         slotMap[matchedSlot.start].count += 1;

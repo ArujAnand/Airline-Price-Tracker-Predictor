@@ -15,6 +15,7 @@ import { modelRegistryService } from './server/modelRegistryService';
 import { shadowSchedulerDaemon } from './server/shadowScheduler';
 import { firestoreDB } from './server/firestoreService';
 import { getSerpApiQuota } from './server/googleFlightsScraper';
+import { lkoPnqFareTrackerService } from './server/fareTrackerService';
 
 async function startServer() {
   const app = express();
@@ -110,6 +111,18 @@ async function startServer() {
     } catch (err: any) {
       console.error('Fare indexing analytics error:', err);
       res.status(500).json({ error: err?.message || 'Failed to compute fare analytics indices' });
+    }
+  });
+
+  // Dedicated LKO -> PNQ Authentic Fare Movement Tracker (9 Nov - 23 Nov 2026)
+  app.get('/api/fare-tracker/lko-pnq', async (req, res) => {
+    try {
+      const forceRefresh = req.query.refresh === 'true';
+      const data = await lkoPnqFareTrackerService.getTrendData(forceRefresh);
+      res.json(data);
+    } catch (err: any) {
+      console.error('LKO-PNQ Fare Tracker error:', err);
+      res.status(500).json({ error: err?.message || 'Failed to load LKO-PNQ authentic fare data' });
     }
   });
 

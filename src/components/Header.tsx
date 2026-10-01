@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plane, RefreshCw, Bell, BellRing, Database, Calendar, CheckCircle2, AlertCircle, BarChart3 } from 'lucide-react';
+import { Plane, RefreshCw, Bell, BellRing, Database, Calendar, CheckCircle2, AlertCircle, BarChart3, Activity } from 'lucide-react';
 import { AggregatorStatus, AppNotification } from '../types';
 import { requestNotificationPermission, getNotificationPermission, sendBrowserPushNotification } from '../utils/notifications';
 
@@ -12,6 +12,7 @@ interface HeaderProps {
   onOpenAggregator: () => void;
   onOpenFestivals: () => void;
   onOpenFareAnalytics: () => void;
+  onOpenLkoPnqTracker?: () => void;
   onTriggerTestAlert: () => void;
 }
 
@@ -24,6 +25,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAggregator,
   onOpenFestivals,
   onOpenFareAnalytics,
+  onOpenLkoPnqTracker,
   onTriggerTestAlert,
 }) => {
   const [permission, setPermission] = useState<NotificationPermission>(getNotificationPermission());
@@ -128,6 +130,19 @@ export const Header: React.FC<HeaderProps> = ({
               <BarChart3 className="h-3.5 w-3.5 text-blue-400" />
               <span className="hidden lg:inline">Fare Analytics</span>
             </button>
+
+            {/* Dedicated LKO -> PNQ Authentic Fare Tracker Button */}
+            {onOpenLkoPnqTracker && (
+              <button
+                id="lko-pnq-tracker-header-btn"
+                onClick={onOpenLkoPnqTracker}
+                className="flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-xs transition"
+                title="Open Authentic LKO ➔ PNQ Fare Movement Tracker (9–23 Nov 2026)"
+              >
+                <Activity className="h-3.5 w-3.5 text-blue-200" />
+                <span>LKO ➔ PNQ (9–23 Nov)</span>
+              </button>
+            )}
 
             {/* Push Notification Toggle */}
             {permission === 'granted' ? (

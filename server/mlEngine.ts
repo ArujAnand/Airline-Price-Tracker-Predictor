@@ -4,10 +4,13 @@ import { DataProvenance } from './types/mlPipeline';
 export interface EmpiricalTrainingRecord {
   routeId: string;
   leadTimeDays: number;
+  festivalDemandMultiplier?: number;
+  festivalOffsetDays?: number;
   dayOfWeek: number;
   month: number;
   isSaturday: boolean;
   isSunday: boolean;
+  loadFactor?: number;
   departureHour: number;
   actualFinalPrice: number;
   lowestObservedPrice: number;
@@ -55,10 +58,13 @@ class FastQuantileForest {
 
   private extractFeatures(record: EmpiricalTrainingRecord): number[] {
     return [
-      record.leadTimeDays,                                // 0: Lead time
-      record.isSaturday || record.isSunday ? 1 : 0,       // 1: Weekend flag
-      record.dayOfWeek,                                   // 2: Day of week (0-6)
-      record.departureHour <= 5 ? 1 : 0,                  // 3: Early morning
+      record.leadTimeDays,                                                 // 0: Lead time
+      record.festivalDemandMultiplier ?? 1.0,                              // 1: Festival Demand Multiplier (e.g. 1.0 - 2.2x)
+      record.festivalOffsetDays ?? 50,                                     // 2: Proximity to festival peak
+      record.isSaturday || record.isSunday ? 1 : 0,                        // 3: Weekend flag
+      record.dayOfWeek,                                                    // 4: Day of week (0-6)
+      record.loadFactor ?? Math.min(0.96, Math.max(0.48, 1.0 - (record.leadTimeDays / 75) * 0.35)), // 5: Estimated seat load factor
+      record.departureHour <= 5 ? 1 : 0,                                   // 6: Early morning / unfreeze hour
     ];
   }
 

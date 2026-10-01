@@ -97,8 +97,8 @@ class PredictionTracker {
       modelVersion: modelVer,
       createdAt: nowIso,
       status: 'PENDING_VERIFICATION',
-      actualLowestPriceObserved: data.initialPriceAtPrediction,
-      actualLowestDateObserved: nowIso.split('T')[0],
+      actualLowestPriceObserved: undefined,
+      actualLowestDateObserved: undefined,
     };
 
     this.records.unshift(newRecord);
@@ -144,7 +144,7 @@ class PredictionTracker {
           matchingSnapshots[0]
         );
 
-        if (lowestSnapshot.price < (record.actualLowestPriceObserved || Infinity)) {
+        if (record.actualLowestPriceObserved === undefined || lowestSnapshot.price < record.actualLowestPriceObserved) {
           record.actualLowestPriceObserved = lowestSnapshot.price;
           record.actualLowestDateObserved = lowestSnapshot.timestamp?.split('T')[0] || todayStr;
         }
@@ -164,7 +164,7 @@ class PredictionTracker {
         record.finalPriceAtDeparture = finalPrice;
 
         if (record.recommendationGiven === 'BUY_NOW') {
-          // Did price rise or stay at floor?
+          // Meaningful savings threshold strictly > 50 INR
           if (finalPrice >= record.initialPriceAtPrediction) {
             record.status = 'VERIFIED_CORRECT';
             record.wasAccurate = true;
@@ -177,17 +177,19 @@ class PredictionTracker {
             record.auditNotes = `Diverged: Price dipped by ₹${Math.abs(record.actualSavingsOrLossINR)} before departure.`;
           }
         } else if (record.recommendationGiven === 'WAIT_AND_WATCH' || record.recommendationGiven === 'DROP_IMMINENT') {
-          // Did price drop below initial price?
-          if ((record.actualLowestPriceObserved || record.initialPriceAtPrediction) < record.initialPriceAtPrediction) {
+          // Did price drop below initial price by meaningful margin (> ₹50)?
+          const lowestObs = record.actualLowestPriceObserved ?? record.initialPriceAtPrediction;
+          const dropAmount = record.initialPriceAtPrediction - lowestObs;
+          if (dropAmount > 50) {
             record.status = 'VERIFIED_CORRECT';
             record.wasAccurate = true;
-            record.actualSavingsOrLossINR = record.initialPriceAtPrediction - (record.actualLowestPriceObserved || 0);
-            record.auditNotes = `Accurate WAIT recommendation: Captured dip to ₹${(record.actualLowestPriceObserved || 0).toLocaleString()} (saved ₹${record.actualSavingsOrLossINR}).`;
+            record.actualSavingsOrLossINR = dropAmount;
+            record.auditNotes = `Accurate WAIT recommendation: Captured dip to ₹${lowestObs.toLocaleString()} (saved ₹${record.actualSavingsOrLossINR}).`;
           } else {
             record.status = 'DIVERGED';
             record.wasAccurate = false;
             record.actualSavingsOrLossINR = 0;
-            record.auditNotes = 'Price stayed flat without further dip prior to departure.';
+            record.auditNotes = 'Price stayed flat without meaningful dip (> ₹50) prior to departure.';
           }
         }
 
@@ -195,29 +197,7 @@ class PredictionTracker {
       }
     }
 
-    // Continuous Dynamic Retraining: Convert verified ground truth records into updated training data (Real Data Only)
-    const verified = this.records.filter((r) => r.status === 'VERIFIED_CORRECT' && r.actualLowestPriceObserved);
-    if (verified.length > 0) {
-      const liveFeedbackRecords = verified.map((v) => {
-        const depDate = new Date(v.departureDate);
-        return {
-          routeId: v.routeId,
-          leadTimeDays: Math.max(1, Math.round((new Date(v.departureDate).getTime() - new Date(v.createdAt).getTime()) / (1000 * 60 * 60 * 24))),
-          dayOfWeek: depDate.getDay(),
-          month: depDate.getMonth() + 1,
-          isSaturday: depDate.getDay() === 6,
-          isSunday: depDate.getDay() === 0,
-          departureHour: 6,
-          actualFinalPrice: v.finalPriceAtDeparture || v.initialPriceAtPrediction,
-          lowestObservedPrice: v.actualLowestPriceObserved || v.initialPriceAtPrediction,
-          provenance: 'REAL_OBSERVATION' as const,
-        };
-      });
-
-      mlForest.train(liveFeedbackRecords);
-      console.log(`[ML Engine Recalibrated] Quantile Decision Forest retrained with ${liveFeedbackRecords.length} genuine real-world feedback records.`);
-    }
-
+    // Dynamic retraining gated until model promotion criteria are satisfied
     return this.getAuditSummaryInternal();
   }
 
