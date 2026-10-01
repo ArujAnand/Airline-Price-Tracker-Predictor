@@ -256,31 +256,43 @@ class SupabaseManager {
     // 2. Push to remote Supabase if connected
     if (this.client) {
       try {
-        const { error } = await this.client
-          .from('fare_observations')
-          .upsert(
-            obsList.map(obs => ({
-              id: obs.id,
-              route: obs.route,
-              origin: obs.origin,
-              destination: obs.destination,
-              flight_number: obs.flight_number,
-              airline: obs.airline,
-              departure_date: obs.departure_date,
-              departure_timestamp: obs.departure_timestamp,
-              observed_at: obs.observed_at,
-              fare: obs.fare,
-              source: obs.source,
-              provenance: obs.provenance,
-              authenticity: obs.authenticity,
-              is_synthetic: obs.is_synthetic,
-              created_at: obs.created_at || new Date().toISOString()
-            })),
-            { onConflict: 'id' }
-          );
+        // PostgreSQL ON CONFLICT DO UPDATE throws if duplicate IDs exist in the same batch statement.
+        // Deduplicate by ID preserving the latest record in the batch:
+        const uniqueMap = new Map<string, SupabaseFareObservation>();
+        for (const obs of obsList) {
+          if (obs && obs.id) {
+            uniqueMap.set(obs.id, obs);
+          }
+        }
+        const dedupedList = Array.from(uniqueMap.values());
 
-        if (error) {
-          console.warn('[Supabase] Batch upsert remote warning:', error.message);
+        if (dedupedList.length > 0) {
+          const { error } = await this.client
+            .from('fare_observations')
+            .upsert(
+              dedupedList.map(obs => ({
+                id: obs.id,
+                route: obs.route,
+                origin: obs.origin,
+                destination: obs.destination,
+                flight_number: obs.flight_number,
+                airline: obs.airline,
+                departure_date: obs.departure_date,
+                departure_timestamp: obs.departure_timestamp,
+                observed_at: obs.observed_at,
+                fare: obs.fare,
+                source: obs.source,
+                provenance: obs.provenance,
+                authenticity: obs.authenticity,
+                is_synthetic: obs.is_synthetic,
+                created_at: obs.created_at || new Date().toISOString()
+              })),
+              { onConflict: 'id' }
+            );
+
+          if (error) {
+            console.warn('[Supabase] Batch upsert remote warning:', error.message);
+          }
         }
       } catch (err: any) {
         console.warn('[Supabase] Remote batch insert failed, kept in local store:', err?.message);
