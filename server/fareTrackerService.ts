@@ -240,8 +240,11 @@ class LkoPnqFareTrackerService {
       if (fs.existsSync(this.cacheFilePath)) {
         const raw = fs.readFileSync(this.cacheFilePath, 'utf8');
         const parsed = JSON.parse(raw) as LkoPnqTrendSummary;
-        const enriched = this.enrichSummaryWithTMinus(parsed);
-        return enriched;
+        const rawObs = parsed.rawObservations || [];
+        if (rawObs.length > 0) {
+          return this.buildSummaryFromRawObservations(rawObs);
+        }
+        return this.enrichSummaryWithTMinus(parsed);
       }
     } catch (err) {
       console.warn('[FareTracker] Could not load disk cache:', err);
@@ -262,12 +265,107 @@ class LkoPnqFareTrackerService {
   }
 
   /**
-   * Ensures all 15 departure dates are present with exact T-minus calculations
+   * Constructs the complete LkoPnqTrendSummary from raw observations
    */
-  private enrichSummaryWithTMinus(summary: LkoPnqTrendSummary): LkoPnqTrendSummary {
-    const rawObs = summary.rawObservations || [];
-    const dateStatsMap = new Map<string, { count: number; prices: number[]; flights: Set<string> }>();
+  public buildSummaryFromRawObservations(rawObs: AuthenticFareObservation[]): LkoPnqTrendSummary {
+    rawObs.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
+    // 1. Build Flight Fare Trajectories
+    const trajectoryMap = new Map<string, FlightFareTrajectory>();
+    for (const obs of rawObs) {
+      const key = `${obs.flightNumber}_${obs.departureDate}`;
+      if (!trajectoryMap.has(key)) {
+        trajectoryMap.set(key, {
+          flightNumber: obs.flightNumber,
+          airline: obs.airline,
+          departureDate: obs.departureDate,
+          observationsCount: 0,
+          firstPrice: obs.price,
+          lastPrice: obs.price,
+          minPrice: obs.price,
+          maxPrice: obs.price,
+          priceDelta: 0,
+          priceDeltaPercent: 0,
+          firstObservedAt: obs.timestamp,
+          lastObservedAt: obs.timestamp,
+          history: []
+        });
+      }
+      const traj = trajectoryMap.get(key)!;
+      traj.observationsCount++;
+      traj.lastPrice = obs.price;
+      traj.lastObservedAt = obs.timestamp;
+      if (obs.price < traj.minPrice) traj.minPrice = obs.price;
+      if (obs.price > traj.maxPrice) traj.maxPrice = obs.price;
+      traj.priceDelta = traj.lastPrice - traj.firstPrice;
+      traj.priceDeltaPercent = traj.firstPrice > 0 ? ((traj.priceDelta / traj.firstPrice) * 100) : 0;
+      traj.history.push({
+        timestamp: obs.timestamp,
+        price: obs.price,
+        source: obs.source,
+        provenance: obs.provenance
+      });
+    }
+
+    const trajectories = Array.from(trajectoryMap.values()).sort((a, b) => {
+      if (a.departureDate !== b.departureDate) {
+        return a.departureDate.localeCompare(b.departureDate);
+      }
+      return a.minPrice - b.minPrice;
+    });
+
+    // 2. Build Airline Carrier Breakdown
+    let overallMinPrice = Infinity;
+    let overallMaxPrice = -Infinity;
+    let minFareItem: any = null;
+    let maxFareItem: any = null;
+
+    const airlineStatsMap = new Map<string, { count: number; prices: number[] }>();
+
+    for (const obs of rawObs) {
+      if (obs.price < overallMinPrice) {
+        overallMinPrice = obs.price;
+        minFareItem = {
+          price: obs.price,
+          flightNumber: obs.flightNumber,
+          departureDate: obs.departureDate,
+          observedAt: obs.timestamp,
+          airline: obs.airline
+        };
+      }
+      if (obs.price > overallMaxPrice) {
+        overallMaxPrice = obs.price;
+        maxFareItem = {
+          price: obs.price,
+          flightNumber: obs.flightNumber,
+          departureDate: obs.departureDate,
+          observedAt: obs.timestamp,
+          airline: obs.airline
+        };
+      }
+
+      if (!airlineStatsMap.has(obs.airline)) {
+        airlineStatsMap.set(obs.airline, { count: 0, prices: [] });
+      }
+      const aStat = airlineStatsMap.get(obs.airline)!;
+      aStat.count++;
+      aStat.prices.push(obs.price);
+    }
+
+    const airlines = Array.from(airlineStatsMap.entries())
+      .map(([name, stat]) => ({
+        name,
+        count: stat.count,
+        minPrice: Math.min(...stat.prices),
+        maxPrice: Math.max(...stat.prices),
+        avgPrice: Math.round(stat.prices.reduce((acc, p) => acc + p, 0) / stat.prices.length)
+      }))
+      .sort((a, b) => b.count - a.count);
+
+    const uniqueFlights = Array.from(new Set(rawObs.map((o) => o.flightNumber))).sort();
+
+    // 3. Build Date Breakdown across all 15 departure dates
+    const dateStatsMap = new Map<string, { count: number; prices: number[]; flights: Set<string> }>();
     const dateObsMap = new Map<string, AuthenticFareObservation[]>();
 
     for (const obs of rawObs) {
@@ -285,18 +383,18 @@ class LkoPnqFareTrackerService {
     const dateBreakdown: DateBreakdownItem[] = ALL_15_DATES.map((date) => {
       const stat = dateStatsMap.get(date);
       const baseline = AUTHENTIC_BASELINES[date] || { count: 0, minPrice: 0, maxPrice: 0, avgPrice: 0, flightCount: 0 };
-      
-      const count = Math.max(stat ? stat.count : 0, baseline.count);
-      const minPrice = stat && stat.prices.length > 0 
-        ? Math.min(...stat.prices) 
+
+      const count = stat ? stat.count : baseline.count;
+      const minPrice = stat && stat.prices.length > 0
+        ? Math.min(...stat.prices)
         : (baseline.count > 0 ? baseline.minPrice : null);
-      const maxPrice = stat && stat.prices.length > 0 
-        ? Math.max(...stat.prices) 
+      const maxPrice = stat && stat.prices.length > 0
+        ? Math.max(...stat.prices)
         : (baseline.count > 0 ? baseline.maxPrice : null);
       const avgPrice = stat && stat.prices.length > 0
         ? Math.round(stat.prices.reduce((a, b) => a + b, 0) / stat.prices.length)
         : (baseline.count > 0 ? baseline.avgPrice : null);
-      
+
       const dateObs = dateObsMap.get(date) || [];
       let currentPrice: number | null = null;
       if (dateObs.length > 0) {
@@ -307,9 +405,7 @@ class LkoPnqFareTrackerService {
         currentPrice = baseline.minPrice;
       }
 
-      const flightCount = Math.max(stat ? stat.flights.size : 0, baseline.flightCount);
-
-      // Compute exact T-minus curve for this departure date
+      const flightCount = stat ? stat.flights.size : baseline.flightCount;
       const tMinusPoints = computeTMinusPoints(rawObs, date);
 
       return {
@@ -324,9 +420,9 @@ class LkoPnqFareTrackerService {
       };
     });
 
-    const totalObs = dateBreakdown.reduce((acc, d) => acc + d.observationCount, 0);
+    const totalObs = rawObs.length > 0 ? rawObs.length : dateBreakdown.reduce((acc, d) => acc + d.observationCount, 0);
 
-    // Build corridor-wide T-minus points
+    // 4. Build corridor-wide T-minus points
     const corridorMap: Record<number, { sum: number; count: number; prices: number[]; distinctDates: Set<string> }> = {};
     TARGET_TMINUS_WINDOWS.forEach((w) => {
       corridorMap[w] = { sum: 0, count: 0, prices: [], distinctDates: new Set<string>() };
@@ -361,12 +457,35 @@ class LkoPnqFareTrackerService {
     });
 
     return {
-      ...summary,
+      route: 'LKO-PNQ (Lucknow to Pune)',
+      departureDateWindow: {
+        start: '2026-11-09',
+        end: '2026-11-23'
+      },
       totalAuthenticObservations: totalObs,
       uniqueDepartureDates: ALL_15_DATES,
+      uniqueFlights,
+      airlines,
+      overallMinFare: minFareItem || { price: 7550, flightNumber: '6E-2413', departureDate: '2026-11-09', observedAt: '2026-09-25T12:01:41.037Z', airline: 'IndiGo' },
+      overallMaxFare: maxFareItem || { price: 34950, flightNumber: '6E7742 / 6E6116', departureDate: '2026-11-15', observedAt: '2026-10-01T05:48:04.454Z', airline: 'IndiGo' },
+      earliestObservationTimestamp: rawObs.length > 0 ? rawObs[0].timestamp : '2026-09-23T06:56:33.946Z',
+      latestObservationTimestamp: rawObs.length > 0 ? rawObs[rawObs.length - 1].timestamp : '2026-10-01T05:48:14.370Z',
       dateBreakdown,
-      corridorTMinusPoints
+      corridorTMinusPoints,
+      trajectories,
+      rawObservations: rawObs
     };
+  }
+
+  /**
+   * Ensures all 15 departure dates are present with exact T-minus calculations
+   */
+  private enrichSummaryWithTMinus(summary: LkoPnqTrendSummary): LkoPnqTrendSummary {
+    const rawObs = summary.rawObservations || [];
+    if (rawObs.length > 0) {
+      return this.buildSummaryFromRawObservations(rawObs);
+    }
+    return summary;
   }
 
   /**
@@ -419,128 +538,13 @@ class LkoPnqFareTrackerService {
         }
       }
 
-      rawObs.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-
-      // Trajectories
-      const trajectoryMap = new Map<string, FlightFareTrajectory>();
-      for (const obs of rawObs) {
-        const key = `${obs.flightNumber}_${obs.departureDate}`;
-        if (!trajectoryMap.has(key)) {
-          trajectoryMap.set(key, {
-            flightNumber: obs.flightNumber,
-            airline: obs.airline,
-            departureDate: obs.departureDate,
-            observationsCount: 0,
-            firstPrice: obs.price,
-            lastPrice: obs.price,
-            minPrice: obs.price,
-            maxPrice: obs.price,
-            priceDelta: 0,
-            priceDeltaPercent: 0,
-            firstObservedAt: obs.timestamp,
-            lastObservedAt: obs.timestamp,
-            history: []
-          });
-        }
-        const traj = trajectoryMap.get(key)!;
-        traj.observationsCount++;
-        traj.lastPrice = obs.price;
-        traj.lastObservedAt = obs.timestamp;
-        if (obs.price < traj.minPrice) traj.minPrice = obs.price;
-        if (obs.price > traj.maxPrice) traj.maxPrice = obs.price;
-        traj.priceDelta = traj.lastPrice - traj.firstPrice;
-        traj.priceDeltaPercent = traj.firstPrice > 0 ? ((traj.priceDelta / traj.firstPrice) * 100) : 0;
-        traj.history.push({
-          timestamp: obs.timestamp,
-          price: obs.price,
-          source: obs.source,
-          provenance: obs.provenance
-        });
-      }
-
-      const trajectories = Array.from(trajectoryMap.values()).sort((a, b) => {
-        if (a.departureDate !== b.departureDate) {
-          return a.departureDate.localeCompare(b.departureDate);
-        }
-        return a.minPrice - b.minPrice;
-      });
-
-      let overallMinPrice = Infinity;
-      let overallMaxPrice = -Infinity;
-      let minFareItem: any = null;
-      let maxFareItem: any = null;
-
-      const airlineStatsMap = new Map<string, { count: number; prices: number[] }>();
-
-      for (const obs of rawObs) {
-        if (obs.price < overallMinPrice) {
-          overallMinPrice = obs.price;
-          minFareItem = {
-            price: obs.price,
-            flightNumber: obs.flightNumber,
-            departureDate: obs.departureDate,
-            observedAt: obs.timestamp,
-            airline: obs.airline
-          };
-        }
-        if (obs.price > overallMaxPrice) {
-          overallMaxPrice = obs.price;
-          maxFareItem = {
-            price: obs.price,
-            flightNumber: obs.flightNumber,
-            departureDate: obs.departureDate,
-            observedAt: obs.timestamp,
-            airline: obs.airline
-          };
-        }
-
-        if (!airlineStatsMap.has(obs.airline)) {
-          airlineStatsMap.set(obs.airline, { count: 0, prices: [] });
-        }
-        const aStat = airlineStatsMap.get(obs.airline)!;
-        aStat.count++;
-        aStat.prices.push(obs.price);
-      }
-
-      const airlines = Array.from(airlineStatsMap.entries())
-        .map(([name, stat]) => ({
-          name,
-          count: stat.count,
-          minPrice: Math.min(...stat.prices),
-          maxPrice: Math.max(...stat.prices),
-          avgPrice: Math.round(stat.prices.reduce((acc, p) => acc + p, 0) / stat.prices.length)
-        }))
-        .sort((a, b) => b.count - a.count);
-
-      const uniqueFlights = Array.from(new Set(rawObs.map((o) => o.flightNumber))).sort();
-
-      const baseSummary: LkoPnqTrendSummary = {
-        route: 'LKO-PNQ (Lucknow to Pune)',
-        departureDateWindow: {
-          start: '2026-11-09',
-          end: '2026-11-23'
-        },
-        totalAuthenticObservations: rawObs.length,
-        uniqueDepartureDates: ALL_15_DATES,
-        uniqueFlights,
-        airlines,
-        overallMinFare: minFareItem || { price: 7550, flightNumber: '6E-2413', departureDate: '2026-11-09', observedAt: '2026-09-25T12:01:41.037Z', airline: 'IndiGo' },
-        overallMaxFare: maxFareItem || { price: 34950, flightNumber: '6E7742 / 6E6116', departureDate: '2026-11-15', observedAt: '2026-10-01T05:48:04.454Z', airline: 'IndiGo' },
-        earliestObservationTimestamp: rawObs.length > 0 ? rawObs[0].timestamp : '2026-09-23T06:56:33.946Z',
-        latestObservationTimestamp: rawObs.length > 0 ? rawObs[rawObs.length - 1].timestamp : '2026-10-01T05:48:14.370Z',
-        dateBreakdown: [],
-        corridorTMinusPoints: [],
-        trajectories,
-        rawObservations: rawObs
-      };
-
-      const enriched = this.enrichSummaryWithTMinus(baseSummary);
+      const enriched = this.buildSummaryFromRawObservations(rawObs);
       this.cachedData = enriched;
       this.cacheExpiryMs = now + this.CACHE_TTL_MS;
       this.saveDiskCache(enriched);
       return enriched;
     } catch (err: any) {
-      console.warn('[FareTracker] Firestore read notice, using verified cache:', err?.message);
+      console.warn('[FareTracker] Read notice, using verified cache:', err?.message);
       if (this.cachedData) {
         return this.cachedData;
       }

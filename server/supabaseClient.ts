@@ -330,6 +330,12 @@ class SupabaseManager {
     departure_date_start?: string;
     departure_date_end?: string;
   }): Promise<SupabaseFareObservation[]> {
+    const localRecords = this.localStore.queryObservations(filter);
+    const map = new Map<string, SupabaseFareObservation>();
+    for (const item of localRecords) {
+      map.set(item.id, item);
+    }
+
     if (this.client) {
       try {
         let query = this.client
@@ -346,14 +352,16 @@ class SupabaseManager {
 
         const { data, error } = await query;
         if (!error && data && data.length > 0) {
-          return data as SupabaseFareObservation[];
+          for (const item of data) {
+            map.set(item.id, item as SupabaseFareObservation);
+          }
         }
       } catch (err) {
-        // Fallback to local store
+        // Kept in local store
       }
     }
 
-    return this.localStore.queryObservations(filter);
+    return Array.from(map.values()).sort((a, b) => new Date(a.observed_at).getTime() - new Date(b.observed_at).getTime());
   }
 
   public async countObservations(route?: string): Promise<number> {
