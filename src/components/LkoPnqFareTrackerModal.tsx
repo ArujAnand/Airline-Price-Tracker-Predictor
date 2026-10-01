@@ -39,11 +39,10 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
   const [hoveredPoint, setHoveredPoint] = useState<{
     x: number;
     y: number;
-    price: number;
-    timestamp: string;
-    flightNumber: string;
     airline: string;
-    departureDate: string;
+    date: string;
+    cumulativeCount: number;
+    dailyCount: number;
   } | null>(null);
 
   const fetchData = async (refresh = false) => {
@@ -600,23 +599,28 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                     })()}
                   </div>
 
-                  {/* Multi-Flight Trajectory Scatter / Time-Series */}
+                  {/* Cumulative Observations by Airline Chart */}
                   <div className="p-4 sm:p-5 bg-white border border-slate-200 rounded-xl relative">
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                       <div>
-                        <h3 className="text-sm font-bold text-slate-900">
-                          Observed Fare Timeline (By Collection Timestamp)
+                        <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                          <span>Cumulative Observations by Airline</span>
+                          <span className="text-[11px] font-normal px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-100">
+                            Volume Growth
+                          </span>
                         </h3>
-                        <p className="text-xs text-slate-500">
-                          Every point is an authentic fare observation captured from SerpApi / Google Flights
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          Total authentic price observations accumulated for each airline across collection dates
                         </p>
                       </div>
-                      <span className="text-xs text-slate-500">
-                        {filteredObservations.length} observations plotted
-                      </span>
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="px-2 py-1 rounded bg-slate-100 font-mono text-slate-700 font-semibold text-[11px]">
+                          {filteredObservations.length} Total Observations
+                        </span>
+                      </div>
                     </div>
 
-                    {/* SVG Chart Container */}
+                    {/* SVG Cumulative Volume Chart Container */}
                     <div className="relative w-full h-80 border border-slate-100 rounded-lg bg-slate-50/50 overflow-hidden">
                       {filteredObservations.length === 0 ? (
                         <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">
@@ -625,40 +629,11 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                       ) : (
                         (() => {
                           const obsList = filteredObservations;
-                          const timestamps = obsList.map(o => new Date(o.timestamp).getTime());
-                          const minTime = Math.min(...timestamps);
-                          const maxTime = Math.max(...timestamps);
-                          const timeSpan = Math.max(1, maxTime - minTime);
-
-                          const prices = obsList.map(o => o.price);
-                          const minP = Math.min(...prices) * 0.95;
-                          const maxP = Math.max(...prices) * 1.05;
-                          const priceSpan = Math.max(1, maxP - minP);
-
-                          const width = 800;
-                          const height = 290;
-                          const padLeft = 65;
-                          const padRight = 30;
-                          const padTop = 20;
-                          const padBottom = 45;
-                          const chartW = width - padLeft - padRight;
-                          const chartH = height - padTop - padBottom;
-
-                          // Time intervals for X-axis ticks (4 ticks)
-                          const timeTicks = [0, 0.33, 0.66, 1].map(ratio => {
-                            const tVal = minTime + ratio * timeSpan;
-                            const d = new Date(tVal);
-                            const day = d.getDate().toString().padStart(2, '0');
-                            const month = d.toLocaleString('en-IN', { month: 'short' });
-                            const hours = d.getHours().toString().padStart(2, '0');
-                            const mins = d.getMinutes().toString().padStart(2, '0');
-                            return {
-                              ratio,
-                              x: padLeft + ratio * chartW,
-                              label: `${day} ${month}`,
-                              time: `${hours}:${mins}`
-                            };
-                          });
+                          
+                          // 1. Extract chronological calendar collection days
+                          const rawDays = Array.from(new Set(obsList.map(o => o.timestamp.split('T')[0]))).sort();
+                          const defaultDays = ['2026-09-25', '2026-09-26', '2026-09-27', '2026-09-28', '2026-09-29', '2026-09-30', '2026-10-01'];
+                          const timelineDays = rawDays.length >= 2 ? rawDays : defaultDays;
 
                           const AIRLINE_CONFIG: Record<string, { stroke: string; fill: string; bg: string; text: string }> = {
                             'IndiGo': { stroke: '#2563eb', fill: '#3b82f6', bg: 'bg-blue-600', text: 'text-blue-600' },
@@ -668,26 +643,55 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                             'SpiceJet': { stroke: '#d97706', fill: '#f59e0b', bg: 'bg-amber-600', text: 'text-amber-600' }
                           };
 
-                          const distinctAirlines = Array.from(new Set(obsList.map(o => o.airline)));
+                          const allAirlines = ['IndiGo', 'Air India', 'Air India Express', 'Akasa Air'];
+                          const activeAirlines = selectedAirline === 'ALL' 
+                            ? allAirlines.filter(a => obsList.some(o => o.airline === a))
+                            : [selectedAirline];
 
-                          const airlineSeries = distinctAirlines.map(airlineName => {
-                            const points = obsList
-                              .filter(o => o.airline === airlineName)
-                              .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
-                              .map((obs, idx) => {
-                                const t = new Date(obs.timestamp).getTime();
-                                const x = padLeft + (timeSpan > 0 ? ((t - minTime) / timeSpan) : 0.5) * chartW;
-                                const y = padTop + (priceSpan > 0 ? (1 - (obs.price - minP) / priceSpan) : 0.5) * chartH;
-                                return { x, y, obs, id: obs.id || `${airlineName}-${idx}` };
-                              });
-
-                            const pathD = points.length > 0
-                              ? points.map((p, idx) => `${idx === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ')
-                              : '';
+                          // 2. Compute progressive cumulative volume per airline
+                          let maxObsValue = 10;
+                          const airlineSeries = activeAirlines.map(airlineName => {
+                            const airlineObs = obsList.filter(o => o.airline === airlineName);
+                            let runningTotal = 0;
+                            const points = timelineDays.map(day => {
+                              const dayCount = airlineObs.filter(o => o.timestamp.startsWith(day)).length;
+                              runningTotal += dayCount;
+                              if (runningTotal > maxObsValue) maxObsValue = runningTotal;
+                              return {
+                                day,
+                                dailyCount: dayCount,
+                                cumulativeCount: runningTotal
+                              };
+                            });
 
                             const cfg = AIRLINE_CONFIG[airlineName] || { stroke: '#64748b', fill: '#94a3b8', bg: 'bg-slate-600', text: 'text-slate-600' };
+                            return { airlineName, points, cfg, total: runningTotal };
+                          });
 
-                            return { airlineName, points, pathD, cfg };
+                          const maxVal = Math.max(10, Math.ceil(maxObsValue * 1.15));
+
+                          const width = 800;
+                          const height = 290;
+                          const padLeft = 65;
+                          const padRight = 30;
+                          const padTop = 25;
+                          const padBottom = 45;
+                          const chartW = width - padLeft - padRight;
+                          const chartH = height - padTop - padBottom;
+
+                          // Map to coordinate space
+                          const seriesWithCoords = airlineSeries.map(s => {
+                            const coords = s.points.map((p, idx) => {
+                              const x = padLeft + (timelineDays.length > 1 ? (idx / (timelineDays.length - 1)) * chartW : chartW / 2);
+                              const y = padTop + (1 - (p.cumulativeCount / maxVal)) * chartH;
+                              return { ...p, x, y };
+                            });
+
+                            const pathD = coords.length > 0
+                              ? coords.map((c, idx) => `${idx === 0 ? 'M' : 'L'} ${c.x.toFixed(1)} ${c.y.toFixed(1)}`).join(' ')
+                              : '';
+
+                            return { ...s, coords, pathD };
                           });
 
                           return (
@@ -698,53 +702,48 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                                 preserveAspectRatio="none"
                               >
                                 <defs>
-                                  {airlineSeries.map(s => (
+                                  {seriesWithCoords.map(s => (
                                     <linearGradient key={`grad-${s.airlineName}`} id={`grad-${s.airlineName.replace(/\s+/g, '')}`} x1="0" y1="0" x2="0" y2="1">
-                                      <stop offset="0%" stopColor={s.cfg.stroke} stopOpacity="0.25" />
+                                      <stop offset="0%" stopColor={s.cfg.stroke} stopOpacity="0.2" />
                                       <stop offset="100%" stopColor={s.cfg.stroke} stopOpacity="0.0" />
                                     </linearGradient>
                                   ))}
                                 </defs>
 
-                                {/* Vertical Time Grid lines & Date Labels */}
-                                {timeTicks.map((tick, idx) => (
-                                  <g key={idx}>
-                                    <line
-                                      x1={tick.x}
-                                      y1={padTop}
-                                      x2={tick.x}
-                                      y2={padTop + chartH}
-                                      stroke="#e2e8f0"
-                                      strokeDasharray="3 3"
-                                      strokeWidth="1"
-                                    />
-                                    <text
-                                      x={tick.x}
-                                      y={padTop + chartH + 16}
-                                      textAnchor="middle"
-                                      fontSize="10"
-                                      fontWeight="bold"
-                                      fill="#475569"
-                                    >
-                                      {tick.label}
-                                    </text>
-                                    <text
-                                      x={tick.x}
-                                      y={padTop + chartH + 28}
-                                      textAnchor="middle"
-                                      fontSize="9"
-                                      fill="#94a3b8"
-                                      fontFamily="monospace"
-                                    >
-                                      {tick.time}
-                                    </text>
-                                  </g>
-                                ))}
+                                {/* Vertical Timeline Day Gridlines & Labels */}
+                                {timelineDays.map((day, idx) => {
+                                  const x = padLeft + (timelineDays.length > 1 ? (idx / (timelineDays.length - 1)) * chartW : chartW / 2);
+                                  const d = new Date(day);
+                                  const label = d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+                                  return (
+                                    <g key={day}>
+                                      <line
+                                        x1={x}
+                                        y1={padTop}
+                                        x2={x}
+                                        y2={padTop + chartH}
+                                        stroke="#e2e8f0"
+                                        strokeDasharray="3 3"
+                                        strokeWidth="1"
+                                      />
+                                      <text
+                                        x={x}
+                                        y={padTop + chartH + 18}
+                                        textAnchor="middle"
+                                        fontSize="10"
+                                        fontWeight="600"
+                                        fill="#475569"
+                                      >
+                                        {label}
+                                      </text>
+                                    </g>
+                                  );
+                                })}
 
-                                {/* Horizontal Fare Grid lines & Y-axis Labels */}
+                                {/* Horizontal Cumulative Count Gridlines & Y-axis Labels */}
                                 {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
                                   const y = padTop + (1 - ratio) * chartH;
-                                  const pVal = Math.round(minP + ratio * priceSpan);
+                                  const countVal = Math.round(ratio * maxVal);
                                   return (
                                     <g key={ratio}>
                                       <line
@@ -765,14 +764,14 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                                         fontWeight="500"
                                         fontFamily="monospace"
                                       >
-                                        ₹{pVal.toLocaleString('en-IN')}
+                                        {countVal} obs
                                       </text>
                                     </g>
                                   );
                                 })}
 
-                                {/* Multi-Airline Connected Trajectory Lines */}
-                                {airlineSeries.map(series => {
+                                {/* Multi-Airline Cumulative Line Paths */}
+                                {seriesWithCoords.map(series => {
                                   if (!series.pathD) return null;
                                   return (
                                     <g key={`line-${series.airlineName}`}>
@@ -780,49 +779,47 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                                         d={series.pathD}
                                         fill="none"
                                         stroke={series.cfg.stroke}
-                                        strokeWidth="2.5"
+                                        strokeWidth="3"
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
-                                        className="transition-all opacity-85 hover:opacity-100"
+                                        className="transition-all opacity-90 hover:opacity-100 drop-shadow-xs"
                                       />
                                     </g>
                                   );
                                 })}
 
-                                {/* Observation Data point nodes */}
-                                {airlineSeries.map(series =>
-                                  series.points.map(pt => (
+                                {/* Daily Cumulative Observation Node Points */}
+                                {seriesWithCoords.map(series =>
+                                  series.coords.map(pt => (
                                     <circle
-                                      key={pt.id}
+                                      key={`${series.airlineName}-${pt.day}`}
                                       cx={pt.x}
                                       cy={pt.y}
-                                      r="4"
+                                      r="4.5"
                                       fill={series.cfg.fill}
                                       stroke="#ffffff"
-                                      strokeWidth="1.5"
-                                      className="cursor-pointer hover:r-6 hover:stroke-2 transition-all shadow-sm"
+                                      strokeWidth="2"
+                                      className="cursor-pointer hover:r-6.5 hover:stroke-2 transition-all shadow-md"
                                       onMouseEnter={(e) => {
                                         const rect = e.currentTarget.ownerSVGElement?.getBoundingClientRect() || e.currentTarget.getBoundingClientRect();
                                         const pointRect = e.currentTarget.getBoundingClientRect();
                                         setHoveredPoint({
                                           x: pointRect.left - rect.left + pointRect.width / 2,
                                           y: pointRect.top - rect.top,
-                                          price: pt.obs.price,
-                                          timestamp: pt.obs.timestamp,
-                                          flightNumber: pt.obs.flightNumber,
-                                          airline: pt.obs.airline,
-                                          departureDate: pt.obs.departureDate
+                                          airline: series.airlineName,
+                                          date: pt.day,
+                                          cumulativeCount: pt.cumulativeCount,
+                                          dailyCount: pt.dailyCount
                                         });
                                       }}
                                       onClick={() => {
                                         setHoveredPoint({
                                           x: pt.x,
                                           y: pt.y,
-                                          price: pt.obs.price,
-                                          timestamp: pt.obs.timestamp,
-                                          flightNumber: pt.obs.flightNumber,
-                                          airline: pt.obs.airline,
-                                          departureDate: pt.obs.departureDate
+                                          airline: series.airlineName,
+                                          date: pt.day,
+                                          cumulativeCount: pt.cumulativeCount,
+                                          dailyCount: pt.dailyCount
                                         });
                                       }}
                                       onMouseLeave={() => setHoveredPoint(null)}
@@ -831,7 +828,7 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                                 )}
                               </svg>
 
-                              {/* Floating Tooltip displaying exact Date & Time of Observation */}
+                              {/* Floating Tooltip displaying Cumulative Observation Volume */}
                               {hoveredPoint && (
                                 <div
                                   style={{
@@ -841,30 +838,19 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                                   className="absolute z-20 pointer-events-none transform -translate-x-1/2 -translate-y-full mb-2 bg-slate-900/95 backdrop-blur text-white text-xs rounded-lg py-2 px-3 shadow-xl border border-slate-700 min-w-[200px]"
                                 >
                                   <div className="flex items-center justify-between border-b border-slate-700 pb-1.5 mb-1.5">
-                                    <span className="font-bold text-blue-400">{hoveredPoint.flightNumber}</span>
-                                    <span className="text-[11px] text-slate-300">{hoveredPoint.airline}</span>
+                                    <span className="font-bold text-blue-400">{hoveredPoint.airline}</span>
+                                    <span className="text-[11px] text-slate-300">
+                                      {new Date(hoveredPoint.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                    </span>
                                   </div>
                                   <div className="space-y-1 text-[11px]">
                                     <div className="flex justify-between">
-                                      <span className="text-slate-400">Observed At:</span>
-                                      <span className="font-semibold text-amber-300 font-mono">
-                                        {new Date(hoveredPoint.timestamp).toLocaleString('en-IN', {
-                                          day: '2-digit',
-                                          month: 'short',
-                                          year: 'numeric',
-                                          hour: '2-digit',
-                                          minute: '2-digit',
-                                          hour12: true
-                                        })}
-                                      </span>
+                                      <span className="text-slate-400">Cumulative Volume:</span>
+                                      <span className="font-bold text-emerald-400 font-mono">{hoveredPoint.cumulativeCount} observations</span>
                                     </div>
                                     <div className="flex justify-between">
-                                      <span className="text-slate-400">Departure:</span>
-                                      <span className="text-slate-200 font-mono">{hoveredPoint.departureDate}</span>
-                                    </div>
-                                    <div className="flex justify-between pt-1 border-t border-slate-800">
-                                      <span className="text-slate-400">Recorded Fare:</span>
-                                      <span className="text-emerald-400 font-bold font-mono">₹{hoveredPoint.price.toLocaleString('en-IN')}</span>
+                                      <span className="text-slate-400">Captured on this date:</span>
+                                      <span className="font-semibold text-amber-300 font-mono">+{hoveredPoint.dailyCount} new obs</span>
                                     </div>
                                   </div>
                                 </div>
