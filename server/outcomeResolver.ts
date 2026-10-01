@@ -377,7 +377,6 @@ export class OutcomeResolverEngine {
       notes
     };
   }
-  }
 }
 
 export const outcomeResolverEngine = new OutcomeResolverEngine();
