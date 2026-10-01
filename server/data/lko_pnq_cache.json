@@ -11,12 +11,16 @@
     "2026-11-11",
     "2026-11-12",
     "2026-11-13",
+    "2026-11-14",
     "2026-11-15",
     "2026-11-16",
     "2026-11-17",
     "2026-11-18",
+    "2026-11-19",
     "2026-11-20",
-    "2026-11-21"
+    "2026-11-21",
+    "2026-11-22",
+    "2026-11-23"
   ],
   "uniqueFlights": [
     "6E-118",
@@ -91,17 +95,221 @@
       "date": "2026-11-09",
       "observationCount": 48,
       "minPrice": 7550,
-      "maxPrice": 9580,
-      "avgPrice": 8464,
-      "flightCount": 6
+      "maxPrice": 7790,
+      "avgPrice": 7670,
+      "flightCount": 6,
+      "tMinusPoints": [
+        {
+          "daysBeforeDeparture": 1,
+          "label": "T-1d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 7,
+          "label": "T-7d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 14,
+          "label": "T-14d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 30,
+          "label": "T-30d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 40,
+          "label": "T-40d",
+          "averageFare": 8431,
+          "minFare": 7550,
+          "maxFare": 9580,
+          "dataPointsCount": 48,
+          "distinctDatesCount": 1,
+          "status": "sufficient"
+        },
+        {
+          "daysBeforeDeparture": 50,
+          "label": "T-50d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 60,
+          "label": "T-60d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 70,
+          "label": "T-70d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 80,
+          "label": "T-80d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 90,
+          "label": "T-90d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        }
+      ]
     },
     {
       "date": "2026-11-10",
       "observationCount": 131,
-      "minPrice": 11343,
-      "maxPrice": 23542,
-      "avgPrice": 13693,
-      "flightCount": 18
+      "minPrice": 11943,
+      "maxPrice": 13233,
+      "avgPrice": 12724,
+      "flightCount": 18,
+      "tMinusPoints": [
+        {
+          "daysBeforeDeparture": 1,
+          "label": "T-1d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 7,
+          "label": "T-7d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 14,
+          "label": "T-14d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 30,
+          "label": "T-30d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 40,
+          "label": "T-40d",
+          "averageFare": 13671,
+          "minFare": 11343,
+          "maxFare": 23542,
+          "dataPointsCount": 131,
+          "distinctDatesCount": 1,
+          "status": "sufficient"
+        },
+        {
+          "daysBeforeDeparture": 50,
+          "label": "T-50d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 60,
+          "label": "T-60d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 70,
+          "label": "T-70d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 80,
+          "label": "T-80d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 90,
+          "label": "T-90d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        }
+      ]
     },
     {
       "date": "2026-11-11",
@@ -109,7 +317,109 @@
       "minPrice": 11943,
       "maxPrice": 23700,
       "avgPrice": 15465,
-      "flightCount": 13
+      "flightCount": 13,
+      "tMinusPoints": [
+        {
+          "daysBeforeDeparture": 1,
+          "label": "T-1d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 7,
+          "label": "T-7d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 14,
+          "label": "T-14d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 30,
+          "label": "T-30d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 40,
+          "label": "T-40d",
+          "averageFare": 15465,
+          "minFare": 11943,
+          "maxFare": 23700,
+          "dataPointsCount": 46,
+          "distinctDatesCount": 1,
+          "status": "sufficient"
+        },
+        {
+          "daysBeforeDeparture": 50,
+          "label": "T-50d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 60,
+          "label": "T-60d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 70,
+          "label": "T-70d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 80,
+          "label": "T-80d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 90,
+          "label": "T-90d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        }
+      ]
     },
     {
       "date": "2026-11-12",
@@ -117,7 +427,109 @@
       "minPrice": 12100,
       "maxPrice": 21900,
       "avgPrice": 15120,
-      "flightCount": 10
+      "flightCount": 10,
+      "tMinusPoints": [
+        {
+          "daysBeforeDeparture": 1,
+          "label": "T-1d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 7,
+          "label": "T-7d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 14,
+          "label": "T-14d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 30,
+          "label": "T-30d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 40,
+          "label": "T-40d",
+          "averageFare": 15120,
+          "minFare": 12100,
+          "maxFare": 21900,
+          "dataPointsCount": 32,
+          "distinctDatesCount": 1,
+          "status": "sufficient"
+        },
+        {
+          "daysBeforeDeparture": 50,
+          "label": "T-50d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 60,
+          "label": "T-60d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 70,
+          "label": "T-70d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 80,
+          "label": "T-80d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 90,
+          "label": "T-90d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        }
+      ]
     },
     {
       "date": "2026-11-13",
@@ -125,15 +537,329 @@
       "minPrice": 12450,
       "maxPrice": 22400,
       "avgPrice": 15890,
-      "flightCount": 11
+      "flightCount": 11,
+      "tMinusPoints": [
+        {
+          "daysBeforeDeparture": 1,
+          "label": "T-1d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 7,
+          "label": "T-7d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 14,
+          "label": "T-14d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 30,
+          "label": "T-30d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 40,
+          "label": "T-40d",
+          "averageFare": 15890,
+          "minFare": 12450,
+          "maxFare": 22400,
+          "dataPointsCount": 41,
+          "distinctDatesCount": 1,
+          "status": "sufficient"
+        },
+        {
+          "daysBeforeDeparture": 50,
+          "label": "T-50d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 60,
+          "label": "T-60d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 70,
+          "label": "T-70d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 80,
+          "label": "T-80d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 90,
+          "label": "T-90d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-14",
+      "observationCount": 0,
+      "minPrice": null,
+      "maxPrice": null,
+      "avgPrice": null,
+      "flightCount": 0,
+      "tMinusPoints": [
+        {
+          "daysBeforeDeparture": 1,
+          "label": "T-1d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 7,
+          "label": "T-7d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 14,
+          "label": "T-14d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 30,
+          "label": "T-30d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 40,
+          "label": "T-40d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 50,
+          "label": "T-50d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 60,
+          "label": "T-60d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 70,
+          "label": "T-70d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 80,
+          "label": "T-80d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 90,
+          "label": "T-90d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        }
+      ]
     },
     {
       "date": "2026-11-15",
       "observationCount": 84,
       "minPrice": 17944,
       "maxPrice": 34950,
-      "avgPrice": 24800,
-      "flightCount": 14
+      "avgPrice": 26447,
+      "flightCount": 14,
+      "tMinusPoints": [
+        {
+          "daysBeforeDeparture": 1,
+          "label": "T-1d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 7,
+          "label": "T-7d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 14,
+          "label": "T-14d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 30,
+          "label": "T-30d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 40,
+          "label": "T-40d",
+          "averageFare": 24839,
+          "minFare": 17944,
+          "maxFare": 34950,
+          "dataPointsCount": 84,
+          "distinctDatesCount": 1,
+          "status": "sufficient"
+        },
+        {
+          "daysBeforeDeparture": 50,
+          "label": "T-50d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 60,
+          "label": "T-60d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 70,
+          "label": "T-70d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 80,
+          "label": "T-80d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 90,
+          "label": "T-90d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        }
+      ]
     },
     {
       "date": "2026-11-16",
@@ -141,7 +867,109 @@
       "minPrice": 13200,
       "maxPrice": 24100,
       "avgPrice": 16900,
-      "flightCount": 12
+      "flightCount": 12,
+      "tMinusPoints": [
+        {
+          "daysBeforeDeparture": 1,
+          "label": "T-1d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 7,
+          "label": "T-7d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 14,
+          "label": "T-14d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 30,
+          "label": "T-30d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 40,
+          "label": "T-40d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 50,
+          "label": "T-50d",
+          "averageFare": 16900,
+          "minFare": 13200,
+          "maxFare": 24100,
+          "dataPointsCount": 55,
+          "distinctDatesCount": 1,
+          "status": "sufficient"
+        },
+        {
+          "daysBeforeDeparture": 60,
+          "label": "T-60d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 70,
+          "label": "T-70d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 80,
+          "label": "T-80d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 90,
+          "label": "T-90d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        }
+      ]
     },
     {
       "date": "2026-11-17",
@@ -149,7 +977,109 @@
       "minPrice": 12800,
       "maxPrice": 22500,
       "avgPrice": 16100,
-      "flightCount": 9
+      "flightCount": 9,
+      "tMinusPoints": [
+        {
+          "daysBeforeDeparture": 1,
+          "label": "T-1d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 7,
+          "label": "T-7d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 14,
+          "label": "T-14d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 30,
+          "label": "T-30d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 40,
+          "label": "T-40d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 50,
+          "label": "T-50d",
+          "averageFare": 16100,
+          "minFare": 12800,
+          "maxFare": 22500,
+          "dataPointsCount": 27,
+          "distinctDatesCount": 1,
+          "status": "sufficient"
+        },
+        {
+          "daysBeforeDeparture": 60,
+          "label": "T-60d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 70,
+          "label": "T-70d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 80,
+          "label": "T-80d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 90,
+          "label": "T-90d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        }
+      ]
     },
     {
       "date": "2026-11-18",
@@ -157,15 +1087,329 @@
       "minPrice": 11950,
       "maxPrice": 21800,
       "avgPrice": 15200,
-      "flightCount": 12
+      "flightCount": 12,
+      "tMinusPoints": [
+        {
+          "daysBeforeDeparture": 1,
+          "label": "T-1d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 7,
+          "label": "T-7d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 14,
+          "label": "T-14d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 30,
+          "label": "T-30d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 40,
+          "label": "T-40d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 50,
+          "label": "T-50d",
+          "averageFare": 15200,
+          "minFare": 11950,
+          "maxFare": 21800,
+          "dataPointsCount": 51,
+          "distinctDatesCount": 1,
+          "status": "sufficient"
+        },
+        {
+          "daysBeforeDeparture": 60,
+          "label": "T-60d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 70,
+          "label": "T-70d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 80,
+          "label": "T-80d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 90,
+          "label": "T-90d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-19",
+      "observationCount": 0,
+      "minPrice": null,
+      "maxPrice": null,
+      "avgPrice": null,
+      "flightCount": 0,
+      "tMinusPoints": [
+        {
+          "daysBeforeDeparture": 1,
+          "label": "T-1d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 7,
+          "label": "T-7d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 14,
+          "label": "T-14d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 30,
+          "label": "T-30d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 40,
+          "label": "T-40d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 50,
+          "label": "T-50d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 60,
+          "label": "T-60d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 70,
+          "label": "T-70d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 80,
+          "label": "T-80d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 90,
+          "label": "T-90d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        }
+      ]
     },
     {
       "date": "2026-11-20",
       "observationCount": 332,
       "minPrice": 10519,
-      "maxPrice": 19800,
-      "avgPrice": 14100,
-      "flightCount": 22
+      "maxPrice": 10743,
+      "avgPrice": 10631,
+      "flightCount": 22,
+      "tMinusPoints": [
+        {
+          "daysBeforeDeparture": 1,
+          "label": "T-1d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 7,
+          "label": "T-7d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 14,
+          "label": "T-14d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 30,
+          "label": "T-30d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 40,
+          "label": "T-40d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 50,
+          "label": "T-50d",
+          "averageFare": 14079,
+          "minFare": 10519,
+          "maxFare": 19800,
+          "dataPointsCount": 332,
+          "distinctDatesCount": 1,
+          "status": "sufficient"
+        },
+        {
+          "daysBeforeDeparture": 60,
+          "label": "T-60d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 70,
+          "label": "T-70d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 80,
+          "label": "T-80d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 90,
+          "label": "T-90d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        }
+      ]
     },
     {
       "date": "2026-11-21",
@@ -173,7 +1417,329 @@
       "minPrice": 11800,
       "maxPrice": 20500,
       "avgPrice": 14900,
-      "flightCount": 11
+      "flightCount": 11,
+      "tMinusPoints": [
+        {
+          "daysBeforeDeparture": 1,
+          "label": "T-1d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 7,
+          "label": "T-7d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 14,
+          "label": "T-14d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 30,
+          "label": "T-30d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 40,
+          "label": "T-40d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 50,
+          "label": "T-50d",
+          "averageFare": 14900,
+          "minFare": 11800,
+          "maxFare": 20500,
+          "dataPointsCount": 48,
+          "distinctDatesCount": 1,
+          "status": "sufficient"
+        },
+        {
+          "daysBeforeDeparture": 60,
+          "label": "T-60d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 70,
+          "label": "T-70d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 80,
+          "label": "T-80d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 90,
+          "label": "T-90d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-22",
+      "observationCount": 0,
+      "minPrice": null,
+      "maxPrice": null,
+      "avgPrice": null,
+      "flightCount": 0,
+      "tMinusPoints": [
+        {
+          "daysBeforeDeparture": 1,
+          "label": "T-1d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 7,
+          "label": "T-7d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 14,
+          "label": "T-14d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 30,
+          "label": "T-30d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 40,
+          "label": "T-40d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 50,
+          "label": "T-50d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 60,
+          "label": "T-60d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 70,
+          "label": "T-70d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 80,
+          "label": "T-80d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 90,
+          "label": "T-90d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-23",
+      "observationCount": 0,
+      "minPrice": null,
+      "maxPrice": null,
+      "avgPrice": null,
+      "flightCount": 0,
+      "tMinusPoints": [
+        {
+          "daysBeforeDeparture": 1,
+          "label": "T-1d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 7,
+          "label": "T-7d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 14,
+          "label": "T-14d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 30,
+          "label": "T-30d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 40,
+          "label": "T-40d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 50,
+          "label": "T-50d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 1,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 60,
+          "label": "T-60d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 70,
+          "label": "T-70d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 80,
+          "label": "T-80d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        },
+        {
+          "daysBeforeDeparture": 90,
+          "label": "T-90d",
+          "averageFare": null,
+          "minFare": null,
+          "maxFare": null,
+          "dataPointsCount": 0,
+          "distinctDatesCount": 0,
+          "status": "insufficient_data"
+        }
+      ]
     }
   ],
   "trajectories": [
@@ -191,9 +1757,24 @@
       "firstObservedAt": "2026-09-23T06:56:33.946Z",
       "lastObservedAt": "2026-09-25T12:01:41.037Z",
       "history": [
-        { "timestamp": "2026-09-23T06:56:33.946Z", "price": 7890, "source": "SerpApi (Google Flights)", "provenance": "REAL_EXTERNAL_OBSERVATION" },
-        { "timestamp": "2026-09-24T09:12:00.000Z", "price": 8200, "source": "SerpApi (Google Flights)", "provenance": "REAL_EXTERNAL_OBSERVATION" },
-        { "timestamp": "2026-09-25T12:01:41.037Z", "price": 7550, "source": "SerpApi (Google Flights)", "provenance": "REAL_EXTERNAL_OBSERVATION" }
+        {
+          "timestamp": "2026-09-23T06:56:33.946Z",
+          "price": 7890,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-09-24T09:12:00.000Z",
+          "price": 8200,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-09-25T12:01:41.037Z",
+          "price": 7550,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
       ]
     },
     {
@@ -210,8 +1791,18 @@
       "firstObservedAt": "2026-09-23T08:00:00.000Z",
       "lastObservedAt": "2026-09-26T14:30:00.000Z",
       "history": [
-        { "timestamp": "2026-09-23T08:00:00.000Z", "price": 8540, "source": "SerpApi (Google Flights)", "provenance": "REAL_EXTERNAL_OBSERVATION" },
-        { "timestamp": "2026-09-26T14:30:00.000Z", "price": 7790, "source": "SerpApi (Google Flights)", "provenance": "REAL_EXTERNAL_OBSERVATION" }
+        {
+          "timestamp": "2026-09-23T08:00:00.000Z",
+          "price": 8540,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-09-26T14:30:00.000Z",
+          "price": 7790,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
       ]
     },
     {
@@ -228,9 +1819,24 @@
       "firstObservedAt": "2026-09-24T10:00:00.000Z",
       "lastObservedAt": "2026-10-01T05:48:02.458Z",
       "history": [
-        { "timestamp": "2026-09-24T10:00:00.000Z", "price": 12500, "source": "SerpApi (Google Flights)", "provenance": "REAL_EXTERNAL_OBSERVATION" },
-        { "timestamp": "2026-09-28T16:00:00.000Z", "price": 13200, "source": "SerpApi (Google Flights)", "provenance": "REAL_EXTERNAL_OBSERVATION" },
-        { "timestamp": "2026-10-01T05:48:02.458Z", "price": 11943, "source": "SerpApi (Google Flights)", "provenance": "REAL_EXTERNAL_OBSERVATION" }
+        {
+          "timestamp": "2026-09-24T10:00:00.000Z",
+          "price": 12500,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-09-28T16:00:00.000Z",
+          "price": 13200,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-01T05:48:02.458Z",
+          "price": 11943,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
       ]
     },
     {
@@ -247,8 +1853,18 @@
       "firstObservedAt": "2026-09-25T11:00:00.000Z",
       "lastObservedAt": "2026-10-01T05:48:02.458Z",
       "history": [
-        { "timestamp": "2026-09-25T11:00:00.000Z", "price": 13500, "source": "SerpApi (Google Flights)", "provenance": "REAL_EXTERNAL_OBSERVATION" },
-        { "timestamp": "2026-10-01T05:48:02.458Z", "price": 12996, "source": "SerpApi (Google Flights)", "provenance": "REAL_EXTERNAL_OBSERVATION" }
+        {
+          "timestamp": "2026-09-25T11:00:00.000Z",
+          "price": 13500,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-01T05:48:02.458Z",
+          "price": 12996,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
       ]
     },
     {
@@ -265,7 +1881,12 @@
       "firstObservedAt": "2026-09-25T11:00:00.000Z",
       "lastObservedAt": "2026-10-01T05:48:02.458Z",
       "history": [
-        { "timestamp": "2026-10-01T05:48:02.458Z", "price": 13233, "source": "SerpApi (Google Flights)", "provenance": "REAL_EXTERNAL_OBSERVATION" }
+        {
+          "timestamp": "2026-10-01T05:48:02.458Z",
+          "price": 13233,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
       ]
     },
     {
@@ -282,9 +1903,24 @@
       "firstObservedAt": "2026-09-24T06:00:00.000Z",
       "lastObservedAt": "2026-10-01T05:48:14.370Z",
       "history": [
-        { "timestamp": "2026-09-24T06:00:00.000Z", "price": 11200, "source": "Google Flights (Live Scraping)", "provenance": "REAL_EXTERNAL_OBSERVATION" },
-        { "timestamp": "2026-09-27T18:00:00.000Z", "price": 12400, "source": "Google Flights 3h Yield Collector", "provenance": "REAL_EXTERNAL_OBSERVATION" },
-        { "timestamp": "2026-10-01T05:48:14.370Z", "price": 10519, "source": "Google Flights (Live Scraping)", "provenance": "REAL_EXTERNAL_OBSERVATION" }
+        {
+          "timestamp": "2026-09-24T06:00:00.000Z",
+          "price": 11200,
+          "source": "Google Flights (Live Scraping)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-09-27T18:00:00.000Z",
+          "price": 12400,
+          "source": "Google Flights 3h Yield Collector",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-01T05:48:14.370Z",
+          "price": 10519,
+          "source": "Google Flights (Live Scraping)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
       ]
     },
     {
@@ -301,8 +1937,18 @@
       "firstObservedAt": "2026-09-24T06:00:00.000Z",
       "lastObservedAt": "2026-10-01T05:48:14.370Z",
       "history": [
-        { "timestamp": "2026-09-24T06:00:00.000Z", "price": 11400, "source": "Google Flights (Live Scraping)", "provenance": "REAL_EXTERNAL_OBSERVATION" },
-        { "timestamp": "2026-10-01T05:48:14.370Z", "price": 10743, "source": "Google Flights (Live Scraping)", "provenance": "REAL_EXTERNAL_OBSERVATION" }
+        {
+          "timestamp": "2026-09-24T06:00:00.000Z",
+          "price": 11400,
+          "source": "Google Flights (Live Scraping)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-01T05:48:14.370Z",
+          "price": 10743,
+          "source": "Google Flights (Live Scraping)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
       ]
     },
     {
@@ -315,12 +1961,22 @@
       "minPrice": 17944,
       "maxPrice": 19200,
       "priceDelta": -556,
-      "priceDeltaPercent": -3.0,
+      "priceDeltaPercent": -3,
       "firstObservedAt": "2026-09-25T08:00:00.000Z",
       "lastObservedAt": "2026-10-01T05:48:04.454Z",
       "history": [
-        { "timestamp": "2026-09-25T08:00:00.000Z", "price": 18500, "source": "SerpApi (Google Flights)", "provenance": "REAL_EXTERNAL_OBSERVATION" },
-        { "timestamp": "2026-10-01T05:48:04.454Z", "price": 17944, "source": "SerpApi (Google Flights)", "provenance": "REAL_EXTERNAL_OBSERVATION" }
+        {
+          "timestamp": "2026-09-25T08:00:00.000Z",
+          "price": 18500,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-01T05:48:04.454Z",
+          "price": 17944,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
       ]
     },
     {
@@ -337,8 +1993,18 @@
       "firstObservedAt": "2026-09-25T08:00:00.000Z",
       "lastObservedAt": "2026-10-01T05:48:04.454Z",
       "history": [
-        { "timestamp": "2026-09-25T08:00:00.000Z", "price": 32000, "source": "SerpApi (Google Flights)", "provenance": "REAL_EXTERNAL_OBSERVATION" },
-        { "timestamp": "2026-10-01T05:48:04.454Z", "price": 34950, "source": "SerpApi (Google Flights)", "provenance": "REAL_EXTERNAL_OBSERVATION" }
+        {
+          "timestamp": "2026-09-25T08:00:00.000Z",
+          "price": 32000,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-01T05:48:04.454Z",
+          "price": 34950,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
       ]
     }
   ],
@@ -367,32 +2033,6 @@
       "price": 7790,
       "timestamp": "2026-09-26T14:30:00.000Z",
       "source": "SerpApi (Google Flights)",
-      "provenance": "REAL_EXTERNAL_OBSERVATION"
-    },
-    {
-      "id": "snap-live-LKO-PNQ-IX-1617-2026-11-20-05",
-      "flightNumber": "IX-1617",
-      "flightId": "LKO-PNQ-IX-1617-2026-11-20",
-      "airline": "Air India Express",
-      "origin": "LKO",
-      "destination": "PNQ",
-      "departureDate": "2026-11-20",
-      "price": 10519,
-      "timestamp": "2026-10-01T05:48:14.370Z",
-      "source": "Google Flights (Live Scraping)",
-      "provenance": "REAL_EXTERNAL_OBSERVATION"
-    },
-    {
-      "id": "snap-live-LKO-PNQ-6E-118-2026-11-20-05",
-      "flightNumber": "6E-118",
-      "flightId": "LKO-PNQ-6E-118-2026-11-20",
-      "airline": "IndiGo",
-      "origin": "LKO",
-      "destination": "PNQ",
-      "departureDate": "2026-11-20",
-      "price": 10743,
-      "timestamp": "2026-10-01T05:48:14.370Z",
-      "source": "Google Flights (Live Scraping)",
       "provenance": "REAL_EXTERNAL_OBSERVATION"
     },
     {
@@ -459,6 +2099,134 @@
       "timestamp": "2026-10-01T05:48:04.454Z",
       "source": "SerpApi (Google Flights)",
       "provenance": "REAL_EXTERNAL_OBSERVATION"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-IX-1617-2026-11-20-05",
+      "flightNumber": "IX-1617",
+      "flightId": "LKO-PNQ-IX-1617-2026-11-20",
+      "airline": "Air India Express",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-20",
+      "price": 10519,
+      "timestamp": "2026-10-01T05:48:14.370Z",
+      "source": "Google Flights (Live Scraping)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-118-2026-11-20-05",
+      "flightNumber": "6E-118",
+      "flightId": "LKO-PNQ-6E-118-2026-11-20",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-20",
+      "price": 10743,
+      "timestamp": "2026-10-01T05:48:14.370Z",
+      "source": "Google Flights (Live Scraping)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION"
+    }
+  ],
+  "corridorTMinusPoints": [
+    {
+      "daysBeforeDeparture": 1,
+      "label": "T-1d",
+      "averageFare": null,
+      "minFare": null,
+      "maxFare": null,
+      "dataPointsCount": 0,
+      "distinctDatesCount": 0,
+      "status": "insufficient_data"
+    },
+    {
+      "daysBeforeDeparture": 7,
+      "label": "T-7d",
+      "averageFare": null,
+      "minFare": null,
+      "maxFare": null,
+      "dataPointsCount": 0,
+      "distinctDatesCount": 0,
+      "status": "insufficient_data"
+    },
+    {
+      "daysBeforeDeparture": 14,
+      "label": "T-14d",
+      "averageFare": null,
+      "minFare": null,
+      "maxFare": null,
+      "dataPointsCount": 0,
+      "distinctDatesCount": 0,
+      "status": "insufficient_data"
+    },
+    {
+      "daysBeforeDeparture": 30,
+      "label": "T-30d",
+      "averageFare": null,
+      "minFare": null,
+      "maxFare": null,
+      "dataPointsCount": 0,
+      "distinctDatesCount": 0,
+      "status": "insufficient_data"
+    },
+    {
+      "daysBeforeDeparture": 40,
+      "label": "T-40d",
+      "averageFare": 16044,
+      "minFare": 7550,
+      "maxFare": 34950,
+      "dataPointsCount": 382,
+      "distinctDatesCount": 6,
+      "status": "sufficient"
+    },
+    {
+      "daysBeforeDeparture": 50,
+      "label": "T-50d",
+      "averageFare": 14664,
+      "minFare": 10519,
+      "maxFare": 24100,
+      "dataPointsCount": 515,
+      "distinctDatesCount": 6,
+      "status": "sufficient"
+    },
+    {
+      "daysBeforeDeparture": 60,
+      "label": "T-60d",
+      "averageFare": null,
+      "minFare": null,
+      "maxFare": null,
+      "dataPointsCount": 0,
+      "distinctDatesCount": 0,
+      "status": "insufficient_data"
+    },
+    {
+      "daysBeforeDeparture": 70,
+      "label": "T-70d",
+      "averageFare": null,
+      "minFare": null,
+      "maxFare": null,
+      "dataPointsCount": 0,
+      "distinctDatesCount": 0,
+      "status": "insufficient_data"
+    },
+    {
+      "daysBeforeDeparture": 80,
+      "label": "T-80d",
+      "averageFare": null,
+      "minFare": null,
+      "maxFare": null,
+      "dataPointsCount": 0,
+      "distinctDatesCount": 0,
+      "status": "insufficient_data"
+    },
+    {
+      "daysBeforeDeparture": 90,
+      "label": "T-90d",
+      "averageFare": null,
+      "minFare": null,
+      "maxFare": null,
+      "dataPointsCount": 0,
+      "distinctDatesCount": 0,
+      "status": "insufficient_data"
     }
   ]
 }

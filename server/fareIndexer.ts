@@ -41,10 +41,38 @@ class FareIndexingService {
     const cleanRouteId = routeId.toUpperCase();
     
     // Fetch snapshots for both directions to support corridor & sub-segment comparison
-    const [rawPnqLko, rawLkoPnq] = await Promise.all([
+    let [rawPnqLko, rawLkoPnq] = await Promise.all([
       firestoreDB.getSnapshots('PNQ-LKO', 2000),
       firestoreDB.getSnapshots('LKO-PNQ', 2000),
     ]);
+
+    // Ensure authentic LKO-PNQ observations are seamlessly available from verified cache
+    if (rawLkoPnq.length === 0) {
+      try {
+        const { lkoPnqFareTrackerService } = await import('./fareTrackerService');
+        const lkoData = await lkoPnqFareTrackerService.getTrendData();
+        if (lkoData.rawObservations && lkoData.rawObservations.length > 0) {
+          rawLkoPnq = lkoData.rawObservations.map(o => ({
+            id: o.id,
+            flightId: o.flightId,
+            routeId: 'LKO-PNQ',
+            origin: o.origin,
+            destination: o.destination,
+            departureDate: o.departureDate,
+            flightNumber: o.flightNumber,
+            airline: o.airline,
+            price: o.price,
+            timestamp: o.timestamp,
+            capturedHour: o.capturedHour !== undefined ? o.capturedHour : new Date(o.timestamp).getHours(),
+            type: (o.type as any) || 'hourly',
+            source: o.source,
+            provenance: o.provenance
+          }));
+        }
+      } catch (err) {
+        // Fallback gracefully
+      }
+    }
 
     const filterValid = (list: PriceSnapshot[]) =>
       list.filter((s) => {

@@ -15,6 +15,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../src/firebaseClient';
 import { PriceSnapshot, TrackedTripAlert, AppNotification, TrackedPredictionRecord } from '../src/types';
+import { lkoPnqFareTrackerService } from './fareTrackerService';
 
 function sanitizeForFirestore<T>(obj: T): T {
   if (obj === null || obj === undefined || typeof obj !== 'object') {
@@ -421,6 +422,7 @@ export class FirestorePersistenceService {
     const enrichedSnapshot = { ...snapshot, id: snapshotId, expireAt };
 
     this.inMemorySnapshots.set(snapshotId, enrichedSnapshot);
+    lkoPnqFareTrackerService.addAuthenticObservationFromSnapshot(enrichedSnapshot);
 
     try {
       const docRef = doc(db, 'snapshots', snapshotId);
@@ -454,7 +456,10 @@ export class FirestorePersistenceService {
 
     validSnapshots.forEach(s => {
       const snapshotId = s.id || (s as any).observationId;
-      if (snapshotId) this.inMemorySnapshots.set(snapshotId, s);
+      if (snapshotId) {
+        this.inMemorySnapshots.set(snapshotId, s);
+        lkoPnqFareTrackerService.addAuthenticObservationFromSnapshot(s);
+      }
     });
 
     try {

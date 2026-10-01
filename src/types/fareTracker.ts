@@ -23,7 +23,7 @@ export interface FlightFareTrajectory {
   lastPrice: number;
   minPrice: number;
   maxPrice: number;
-  priceDelta: number;
+  priceDelta: number; // lastPrice - firstPrice
   priceDeltaPercent: number;
   firstObservedAt: string;
   lastObservedAt: string;
@@ -33,6 +33,27 @@ export interface FlightFareTrajectory {
     source: string;
     provenance: string;
   }>;
+}
+
+export interface TMinusPoint {
+  daysBeforeDeparture: number; // 90, 80, 70, 60, 50, 40, 30, 14, 7, 1
+  label: string; // e.g. "T-90d", "T-70d"
+  averageFare: number | null;
+  minFare: number | null;
+  maxFare: number | null;
+  dataPointsCount: number;
+  distinctDatesCount: number;
+  status: 'sufficient' | 'insufficient_data';
+}
+
+export interface DateBreakdownItem {
+  date: string;
+  observationCount: number;
+  minPrice: number | null;
+  maxPrice: number | null;
+  avgPrice: number | null;
+  flightCount: number;
+  tMinusPoints: TMinusPoint[];
 }
 
 export interface LkoPnqTrendSummary {
@@ -67,14 +88,8 @@ export interface LkoPnqTrendSummary {
   };
   earliestObservationTimestamp: string;
   latestObservationTimestamp: string;
-  dateBreakdown: Array<{
-    date: string;
-    observationCount: number;
-    minPrice: number;
-    maxPrice: number;
-    avgPrice: number;
-    flightCount: number;
-  }>;
+  dateBreakdown: DateBreakdownItem[];
+  corridorTMinusPoints: TMinusPoint[];
   trajectories: FlightFareTrajectory[];
   rawObservations: AuthenticFareObservation[];
 }

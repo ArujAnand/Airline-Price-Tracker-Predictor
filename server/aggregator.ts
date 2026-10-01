@@ -1041,6 +1041,20 @@ class FlightAggregatorEngine {
       if (this.snapshots.length > 2500) {
         this.snapshots = this.snapshots.slice(-2000);
       }
+
+      // Propagate newly arrived authentic LKO-PNQ snapshots to the fare trend tracker
+      if (
+        snap.routeId?.toUpperCase() === 'LKO-PNQ' &&
+        snap.departureDate &&
+        snap.departureDate >= '2026-11-09' &&
+        snap.departureDate <= '2026-11-23'
+      ) {
+        import('./fareTrackerService')
+          .then(({ lkoPnqFareTrackerService }) => {
+            lkoPnqFareTrackerService.addAuthenticObservationFromSnapshot(snap);
+          })
+          .catch(() => {});
+      }
     }
   }
 

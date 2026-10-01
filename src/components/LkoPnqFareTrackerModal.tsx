@@ -17,6 +17,7 @@ import {
   ChevronUp
 } from 'lucide-react';
 import { LkoPnqTrendSummary, FlightFareTrajectory, AuthenticFareObservation } from '../types/fareTracker';
+import { BookingWindowCurveChart } from './BookingWindowCurveChart';
 
 interface Props {
   isOpen: boolean;
@@ -105,6 +106,16 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
       return true;
     });
   }, [data, selectedDate, selectedAirline, flightSearch]);
+
+  // Selected T-minus yield curve points (all 15 dates or single date)
+  const currentTMinusPoints = useMemo(() => {
+    if (!data) return [];
+    if (selectedDate === 'ALL') {
+      return data.corridorTMinusPoints || [];
+    }
+    const item = data.dateBreakdown.find((d) => d.date === selectedDate);
+    return item?.tMinusPoints || [];
+  }, [data, selectedDate]);
 
   const handleExportCSV = () => {
     if (!filteredObservations.length) return;
@@ -350,7 +361,7 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                       >
                         <span className="font-semibold">{formatted}</span>
                         <span className={`text-[10px] ${isSelected ? 'text-blue-100' : 'text-slate-400'}`}>
-                          From ₹{d.minPrice.toLocaleString('en-IN')} ({d.observationCount} obs)
+                          {d.minPrice !== null ? `From ₹${d.minPrice.toLocaleString('en-IN')}` : 'No data yet'} ({d.observationCount} obs)
                         </span>
                       </button>
                     );
@@ -361,6 +372,55 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
               {/* Tab 1: Chart View */}
               {activeTab === 'chart' && (
                 <div className="space-y-6">
+                  {/* T-Minus Advance Booking Yield Curve */}
+                  <div className="p-4 sm:p-5 bg-white border border-slate-200 rounded-xl">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-2">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm font-bold text-slate-900">
+                            T-Minus Fare Trajectory Curve
+                          </h3>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-200 font-mono">
+                            {selectedDate === 'ALL' ? 'Corridor (9–23 Nov)' : `${selectedDate.slice(8)} Nov 2026`}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-500">
+                          {selectedDate === 'ALL' 
+                            ? 'Aggregates authentic Google Flights observations into canonical advance booking milestones (T-90d down to T-1d) across all 15 departure dates.'
+                            : `Observed advance booking milestones for departure date ${selectedDate}. Missing milestones represent periods without scraping.`}
+                        </p>
+                      </div>
+                      <div className="text-[11px] text-slate-600 flex items-center gap-3">
+                        <span className="flex items-center gap-1">
+                          <span className="w-2.5 h-2.5 rounded-full bg-amber-600 inline-block"></span>
+                          <span>Observed Fares</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <span className="w-2.5 h-2.5 rounded-full border border-slate-400 border-dashed inline-block"></span>
+                          <span className="text-slate-500">No Observation (Unavailable)</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <BookingWindowCurveChart
+                      points={currentTMinusPoints}
+                      title="AUTHENTIC ADVANCE BOOKING YIELD CURVE"
+                      subtitle="T-90d → T-1d"
+                      departureDateLabel={selectedDate === 'ALL' ? 'LKO ➔ PNQ Combined' : `Departure: ${selectedDate}`}
+                    />
+
+                    {/* Explanatory Data Purity Note */}
+                    <div className="text-[10.5px] text-slate-500 bg-slate-50 border border-slate-200 rounded-lg p-2.5 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Derived strictly from authentic recorded fare snapshots. Missing milestones remain unavailable (never estimated or predicted).</span>
+                      </span>
+                      <span className="text-[10px] font-semibold text-slate-700">
+                        Cadence: ~3h collection cycle
+                      </span>
+                    </div>
+                  </div>
+
                   {/* Daily Minimum Fare Comparison Curve */}
                   <div className="p-4 sm:p-5 bg-white border border-slate-200 rounded-xl">
                     <div className="flex items-center justify-between mb-4">
@@ -379,8 +439,9 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
 
                     <div className="h-48 flex items-end gap-2 pt-6 pb-2 px-2 border-b border-slate-100">
                       {data.dateBreakdown.map(d => {
-                        const maxVal = Math.max(...data.dateBreakdown.map(x => x.minPrice)) * 1.1;
-                        const heightPct = Math.max(15, Math.round((d.minPrice / maxVal) * 100));
+                        const validPrices = data.dateBreakdown.filter(x => x.minPrice !== null).map(x => x.minPrice as number);
+                        const maxVal = (validPrices.length > 0 ? Math.max(...validPrices) : 10000) * 1.1;
+                        const heightPct = d.minPrice !== null ? Math.max(15, Math.round((d.minPrice / maxVal) * 100)) : 4;
                         const isSelected = selectedDate === d.date;
                         return (
                           <div
@@ -389,14 +450,16 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                             className="flex-1 flex flex-col items-center cursor-pointer group h-full justify-end"
                           >
                             <span className="text-[10px] font-bold text-slate-700 mb-1 opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
-                              ₹{d.minPrice.toLocaleString('en-IN')}
+                              {d.minPrice !== null ? `₹${d.minPrice.toLocaleString('en-IN')}` : 'No data'}
                             </span>
                             <div
                               style={{ height: `${heightPct}%` }}
                               className={`w-full max-w-[40px] rounded-t-md transition-all ${
                                 isSelected
                                   ? 'bg-blue-600 shadow-md'
-                                  : 'bg-slate-200 group-hover:bg-blue-400'
+                                  : d.minPrice !== null
+                                    ? 'bg-slate-200 group-hover:bg-blue-400'
+                                    : 'bg-slate-100 border border-dashed border-slate-200'
                               }`}
                             />
                             <span className="text-[10px] text-slate-600 font-medium mt-2 whitespace-nowrap">
