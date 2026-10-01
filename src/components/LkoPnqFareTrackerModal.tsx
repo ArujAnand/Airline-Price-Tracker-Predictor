@@ -438,7 +438,7 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                       </div>
                     </div>
 
-                    <div className="h-48 flex items-end gap-2 pt-6 pb-2 px-2 border-b border-slate-100">
+                    <div className="h-56 flex items-end gap-1 sm:gap-2 pt-6 pb-2 px-1 sm:px-2 border-b border-slate-100">
                       {data.dateBreakdown.map(d => {
                         const validPrices = data.dateBreakdown.filter(x => x.minPrice !== null).map(x => x.minPrice as number);
                         const maxVal = (validPrices.length > 0 ? Math.max(...validPrices) : 10000) * 1.1;
@@ -450,8 +450,21 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                             onClick={() => setSelectedDate(d.date)}
                             className="flex-1 flex flex-col items-center cursor-pointer group h-full justify-end"
                           >
-                            <span className="text-[10px] font-bold text-slate-700 mb-1 opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
-                              {d.minPrice !== null ? `₹${d.minPrice.toLocaleString('en-IN')}` : 'No data'}
+                            <span className={`text-[9px] sm:text-[10px] font-bold mb-1 transition text-center whitespace-nowrap ${
+                              isSelected
+                                ? 'text-blue-700'
+                                : d.minPrice !== null
+                                  ? 'text-slate-700 group-hover:text-blue-600'
+                                  : 'text-slate-400'
+                            }`}>
+                              {d.minPrice !== null ? (
+                                <>
+                                  <span className="hidden md:inline">₹{d.minPrice.toLocaleString('en-IN')}</span>
+                                  <span className="md:hidden">₹{(d.minPrice / 1000).toFixed(1)}k</span>
+                                </>
+                              ) : (
+                                '—'
+                              )}
                             </span>
                             <div
                               style={{ height: `${heightPct}%` }}
@@ -459,11 +472,13 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                                 isSelected
                                   ? 'bg-blue-600 shadow-md'
                                   : d.minPrice !== null
-                                    ? 'bg-slate-200 group-hover:bg-blue-400'
+                                    ? 'bg-blue-100 group-hover:bg-blue-400'
                                     : 'bg-slate-100 border border-dashed border-slate-200'
                               }`}
                             />
-                            <span className="text-[10px] text-slate-600 font-medium mt-2 whitespace-nowrap">
+                            <span className={`text-[10px] font-medium mt-2 whitespace-nowrap ${
+                              isSelected ? 'text-blue-700 font-bold' : 'text-slate-600'
+                            }`}>
                               {d.date.slice(8)} Nov
                             </span>
                           </div>
