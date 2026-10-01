@@ -87,7 +87,7 @@ export interface LkoPnqTrendSummary {
 class LkoPnqFareTrackerService {
   private cachedData: LkoPnqTrendSummary | null = null;
   private cacheExpiryMs = 0;
-  private readonly CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes cache
+  private readonly CACHE_TTL_MS = 3 * 60 * 60 * 1000; // 3 hours cache to conserve Firestore read quota
   private cacheFilePath = path.join(process.cwd(), 'server', 'data', 'lko_pnq_cache.json');
 
   constructor() {

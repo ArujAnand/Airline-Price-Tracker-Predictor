@@ -9,7 +9,7 @@ interface CacheEntry {
 }
 
 const liveCache = new Map<string, CacheEntry>();
-const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+const CACHE_TTL_MS = 3 * 60 * 60 * 1000; // 3 hours (aligned with aggregator collection cycle)
 
 /**
  * Normalizes airline name and assigns standard IATA code and aircraft
