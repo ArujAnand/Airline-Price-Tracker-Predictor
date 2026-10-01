@@ -112,7 +112,7 @@ export function getGeminiPoolStatus(): {
 
 // In-memory cache for AI analysis to avoid redundant API hits and mitigate rate limits / 503 spikes
 const aiAnalysisCache = new Map<string, { text: string; timestamp: number; model?: string; keyLabel?: string }>();
-const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+const CACHE_TTL_MS = 3 * 60 * 60 * 1000; // 3 hours
 
 export async function runPricePrediction(
   origin: string,

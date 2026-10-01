@@ -476,14 +476,15 @@ class FlightAggregatorEngine {
   }
 
   private liveScrapedCache: Map<string, { timestamp: number; flights: Flight[] }> = new Map();
+  private readonly CACHE_TTL_MS = 3 * 60 * 60 * 1000; // 3 hours
 
   // Asynchronous live scraper integration (Google Flights / SerpApi / SearchApi)
   public async getFlightsAsync(origin: string, destination: string, departureDateStr: string): Promise<Flight[]> {
     const routeKey = `${origin.toUpperCase()}-${destination.toUpperCase()}-${departureDateStr}`;
     
-    // Check short TTL memory cache first
+    // Check 3-hour TTL memory cache first
     const cached = this.liveScrapedCache.get(routeKey);
-    if (cached && Date.now() - cached.timestamp < 10 * 60 * 1000) {
+    if (cached && Date.now() - cached.timestamp < this.CACHE_TTL_MS) {
       return cached.flights;
     }
 
@@ -543,7 +544,7 @@ class FlightAggregatorEngine {
   public getFlights(origin: string, destination: string, departureDateStr: string): Flight[] {
     const routeKeyWithDate = `${origin.toUpperCase()}-${destination.toUpperCase()}-${departureDateStr}`;
     const cached = this.liveScrapedCache.get(routeKeyWithDate);
-    if (cached && cached.flights.length > 0) {
+    if (cached && cached.flights.length > 0 && Date.now() - cached.timestamp < this.CACHE_TTL_MS) {
       return cached.flights;
     }
 
