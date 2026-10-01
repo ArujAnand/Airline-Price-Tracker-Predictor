@@ -504,7 +504,7 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                     </div>
 
                     {/* SVG Chart Container */}
-                    <div className="relative w-full h-64 border border-slate-100 rounded-lg bg-slate-50/50 overflow-hidden">
+                    <div className="relative w-full h-80 border border-slate-100 rounded-lg bg-slate-50/50 overflow-hidden">
                       {filteredObservations.length === 0 ? (
                         <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">
                           No observations matching filter criteria.
@@ -523,87 +523,196 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                           const priceSpan = Math.max(1, maxP - minP);
 
                           const width = 800;
-                          const height = 240;
-                          const padX = 40;
-                          const padY = 25;
+                          const height = 290;
+                          const padLeft = 65;
+                          const padRight = 30;
+                          const padTop = 20;
+                          const padBottom = 45;
+                          const chartW = width - padLeft - padRight;
+                          const chartH = height - padTop - padBottom;
+
+                          // Time intervals for X-axis ticks (4 ticks)
+                          const timeTicks = [0, 0.33, 0.66, 1].map(ratio => {
+                            const tVal = minTime + ratio * timeSpan;
+                            const d = new Date(tVal);
+                            const day = d.getDate().toString().padStart(2, '0');
+                            const month = d.toLocaleString('en-IN', { month: 'short' });
+                            const hours = d.getHours().toString().padStart(2, '0');
+                            const mins = d.getMinutes().toString().padStart(2, '0');
+                            return {
+                              ratio,
+                              x: padLeft + ratio * chartW,
+                              label: `${day} ${month}`,
+                              time: `${hours}:${mins}`
+                            };
+                          });
 
                           return (
-                            <svg
-                              viewBox={`0 0 ${width} ${height}`}
-                              className="w-full h-full"
-                              preserveAspectRatio="none"
-                            >
-                              {/* Horizontal Grid lines */}
-                              {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
-                                const y = padY + (1 - ratio) * (height - 2 * padY);
-                                const pVal = Math.round(minP + ratio * priceSpan);
-                                return (
-                                  <g key={ratio}>
+                            <>
+                              <svg
+                                viewBox={`0 0 ${width} ${height}`}
+                                className="w-full h-full"
+                                preserveAspectRatio="none"
+                              >
+                                {/* Vertical Time Grid lines & Date Labels */}
+                                {timeTicks.map((tick, idx) => (
+                                  <g key={idx}>
                                     <line
-                                      x1={padX}
-                                      y1={y}
-                                      x2={width - padX}
-                                      y2={y}
+                                      x1={tick.x}
+                                      y1={padTop}
+                                      x2={tick.x}
+                                      y2={padTop + chartH}
                                       stroke="#e2e8f0"
-                                      strokeDasharray="4 4"
+                                      strokeDasharray="3 3"
                                       strokeWidth="1"
                                     />
                                     <text
-                                      x={padX - 6}
-                                      y={y + 4}
-                                      textAnchor="end"
+                                      x={tick.x}
+                                      y={padTop + chartH + 16}
+                                      textAnchor="middle"
                                       fontSize="10"
+                                      fontWeight="bold"
+                                      fill="#475569"
+                                    >
+                                      {tick.label}
+                                    </text>
+                                    <text
+                                      x={tick.x}
+                                      y={padTop + chartH + 28}
+                                      textAnchor="middle"
+                                      fontSize="9"
                                       fill="#94a3b8"
                                       fontFamily="monospace"
                                     >
-                                      ₹{pVal.toLocaleString('en-IN')}
+                                      {tick.time}
                                     </text>
                                   </g>
-                                );
-                              })}
+                                ))}
 
-                              {/* Data points */}
-                              {obsList.map((obs, idx) => {
-                                const t = new Date(obs.timestamp).getTime();
-                                const x = padX + ((t - minTime) / timeSpan) * (width - 2 * padX);
-                                const y = padY + (1 - (obs.price - minP) / priceSpan) * (height - 2 * padY);
+                                {/* Horizontal Fare Grid lines & Y-axis Labels */}
+                                {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
+                                  const y = padTop + (1 - ratio) * chartH;
+                                  const pVal = Math.round(minP + ratio * priceSpan);
+                                  return (
+                                    <g key={ratio}>
+                                      <line
+                                        x1={padLeft}
+                                        y1={y}
+                                        x2={width - padRight}
+                                        y2={y}
+                                        stroke="#e2e8f0"
+                                        strokeDasharray="4 4"
+                                        strokeWidth="1"
+                                      />
+                                      <text
+                                        x={padLeft - 8}
+                                        y={y + 4}
+                                        textAnchor="end"
+                                        fontSize="10"
+                                        fill="#64748b"
+                                        fontWeight="500"
+                                        fontFamily="monospace"
+                                      >
+                                        ₹{pVal.toLocaleString('en-IN')}
+                                      </text>
+                                    </g>
+                                  );
+                                })}
 
-                                const color = obs.airline === 'IndiGo'
-                                  ? '#2563eb'
-                                  : obs.airline === 'Air India'
-                                  ? '#dc2626'
-                                  : obs.airline === 'Air India Express'
-                                  ? '#ea580c'
-                                  : '#059669';
+                                {/* Data points */}
+                                {obsList.map((obs, idx) => {
+                                  const t = new Date(obs.timestamp).getTime();
+                                  const x = padLeft + ((t - minTime) / timeSpan) * chartW;
+                                  const y = padTop + (1 - (obs.price - minP) / priceSpan) * chartH;
 
-                                return (
-                                  <circle
-                                    key={obs.id || idx}
-                                    cx={x}
-                                    cy={y}
-                                    r="4"
-                                    fill={color}
-                                    fillOpacity="0.8"
-                                    stroke="#ffffff"
-                                    strokeWidth="1.5"
-                                    className="cursor-pointer hover:r-6 transition-all"
-                                    onMouseEnter={(e) => {
-                                      const rect = e.currentTarget.getBoundingClientRect();
-                                      setHoveredPoint({
-                                        x: rect.left,
-                                        y: rect.top,
-                                        price: obs.price,
-                                        timestamp: obs.timestamp,
-                                        flightNumber: obs.flightNumber,
-                                        airline: obs.airline,
-                                        departureDate: obs.departureDate
-                                      });
-                                    }}
-                                    onMouseLeave={() => setHoveredPoint(null)}
-                                  />
-                                );
-                              })}
-                            </svg>
+                                  const color = obs.airline === 'IndiGo'
+                                    ? '#2563eb'
+                                    : obs.airline === 'Air India'
+                                    ? '#dc2626'
+                                    : obs.airline === 'Air India Express'
+                                    ? '#ea580c'
+                                    : '#059669';
+
+                                  return (
+                                    <circle
+                                      key={obs.id || idx}
+                                      cx={x}
+                                      cy={y}
+                                      r="4.5"
+                                      fill={color}
+                                      fillOpacity="0.85"
+                                      stroke="#ffffff"
+                                      strokeWidth="1.5"
+                                      className="cursor-pointer hover:r-6 hover:fill-opacity-100 transition-all"
+                                      onMouseEnter={(e) => {
+                                        const rect = e.currentTarget.ownerSVGElement?.getBoundingClientRect() || e.currentTarget.getBoundingClientRect();
+                                        const pointRect = e.currentTarget.getBoundingClientRect();
+                                        setHoveredPoint({
+                                          x: pointRect.left - rect.left + pointRect.width / 2,
+                                          y: pointRect.top - rect.top,
+                                          price: obs.price,
+                                          timestamp: obs.timestamp,
+                                          flightNumber: obs.flightNumber,
+                                          airline: obs.airline,
+                                          departureDate: obs.departureDate
+                                        });
+                                      }}
+                                      onClick={() => {
+                                        setHoveredPoint({
+                                          x: x,
+                                          y: y,
+                                          price: obs.price,
+                                          timestamp: obs.timestamp,
+                                          flightNumber: obs.flightNumber,
+                                          airline: obs.airline,
+                                          departureDate: obs.departureDate
+                                        });
+                                      }}
+                                      onMouseLeave={() => setHoveredPoint(null)}
+                                    />
+                                  );
+                                })}
+                              </svg>
+
+                              {/* Floating Tooltip displaying exact Date & Time of Observation */}
+                              {hoveredPoint && (
+                                <div
+                                  style={{
+                                    left: `${Math.min(80, Math.max(20, (hoveredPoint.x / (width || 800)) * 100))}%`,
+                                    top: `${Math.max(10, Math.min(65, (hoveredPoint.y / (height || 290)) * 100))}%`
+                                  }}
+                                  className="absolute z-20 pointer-events-none transform -translate-x-1/2 -translate-y-full mb-2 bg-slate-900/95 backdrop-blur text-white text-xs rounded-lg py-2 px-3 shadow-xl border border-slate-700 min-w-[200px]"
+                                >
+                                  <div className="flex items-center justify-between border-b border-slate-700 pb-1.5 mb-1.5">
+                                    <span className="font-bold text-blue-400">{hoveredPoint.flightNumber}</span>
+                                    <span className="text-[11px] text-slate-300">{hoveredPoint.airline}</span>
+                                  </div>
+                                  <div className="space-y-1 text-[11px]">
+                                    <div className="flex justify-between">
+                                      <span className="text-slate-400">Observed At:</span>
+                                      <span className="font-semibold text-amber-300 font-mono">
+                                        {new Date(hoveredPoint.timestamp).toLocaleString('en-IN', {
+                                          day: '2-digit',
+                                          month: 'short',
+                                          year: 'numeric',
+                                          hour: '2-digit',
+                                          minute: '2-digit',
+                                          hour12: true
+                                        })}
+                                      </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span className="text-slate-400">Departure:</span>
+                                      <span className="text-slate-200 font-mono">{hoveredPoint.departureDate}</span>
+                                    </div>
+                                    <div className="flex justify-between pt-1 border-t border-slate-800">
+                                      <span className="text-slate-400">Recorded Fare:</span>
+                                      <span className="text-emerald-400 font-bold font-mono">₹{hoveredPoint.price.toLocaleString('en-IN')}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </>
                           );
                         })()
                       )}
