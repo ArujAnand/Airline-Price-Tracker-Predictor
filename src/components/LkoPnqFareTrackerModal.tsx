@@ -599,18 +599,18 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                     })()}
                   </div>
 
-                  {/* Cumulative Observations by Airline Chart */}
+                  {/* Observation Volume by Airline on Each Date Chart */}
                   <div className="p-4 sm:p-5 bg-white border border-slate-200 rounded-xl relative">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                       <div>
                         <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                          <span>Cumulative Observations by Airline</span>
-                          <span className="text-[11px] font-normal px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-100">
-                            Volume Growth
+                          <span>Observation Volume by Airline</span>
+                          <span className="text-[11px] font-normal px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-100">
+                            Daily Volume per Date
                           </span>
                         </h3>
                         <p className="text-xs text-slate-500 mt-0.5">
-                          Total authentic price observations accumulated for each airline across collection dates
+                          Total authentic price observations captured for each airline on each specific date
                         </p>
                       </div>
                       <div className="flex items-center gap-2 text-xs">
@@ -620,7 +620,7 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                       </div>
                     </div>
 
-                    {/* SVG Cumulative Volume Chart Container */}
+                    {/* SVG Volume Chart Container */}
                     <div className="relative w-full h-80 border border-slate-100 rounded-lg bg-slate-50/50 overflow-hidden">
                       {filteredObservations.length === 0 ? (
                         <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">
@@ -648,27 +648,25 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                             ? allAirlines.filter(a => obsList.some(o => o.airline === a))
                             : [selectedAirline];
 
-                          // 2. Compute progressive cumulative volume per airline
-                          let maxObsValue = 10;
+                          // 2. Compute exact observation volume on each date per airline
+                          let maxObsValue = 5;
                           const airlineSeries = activeAirlines.map(airlineName => {
                             const airlineObs = obsList.filter(o => o.airline === airlineName);
-                            let runningTotal = 0;
                             const points = timelineDays.map(day => {
                               const dayCount = airlineObs.filter(o => o.timestamp.startsWith(day)).length;
-                              runningTotal += dayCount;
-                              if (runningTotal > maxObsValue) maxObsValue = runningTotal;
+                              if (dayCount > maxObsValue) maxObsValue = dayCount;
                               return {
                                 day,
-                                dailyCount: dayCount,
-                                cumulativeCount: runningTotal
+                                count: dayCount
                               };
                             });
 
                             const cfg = AIRLINE_CONFIG[airlineName] || { stroke: '#64748b', fill: '#94a3b8', bg: 'bg-slate-600', text: 'text-slate-600' };
-                            return { airlineName, points, cfg, total: runningTotal };
+                            const totalForAirline = airlineObs.length;
+                            return { airlineName, points, cfg, total: totalForAirline };
                           });
 
-                          const maxVal = Math.max(10, Math.ceil(maxObsValue * 1.15));
+                          const maxVal = Math.max(8, Math.ceil(maxObsValue * 1.2));
 
                           const width = 800;
                           const height = 290;
@@ -683,7 +681,7 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                           const seriesWithCoords = airlineSeries.map(s => {
                             const coords = s.points.map((p, idx) => {
                               const x = padLeft + (timelineDays.length > 1 ? (idx / (timelineDays.length - 1)) * chartW : chartW / 2);
-                              const y = padTop + (1 - (p.cumulativeCount / maxVal)) * chartH;
+                              const y = padTop + (1 - (p.count / maxVal)) * chartH;
                               return { ...p, x, y };
                             });
 
@@ -701,15 +699,6 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                                 className="w-full h-full"
                                 preserveAspectRatio="none"
                               >
-                                <defs>
-                                  {seriesWithCoords.map(s => (
-                                    <linearGradient key={`grad-${s.airlineName}`} id={`grad-${s.airlineName.replace(/\s+/g, '')}`} x1="0" y1="0" x2="0" y2="1">
-                                      <stop offset="0%" stopColor={s.cfg.stroke} stopOpacity="0.2" />
-                                      <stop offset="100%" stopColor={s.cfg.stroke} stopOpacity="0.0" />
-                                    </linearGradient>
-                                  ))}
-                                </defs>
-
                                 {/* Vertical Timeline Day Gridlines & Labels */}
                                 {timelineDays.map((day, idx) => {
                                   const x = padLeft + (timelineDays.length > 1 ? (idx / (timelineDays.length - 1)) * chartW : chartW / 2);
@@ -740,7 +729,7 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                                   );
                                 })}
 
-                                {/* Horizontal Cumulative Count Gridlines & Y-axis Labels */}
+                                {/* Horizontal Count Gridlines & Y-axis Labels */}
                                 {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
                                   const y = padTop + (1 - ratio) * chartH;
                                   const countVal = Math.round(ratio * maxVal);
@@ -770,7 +759,7 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                                   );
                                 })}
 
-                                {/* Multi-Airline Cumulative Line Paths */}
+                                {/* Multi-Airline Line Paths */}
                                 {seriesWithCoords.map(series => {
                                   if (!series.pathD) return null;
                                   return (
@@ -779,16 +768,16 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                                         d={series.pathD}
                                         fill="none"
                                         stroke={series.cfg.stroke}
-                                        strokeWidth="3"
+                                        strokeWidth="2.5"
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
-                                        className="transition-all opacity-90 hover:opacity-100 drop-shadow-xs"
+                                        className="transition-all opacity-90 hover:opacity-100"
                                       />
                                     </g>
                                   );
                                 })}
 
-                                {/* Daily Cumulative Observation Node Points */}
+                                {/* Daily Observation Node Points */}
                                 {seriesWithCoords.map(series =>
                                   series.coords.map(pt => (
                                     <circle
@@ -808,8 +797,8 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                                           y: pointRect.top - rect.top,
                                           airline: series.airlineName,
                                           date: pt.day,
-                                          cumulativeCount: pt.cumulativeCount,
-                                          dailyCount: pt.dailyCount
+                                          cumulativeCount: pt.count,
+                                          dailyCount: pt.count
                                         });
                                       }}
                                       onClick={() => {
@@ -818,8 +807,8 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                                           y: pt.y,
                                           airline: series.airlineName,
                                           date: pt.day,
-                                          cumulativeCount: pt.cumulativeCount,
-                                          dailyCount: pt.dailyCount
+                                          cumulativeCount: pt.count,
+                                          dailyCount: pt.count
                                         });
                                       }}
                                       onMouseLeave={() => setHoveredPoint(null)}
@@ -828,7 +817,7 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                                 )}
                               </svg>
 
-                              {/* Floating Tooltip displaying Cumulative Observation Volume */}
+                              {/* Floating Tooltip displaying Observation Volume on that Date */}
                               {hoveredPoint && (
                                 <div
                                   style={{
@@ -845,12 +834,8 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                                   </div>
                                   <div className="space-y-1 text-[11px]">
                                     <div className="flex justify-between">
-                                      <span className="text-slate-400">Cumulative Volume:</span>
+                                      <span className="text-slate-400">Observations on this Date:</span>
                                       <span className="font-bold text-emerald-400 font-mono">{hoveredPoint.cumulativeCount} observations</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                      <span className="text-slate-400">Captured on this date:</span>
-                                      <span className="font-semibold text-amber-300 font-mono">+{hoveredPoint.dailyCount} new obs</span>
                                     </div>
                                   </div>
                                 </div>

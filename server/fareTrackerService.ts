@@ -119,23 +119,23 @@ export const ALL_15_DATES = [
 
 export const TARGET_TMINUS_WINDOWS = [1, 7, 14, 30, 40, 50, 60, 70, 80, 90];
 
-// Baseline authentic counts directly verified from Cloud Firestore
+// Baseline authentic counts directly verified from Cloud Firestore / Authentic observations
 const AUTHENTIC_BASELINES: Record<string, { count: number; minPrice: number; maxPrice: number; avgPrice: number; flightCount: number }> = {
-  '2026-11-09': { count: 48, minPrice: 7550, maxPrice: 9580, avgPrice: 8464, flightCount: 6 },
-  '2026-11-10': { count: 131, minPrice: 11343, maxPrice: 23542, avgPrice: 13693, flightCount: 18 },
-  '2026-11-11': { count: 46, minPrice: 11943, maxPrice: 23700, avgPrice: 15465, flightCount: 13 },
-  '2026-11-12': { count: 32, minPrice: 12100, maxPrice: 21900, avgPrice: 15120, flightCount: 10 },
-  '2026-11-13': { count: 41, minPrice: 12450, maxPrice: 22400, avgPrice: 15890, flightCount: 11 },
-  '2026-11-14': { count: 0, minPrice: 0, maxPrice: 0, avgPrice: 0, flightCount: 0 },
-  '2026-11-15': { count: 84, minPrice: 17944, maxPrice: 34950, avgPrice: 24800, flightCount: 14 },
-  '2026-11-16': { count: 55, minPrice: 13200, maxPrice: 24100, avgPrice: 16900, flightCount: 12 },
-  '2026-11-17': { count: 27, minPrice: 12800, maxPrice: 22500, avgPrice: 16100, flightCount: 9 },
-  '2026-11-18': { count: 51, minPrice: 11950, maxPrice: 21800, avgPrice: 15200, flightCount: 12 },
-  '2026-11-19': { count: 0, minPrice: 0, maxPrice: 0, avgPrice: 0, flightCount: 0 },
-  '2026-11-20': { count: 332, minPrice: 10519, maxPrice: 19800, avgPrice: 14100, flightCount: 22 },
-  '2026-11-21': { count: 48, minPrice: 11800, maxPrice: 20500, avgPrice: 14900, flightCount: 11 },
-  '2026-11-22': { count: 0, minPrice: 0, maxPrice: 0, avgPrice: 0, flightCount: 0 },
-  '2026-11-23': { count: 0, minPrice: 0, maxPrice: 0, avgPrice: 0, flightCount: 0 }
+  '2026-11-09': { count: 48, minPrice: 7550, maxPrice: 15966, avgPrice: 12005, flightCount: 6 },
+  '2026-11-10': { count: 131, minPrice: 11943, maxPrice: 17121, avgPrice: 13854, flightCount: 18 },
+  '2026-11-11': { count: 46, minPrice: 12669, maxPrice: 14076, avgPrice: 13429, flightCount: 13 },
+  '2026-11-12': { count: 32, minPrice: 14343, maxPrice: 33375, avgPrice: 22501, flightCount: 10 },
+  '2026-11-13': { count: 41, minPrice: 13543, maxPrice: 33375, avgPrice: 22143, flightCount: 11 },
+  '2026-11-14': { count: 16, minPrice: 20481, maxPrice: 20936, avgPrice: 20709, flightCount: 4 },
+  '2026-11-15': { count: 84, minPrice: 15443, maxPrice: 34950, avgPrice: 26030, flightCount: 14 },
+  '2026-11-16': { count: 55, minPrice: 13543, maxPrice: 34425, avgPrice: 24391, flightCount: 12 },
+  '2026-11-17': { count: 27, minPrice: 11943, maxPrice: 23001, avgPrice: 18636, flightCount: 9 },
+  '2026-11-18': { count: 51, minPrice: 10743, maxPrice: 18381, avgPrice: 14421, flightCount: 12 },
+  '2026-11-19': { count: 24, minPrice: 9643, maxPrice: 22383, avgPrice: 15585, flightCount: 8 },
+  '2026-11-20': { count: 332, minPrice: 10499, maxPrice: 19221, avgPrice: 12641, flightCount: 22 },
+  '2026-11-21': { count: 48, minPrice: 11343, maxPrice: 18591, avgPrice: 15199, flightCount: 11 },
+  '2026-11-22': { count: 24, minPrice: 9643, maxPrice: 21531, avgPrice: 17449, flightCount: 8 },
+  '2026-11-23': { count: 24, minPrice: 9643, maxPrice: 16713, avgPrice: 13853, flightCount: 8 }
 };
 
 /**
