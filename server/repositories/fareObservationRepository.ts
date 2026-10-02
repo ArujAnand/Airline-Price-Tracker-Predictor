@@ -257,13 +257,13 @@ export class FareObservationRepository {
       }
     }
 
-    // 3. Fallback to Firestore ONLY if cache and Supabase have 0 records and quota is not exhausted
-    if (obsMap.size === 0 && Date.now() - this.lastFirestoreQuotaError > 10 * 60 * 1000) {
+    // 3. Always query Firebase Firestore snapshots collection (with quota protection)
+    if (Date.now() - this.lastFirestoreQuotaError > 10 * 60 * 1000) {
       try {
         const colRef = collection(db, 'snapshots');
-        let q = query(colRef, where('routeId', '==', route.toUpperCase()), fsLimit(150));
+        let q = query(colRef, where('routeId', '==', route.toUpperCase()), fsLimit(300));
         if (departureDateStart) {
-          q = query(colRef, where('routeId', '==', route.toUpperCase()), where('departureDate', '>=', departureDateStart), fsLimit(150));
+          q = query(colRef, where('routeId', '==', route.toUpperCase()), where('departureDate', '>=', departureDateStart), fsLimit(300));
         }
         const snap = await getDocs(q);
         snap.forEach(docSnap => {
@@ -290,7 +290,7 @@ export class FareObservationRepository {
         });
       } catch (err: any) {
         this.lastFirestoreQuotaError = Date.now();
-        console.warn('[Repository] Firestore quota limit reached or unavailable; serving data strictly from Supabase and verified cache.');
+        console.warn('[Repository] Firestore query notice:', err?.message || err);
       }
     }
 
