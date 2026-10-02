@@ -44,6 +44,17 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
     cumulativeCount: number;
     dailyCount: number;
   } | null>(null);
+  const [showMaxLine, setShowMaxLine] = useState<boolean>(true);
+  const [showCurrentLine, setShowCurrentLine] = useState<boolean>(true);
+  const [showMinLine, setShowMinLine] = useState<boolean>(true);
+  const [hoveredDynamics, setHoveredDynamics] = useState<{
+    x: number;
+    y: number;
+    date: string;
+    minPrice: number | null;
+    currentPrice: number | null;
+    maxPrice: number | null;
+  } | null>(null);
 
   const fetchData = async (refresh = false) => {
     setLoading(true);
@@ -352,7 +363,7 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                     return (
                       <button
                         key={d.date}
-                        onClick={() => setSelectedDate(d.date)}
+                        onClick={() => setSelectedDate(isSelected ? 'ALL' : d.date)}
                         className={`px-2.5 py-1.5 rounded-lg text-xs transition border flex flex-col items-start ${
                           isSelected
                             ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
@@ -435,19 +446,34 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                           Authentic fare range showing all-time Minimum, all-time Maximum, and Current lowest fare for each date (9–23 Nov 2026)
                         </p>
                       </div>
-                      <div className="flex items-center gap-3 text-xs">
-                        <span className="flex items-center gap-1.5 text-slate-600">
+                      <div className="flex items-center gap-2 text-xs">
+                        <button
+                          onClick={() => setShowMaxLine(!showMaxLine)}
+                          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition ${
+                            showMaxLine ? 'bg-rose-50 text-rose-700 border-rose-200 font-medium' : 'bg-slate-50 text-slate-400 border-slate-200 opacity-60'
+                          }`}
+                        >
                           <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block" />
                           <span>Max</span>
-                        </span>
-                        <span className="flex items-center gap-1.5 text-slate-600 font-medium">
+                        </button>
+                        <button
+                          onClick={() => setShowCurrentLine(!showCurrentLine)}
+                          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition ${
+                            showCurrentLine ? 'bg-blue-50 text-blue-700 border-blue-200 font-medium' : 'bg-slate-50 text-slate-400 border-slate-200 opacity-60'
+                          }`}
+                        >
                           <span className="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block shadow-sm" />
                           <span>Current</span>
-                        </span>
-                        <span className="flex items-center gap-1.5 text-slate-600">
+                        </button>
+                        <button
+                          onClick={() => setShowMinLine(!showMinLine)}
+                          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition ${
+                            showMinLine ? 'bg-emerald-50 text-emerald-700 border-emerald-200 font-medium' : 'bg-slate-50 text-slate-400 border-slate-200 opacity-60'
+                          }`}
+                        >
                           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
                           <span>Min</span>
-                        </span>
+                        </button>
                       </div>
                     </div>
 
@@ -480,149 +506,213 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                         const minPathD = minPoints.filter(p => p.y !== null).map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y?.toFixed(1)}`).join(' ');
 
                         return (
-                          <svg
-                            viewBox={`0 0 ${width} ${height}`}
-                            className="w-full h-full"
-                            preserveAspectRatio="none"
-                          >
-                            {/* Vertical Gridlines & Date Labels */}
-                            {days.map((d, idx) => {
-                              const x = getX(idx);
-                              const isSelected = selectedDate === d.date;
-                              return (
-                                <g key={d.date}>
-                                  <line
-                                    x1={x}
-                                    y1={padTop}
-                                    x2={x}
-                                    y2={padTop + chartH}
-                                    stroke={isSelected ? '#3b82f6' : '#e2e8f0'}
-                                    strokeDasharray={isSelected ? 'none' : '3 3'}
-                                    strokeWidth={isSelected ? '1.5' : '1'}
-                                  />
-                                  <text
-                                    x={x}
-                                    y={padTop + chartH + 18}
-                                    textAnchor="middle"
-                                    fontSize="10"
-                                    fontWeight={isSelected ? 'bold' : '600'}
-                                    fill={isSelected ? '#2563eb' : '#475569'}
+                          <>
+                            <svg
+                              viewBox={`0 0 ${width} ${height}`}
+                              className="w-full h-full"
+                              preserveAspectRatio="none"
+                            >
+                              {/* Vertical Gridlines & Date Labels */}
+                              {days.map((d, idx) => {
+                                const x = getX(idx);
+                                const isSelected = selectedDate === d.date;
+                                return (
+                                  <g key={d.date}>
+                                    <line
+                                      x1={x}
+                                      y1={padTop}
+                                      x2={x}
+                                      y2={padTop + chartH}
+                                      stroke={isSelected ? '#3b82f6' : '#e2e8f0'}
+                                      strokeDasharray={isSelected ? 'none' : '3 3'}
+                                      strokeWidth={isSelected ? '1.5' : '1'}
+                                    />
+                                    <text
+                                      x={x}
+                                      y={padTop + chartH + 18}
+                                      textAnchor="middle"
+                                      fontSize="10"
+                                      fontWeight={isSelected ? 'bold' : '600'}
+                                      fill={isSelected ? '#2563eb' : '#475569'}
+                                    >
+                                      {d.date.slice(8)} Nov
+                                    </text>
+                                  </g>
+                                );
+                              })}
+
+                              {/* Horizontal Fare Gridlines & Y-axis Labels */}
+                              {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
+                                const y = padTop + (1 - ratio) * chartH;
+                                const fareVal = Math.round(minVal + ratio * (maxVal - minVal));
+                                return (
+                                  <g key={ratio}>
+                                    <line
+                                      x1={padLeft}
+                                      y1={y}
+                                      x2={width - padRight}
+                                      y2={y}
+                                      stroke="#e2e8f0"
+                                      strokeDasharray="4 4"
+                                      strokeWidth="1"
+                                    />
+                                    <text
+                                      x={padLeft - 8}
+                                      y={y + 4}
+                                      textAnchor="end"
+                                      fontSize="9.5"
+                                      fill="#64748b"
+                                      fontWeight="500"
+                                      fontFamily="monospace"
+                                    >
+                                      ₹{(fareVal / 1000).toFixed(0)}k
+                                    </text>
+                                  </g>
+                                );
+                              })}
+
+                              {/* Max Fare Line (Rose) */}
+                              {showMaxLine && maxPathD && (
+                                <path
+                                  d={maxPathD}
+                                  fill="none"
+                                  stroke="#ef4444"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              )}
+
+                              {/* Current Lowest Fare Line (Blue) */}
+                              {showCurrentLine && curPathD && (
+                                <path
+                                  d={curPathD}
+                                  fill="none"
+                                  stroke="#2563eb"
+                                  strokeWidth="2.5"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              )}
+
+                              {/* Min Fare Line (Emerald) */}
+                              {showMinLine && minPathD && (
+                                <path
+                                  d={minPathD}
+                                  fill="none"
+                                  stroke="#10b981"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              )}
+
+                              {/* Interactive Nodes for Max, Current, Min */}
+                              {days.map((d, idx) => {
+                                const x = getX(idx);
+                                const isSelected = selectedDate === d.date;
+                                return (
+                                  <g 
+                                    key={`nodes-${d.date}`} 
+                                    onClick={() => setSelectedDate(isSelected ? 'ALL' : d.date)}
+                                    onMouseEnter={(e) => {
+                                      const rect = e.currentTarget.ownerSVGElement?.getBoundingClientRect() || e.currentTarget.getBoundingClientRect();
+                                      const svgX = (x / width) * 100;
+                                      const svgY = ((getY(d.currentPrice || d.minPrice || minVal)) / height) * 100;
+                                      setHoveredDynamics({
+                                        x: svgX,
+                                        y: svgY,
+                                        date: d.date,
+                                        minPrice: d.minPrice,
+                                        currentPrice: d.currentPrice,
+                                        maxPrice: d.maxPrice
+                                      });
+                                    }}
+                                    onMouseLeave={() => setHoveredDynamics(null)}
+                                    className="cursor-pointer"
                                   >
-                                    {d.date.slice(8)} Nov
-                                  </text>
-                                </g>
-                              );
-                            })}
+                                    {/* Max Node */}
+                                    {showMaxLine && d.maxPrice !== null && (
+                                      <circle
+                                        cx={x}
+                                        cy={getY(d.maxPrice)}
+                                        r={isSelected ? "5.5" : "4"}
+                                        fill="#ef4444"
+                                        stroke="#ffffff"
+                                        strokeWidth="1.5"
+                                      />
+                                    )}
+                                    {/* Current Node */}
+                                    {showCurrentLine && d.currentPrice !== null && (
+                                      <circle
+                                        cx={x}
+                                        cy={getY(d.currentPrice)}
+                                        r={isSelected ? "6.5" : "5"}
+                                        fill="#2563eb"
+                                        stroke="#ffffff"
+                                        strokeWidth="2"
+                                      />
+                                    )}
+                                    {/* Min Node */}
+                                    {showMinLine && d.minPrice !== null && (
+                                      <circle
+                                        cx={x}
+                                        cy={getY(d.minPrice)}
+                                        r={isSelected ? "5.5" : "4"}
+                                        fill="#10b981"
+                                        stroke="#ffffff"
+                                        strokeWidth="1.5"
+                                      />
+                                    )}
+                                  </g>
+                                );
+                              })}
+                            </svg>
 
-                            {/* Horizontal Fare Gridlines & Y-axis Labels */}
-                            {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
-                              const y = padTop + (1 - ratio) * chartH;
-                              const fareVal = Math.round(minVal + ratio * (maxVal - minVal));
-                              return (
-                                <g key={ratio}>
-                                  <line
-                                    x1={padLeft}
-                                    y1={y}
-                                    x2={width - padRight}
-                                    y2={y}
-                                    stroke="#e2e8f0"
-                                    strokeDasharray="4 4"
-                                    strokeWidth="1"
-                                  />
-                                  <text
-                                    x={padLeft - 8}
-                                    y={y + 4}
-                                    textAnchor="end"
-                                    fontSize="9.5"
-                                    fill="#64748b"
-                                    fontWeight="500"
-                                    fontFamily="monospace"
-                                  >
-                                    ₹{(fareVal / 1000).toFixed(0)}k
-                                  </text>
-                                </g>
-                              );
-                            })}
-
-                            {/* Max Fare Line (Rose) */}
-                            {maxPathD && (
-                              <path
-                                d={maxPathD}
-                                fill="none"
-                                stroke="#ef4444"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            )}
-
-                            {/* Current Lowest Fare Line (Blue) */}
-                            {curPathD && (
-                              <path
-                                d={curPathD}
-                                fill="none"
-                                stroke="#2563eb"
-                                strokeWidth="2.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            )}
-
-                            {/* Min Fare Line (Emerald) */}
-                            {minPathD && (
-                              <path
-                                d={minPathD}
-                                fill="none"
-                                stroke="#10b981"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            )}
-
-                            {/* Interactive Nodes for Max, Current, Min */}
-                            {days.map((d, idx) => {
-                              const x = getX(idx);
-                              const isSelected = selectedDate === d.date;
-                              return (
-                                <g key={`nodes-${d.date}`} onClick={() => setSelectedDate(d.date)} className="cursor-pointer">
-                                  {/* Max Node */}
-                                  {d.maxPrice !== null && (
-                                    <circle
-                                      cx={x}
-                                      cy={getY(d.maxPrice)}
-                                      r={isSelected ? "5" : "3.5"}
-                                      fill="#ef4444"
-                                      stroke="#ffffff"
-                                      strokeWidth="1.5"
-                                    />
+                            {/* Floating Hover Tooltip for Dynamics */}
+                            {hoveredDynamics && (
+                              <div
+                                style={{
+                                  left: `${Math.min(85, Math.max(15, hoveredDynamics.x))}%`,
+                                  top: `${Math.min(75, Math.max(15, hoveredDynamics.y))}%`
+                                }}
+                                className="absolute z-30 pointer-events-none transform -translate-x-1/2 -translate-y-full mb-2 bg-slate-900/95 backdrop-blur text-white text-xs rounded-xl py-2.5 px-3.5 shadow-2xl border border-slate-700 min-w-[210px]"
+                              >
+                                <div className="flex items-center justify-between border-b border-slate-700 pb-1.5 mb-1.5 font-semibold text-blue-400">
+                                  <span>Departure: {new Date(hoveredDynamics.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                                </div>
+                                <div className="space-y-1 font-mono text-[11px]">
+                                  {showMaxLine && hoveredDynamics.maxPrice !== null && (
+                                    <div className="flex items-center justify-between text-rose-400">
+                                      <span className="flex items-center gap-1.5">
+                                        <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+                                        <span>Max Fare:</span>
+                                      </span>
+                                      <span className="font-bold">₹{hoveredDynamics.maxPrice.toLocaleString('en-IN')}</span>
+                                    </div>
                                   )}
-                                  {/* Current Node */}
-                                  {d.currentPrice !== null && (
-                                    <circle
-                                      cx={x}
-                                      cy={getY(d.currentPrice)}
-                                      r={isSelected ? "6" : "4.5"}
-                                      fill="#2563eb"
-                                      stroke="#ffffff"
-                                      strokeWidth="2"
-                                    />
+                                  {showCurrentLine && hoveredDynamics.currentPrice !== null && (
+                                    <div className="flex items-center justify-between text-blue-300">
+                                      <span className="flex items-center gap-1.5">
+                                        <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                                        <span>Current Lowest:</span>
+                                      </span>
+                                      <span className="font-bold">₹{hoveredDynamics.currentPrice.toLocaleString('en-IN')}</span>
+                                    </div>
                                   )}
-                                  {/* Min Node */}
-                                  {d.minPrice !== null && (
-                                    <circle
-                                      cx={x}
-                                      cy={getY(d.minPrice)}
-                                      r={isSelected ? "5" : "3.5"}
-                                      fill="#10b981"
-                                      stroke="#ffffff"
-                                      strokeWidth="1.5"
-                                    />
+                                  {showMinLine && hoveredDynamics.minPrice !== null && (
+                                    <div className="flex items-center justify-between text-emerald-400">
+                                      <span className="flex items-center gap-1.5">
+                                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                        <span>Min Record:</span>
+                                      </span>
+                                      <span className="font-bold">₹{hoveredDynamics.minPrice.toLocaleString('en-IN')}</span>
+                                    </div>
                                   )}
-                                </g>
-                              );
-                            })}
-                          </svg>
+                                </div>
+                              </div>
+                            )}
+                          </>
                         );
                       })()}
                     </div>
