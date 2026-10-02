@@ -21504,6 +21504,669 @@
       "authenticity": "REAL_EXTERNAL_OBSERVATION",
       "is_synthetic": false,
       "created_at": "2026-10-02T18:08:36.638Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-118-2026-11-20-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E-118",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-20",
+      "departure_timestamp": "2026-11-20T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:06.402Z",
+      "fare": 11343,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:10:06.402Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E522-2026-11-20-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E142 / 6E522",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-20",
+      "departure_timestamp": "2026-11-20T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:06.402Z",
+      "fare": 13879,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:10:06.402Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E794-2026-11-20-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E6968 / 6E794",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-20",
+      "departure_timestamp": "2026-11-20T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:06.402Z",
+      "fare": 13879,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:10:06.402Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-20-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E7742 / 6E6116",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-20",
+      "departure_timestamp": "2026-11-20T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:06.402Z",
+      "fare": 13879,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:10:06.402Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-118-2026-11-22-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E-118",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-22",
+      "departure_timestamp": "2026-11-22T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:07.389Z",
+      "fare": 9643,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:10:07.390Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-IX-1617-2026-11-22-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "IX-1617",
+      "airline": "Air India Express",
+      "departure_date": "2026-11-22",
+      "departure_timestamp": "2026-11-22T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:07.389Z",
+      "fare": 10599,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:10:07.390Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-AI-AI2973-2026-11-22-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "AI1824 / AI2973",
+      "airline": "Air India",
+      "departure_date": "2026-11-22",
+      "departure_timestamp": "2026-11-22T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:07.389Z",
+      "fare": 13858,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:10:07.390Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E794-2026-11-22-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E6968 / 6E794",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-22",
+      "departure_timestamp": "2026-11-22T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:07.389Z",
+      "fare": 13879,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:10:07.390Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-AI-AI1730-2026-11-22-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "AI1824 / AI1730",
+      "airline": "Air India",
+      "departure_date": "2026-11-22",
+      "departure_timestamp": "2026-11-22T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:07.389Z",
+      "fare": 15628,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:10:07.390Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-IX-IX1083-2026-11-22-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "IX2173 / IX1083",
+      "airline": "Air India Express",
+      "departure_date": "2026-11-22",
+      "departure_timestamp": "2026-11-22T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:07.389Z",
+      "fare": 16104,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:10:07.390Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-IX-IX1257-2026-11-22-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "IX1385 / IX1257",
+      "airline": "Air India Express",
+      "departure_date": "2026-11-22",
+      "departure_timestamp": "2026-11-22T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:07.389Z",
+      "fare": 16416,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:10:07.390Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-22-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E7742 / 6E6116",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-22",
+      "departure_timestamp": "2026-11-22T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:07.389Z",
+      "fare": 21858,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:10:07.390Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-118-2026-11-23-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E-118",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-23",
+      "departure_timestamp": "2026-11-23T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:09.108Z",
+      "fare": 9643,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:10:09.109Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E522-2026-11-23-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E142 / 6E522",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-23",
+      "departure_timestamp": "2026-11-23T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:09.108Z",
+      "fare": 13879,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:10:09.109Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E794-2026-11-23-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E6968 / 6E794",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-23",
+      "departure_timestamp": "2026-11-23T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:09.108Z",
+      "fare": 13879,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:10:09.109Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-23-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E7742 / 6E6116",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-23",
+      "departure_timestamp": "2026-11-23T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:09.108Z",
+      "fare": 13879,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:10:09.109Z"
+    },
+    {
+      "id": "snap-hist-LKO-PNQ-6E-118-2026-11-20-2026-10-02T18:10:06.402Z",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E-118",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-20",
+      "departure_timestamp": "2026-11-20T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:06.402Z",
+      "fare": 11343,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:08.658Z"
+    },
+    {
+      "id": "snap-hist-LKO-PNQ-6E142 / 6E522-2026-11-20-2026-10-02T18:10:06.402Z",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E142 / 6E522",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-20",
+      "departure_timestamp": "2026-11-20T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:06.402Z",
+      "fare": 13879,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:09.032Z"
+    },
+    {
+      "id": "snap-hist-LKO-PNQ-6E6968 / 6E794-2026-11-20-2026-10-02T18:10:06.402Z",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E6968 / 6E794",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-20",
+      "departure_timestamp": "2026-11-20T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:06.402Z",
+      "fare": 13879,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:09.405Z"
+    },
+    {
+      "id": "snap-hist-LKO-PNQ-6E7742 / 6E6116-2026-11-20-2026-10-02T18:10:06.402Z",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E7742 / 6E6116",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-20",
+      "departure_timestamp": "2026-11-20T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:06.402Z",
+      "fare": 13879,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:09.787Z"
+    },
+    {
+      "id": "snap-hist-LKO-PNQ-6E-118-2026-11-22-2026-10-02T18:10:07.389Z",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E-118",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-22",
+      "departure_timestamp": "2026-11-22T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:07.389Z",
+      "fare": 9643,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:11.017Z"
+    },
+    {
+      "id": "snap-hist-LKO-PNQ-IX-1617-2026-11-22-2026-10-02T18:10:07.389Z",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "IX-1617",
+      "airline": "Air India Express",
+      "departure_date": "2026-11-22",
+      "departure_timestamp": "2026-11-22T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:07.389Z",
+      "fare": 10599,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:11.386Z"
+    },
+    {
+      "id": "snap-hist-LKO-PNQ-AI1824 / AI2973-2026-11-22-2026-10-02T18:10:07.389Z",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "AI1824 / AI2973",
+      "airline": "Air India",
+      "departure_date": "2026-11-22",
+      "departure_timestamp": "2026-11-22T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:07.389Z",
+      "fare": 13858,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:11.767Z"
+    },
+    {
+      "id": "snap-hist-LKO-PNQ-6E6968 / 6E794-2026-11-22-2026-10-02T18:10:07.389Z",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E6968 / 6E794",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-22",
+      "departure_timestamp": "2026-11-22T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:07.389Z",
+      "fare": 13879,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:12.143Z"
+    },
+    {
+      "id": "snap-hist-LKO-PNQ-AI1824 / AI1730-2026-11-22-2026-10-02T18:10:07.389Z",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "AI1824 / AI1730",
+      "airline": "Air India",
+      "departure_date": "2026-11-22",
+      "departure_timestamp": "2026-11-22T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:07.389Z",
+      "fare": 15628,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:12.520Z"
+    },
+    {
+      "id": "snap-hist-LKO-PNQ-IX2173 / IX1083-2026-11-22-2026-10-02T18:10:07.389Z",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "IX2173 / IX1083",
+      "airline": "Air India Express",
+      "departure_date": "2026-11-22",
+      "departure_timestamp": "2026-11-22T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:07.389Z",
+      "fare": 16104,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:12.894Z"
+    },
+    {
+      "id": "snap-hist-LKO-PNQ-IX1385 / IX1257-2026-11-22-2026-10-02T18:10:07.389Z",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "IX1385 / IX1257",
+      "airline": "Air India Express",
+      "departure_date": "2026-11-22",
+      "departure_timestamp": "2026-11-22T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:07.389Z",
+      "fare": 16416,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:13.283Z"
+    },
+    {
+      "id": "snap-hist-LKO-PNQ-6E7742 / 6E6116-2026-11-22-2026-10-02T18:10:07.389Z",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E7742 / 6E6116",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-22",
+      "departure_timestamp": "2026-11-22T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:07.389Z",
+      "fare": 21858,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:13.702Z"
+    },
+    {
+      "id": "snap-hist-LKO-PNQ-6E-118-2026-11-23-2026-10-02T18:10:09.108Z",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E-118",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-23",
+      "departure_timestamp": "2026-11-23T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:09.108Z",
+      "fare": 9643,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:14.094Z"
+    },
+    {
+      "id": "snap-hist-LKO-PNQ-6E7742 / 6E6116-2026-11-23-2026-10-02T18:10:09.108Z",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E7742 / 6E6116",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-23",
+      "departure_timestamp": "2026-11-23T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:09.108Z",
+      "fare": 13879,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:14.455Z"
+    },
+    {
+      "id": "snap-hist-LKO-PNQ-6E142 / 6E522-2026-11-23-2026-10-02T18:10:09.108Z",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E142 / 6E522",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-23",
+      "departure_timestamp": "2026-11-23T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:09.108Z",
+      "fare": 13879,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:14.850Z"
+    },
+    {
+      "id": "snap-hist-LKO-PNQ-6E6968 / 6E794-2026-11-23-2026-10-02T18:10:09.108Z",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "6E6968 / 6E794",
+      "airline": "IndiGo",
+      "departure_date": "2026-11-23",
+      "departure_timestamp": "2026-11-23T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:10:09.108Z",
+      "fare": 13879,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:15.249Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-IX-IX1230-2026-11-20-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "IX1264 / IX1230",
+      "airline": "Air India Express",
+      "departure_date": "2026-11-20",
+      "departure_timestamp": "2026-11-20T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:17:49.917Z",
+      "fare": 11686,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:49.919Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-IX-1617-2026-11-20-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "IX-1617",
+      "airline": "Air India Express",
+      "departure_date": "2026-11-20",
+      "departure_timestamp": "2026-11-20T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:17:49.917Z",
+      "fare": 12302,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:49.919Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-AI-AI2609-2026-11-20-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "AI1877 / AI2609",
+      "airline": "Air India",
+      "departure_date": "2026-11-20",
+      "departure_timestamp": "2026-11-20T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:17:49.917Z",
+      "fare": 13191,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:49.919Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-AI-AI1735-2026-11-20-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "AI2500 / AI1735",
+      "airline": "Air India",
+      "departure_date": "2026-11-20",
+      "departure_timestamp": "2026-11-20T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:17:49.917Z",
+      "fare": 13407,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:49.919Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-AI-AI2973-2026-11-20-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "AI1824 / AI2973",
+      "airline": "Air India",
+      "departure_date": "2026-11-20",
+      "departure_timestamp": "2026-11-20T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:17:49.917Z",
+      "fare": 13407,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:49.919Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-AI-AI1730-2026-11-20-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "AI1824 / AI1730",
+      "airline": "Air India",
+      "departure_date": "2026-11-20",
+      "departure_timestamp": "2026-11-20T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:17:49.917Z",
+      "fare": 13714,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:49.919Z"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-IX-IX1083-2026-11-20-2026-10-02T18",
+      "route": "LKO-PNQ",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "flight_number": "IX2173 / IX1083",
+      "airline": "Air India Express",
+      "departure_date": "2026-11-20",
+      "departure_timestamp": "2026-11-20T10:00:00.000Z",
+      "observed_at": "2026-10-02T18:17:49.917Z",
+      "fare": 15670,
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "authenticity": "REAL_EXTERNAL_OBSERVATION",
+      "is_synthetic": false,
+      "created_at": "2026-10-02T18:17:49.919Z"
     }
   ],
   "migrationStatuses": [
@@ -23022,801 +23685,1121 @@
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:38.316Z",
+      "migrated_at": "2026-10-02T18:18:31.760Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:38.317Z"
+      "updated_at": "2026-10-02T18:18:31.760Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-118-2026-11-11-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:38.640Z",
+      "migrated_at": "2026-10-02T18:18:32.059Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:38.640Z"
+      "updated_at": "2026-10-02T18:18:32.059Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E794-2026-11-11-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:38.973Z",
+      "migrated_at": "2026-10-02T18:18:32.358Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:38.973Z"
+      "updated_at": "2026-10-02T18:18:32.358Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E522-2026-11-16-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:39.298Z",
+      "migrated_at": "2026-10-02T18:18:32.782Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:39.298Z"
+      "updated_at": "2026-10-02T18:18:32.782Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E794-2026-11-16-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:39.622Z",
+      "migrated_at": "2026-10-02T18:18:33.078Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:39.622Z"
+      "updated_at": "2026-10-02T18:18:33.078Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-118-2026-11-16-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:39.945Z",
+      "migrated_at": "2026-10-02T18:17:33.469Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:39.945Z"
+      "updated_at": "2026-10-02T18:17:33.469Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-16-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:40.308Z",
+      "migrated_at": "2026-10-02T18:17:33.823Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:40.308Z"
+      "updated_at": "2026-10-02T18:17:33.823Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-118-2026-11-21-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:40.630Z",
+      "migrated_at": "2026-10-02T18:17:34.158Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:40.630Z"
+      "updated_at": "2026-10-02T18:17:34.158Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E794-2026-11-21-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:40.967Z",
+      "migrated_at": "2026-10-02T18:17:34.511Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:40.967Z"
+      "updated_at": "2026-10-02T18:17:34.511Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-118-2026-11-09-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:41.291Z",
+      "migrated_at": "2026-10-02T18:17:34.852Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:41.291Z"
+      "updated_at": "2026-10-02T18:17:34.852Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E522-2026-11-09-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:41.743Z",
+      "migrated_at": "2026-10-02T18:17:35.228Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:41.743Z"
+      "updated_at": "2026-10-02T18:17:35.228Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E794-2026-11-09-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:42.063Z",
+      "migrated_at": "2026-10-02T18:17:35.604Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:42.063Z"
+      "updated_at": "2026-10-02T18:17:35.604Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-09-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:42.407Z",
+      "migrated_at": "2026-10-02T18:17:35.950Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:42.407Z"
+      "updated_at": "2026-10-02T18:17:35.950Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-118-2026-11-10-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:42.728Z",
+      "migrated_at": "2026-10-02T18:17:36.298Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:42.728Z"
+      "updated_at": "2026-10-02T18:17:36.298Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E522-2026-11-10-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:43.048Z",
+      "migrated_at": "2026-10-02T18:17:36.665Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:43.048Z"
+      "updated_at": "2026-10-02T18:17:36.665Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E794-2026-11-10-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:43.427Z",
+      "migrated_at": "2026-10-02T18:17:37.009Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:43.427Z"
+      "updated_at": "2026-10-02T18:17:37.009Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E522-2026-11-12-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:43.763Z",
+      "migrated_at": "2026-10-02T18:17:37.394Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:43.763Z"
+      "updated_at": "2026-10-02T18:17:37.394Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-118-2026-11-12-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:46.681Z",
+      "migrated_at": "2026-10-02T18:17:37.755Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:46.681Z"
+      "updated_at": "2026-10-02T18:17:37.755Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E794-2026-11-12-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:46.991Z",
+      "migrated_at": "2026-10-02T18:17:38.114Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:46.991Z"
+      "updated_at": "2026-10-02T18:17:38.114Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-12-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:47.339Z",
+      "migrated_at": "2026-10-02T18:17:38.462Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:47.339Z"
+      "updated_at": "2026-10-02T18:17:38.462Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-118-2026-11-13-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:47.661Z",
+      "migrated_at": "2026-10-02T18:17:38.805Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:47.661Z"
+      "updated_at": "2026-10-02T18:17:38.805Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E522-2026-11-13-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:47.979Z",
+      "migrated_at": "2026-10-02T18:17:39.166Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:47.979Z"
+      "updated_at": "2026-10-02T18:17:39.166Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E794-2026-11-13-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:48.288Z",
+      "migrated_at": "2026-10-02T18:17:39.521Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:48.288Z"
+      "updated_at": "2026-10-02T18:17:39.521Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-13-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:48.607Z",
+      "migrated_at": "2026-10-02T18:17:39.873Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:48.607Z"
+      "updated_at": "2026-10-02T18:17:39.873Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E794-2026-11-14-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:48.916Z",
+      "migrated_at": "2026-10-02T18:17:40.231Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:48.916Z"
+      "updated_at": "2026-10-02T18:17:40.231Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-118-2026-11-14-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:49.253Z",
+      "migrated_at": "2026-10-02T18:17:40.592Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:49.253Z"
+      "updated_at": "2026-10-02T18:17:40.592Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-118-2026-11-15-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:49.567Z",
+      "migrated_at": "2026-10-02T18:17:40.953Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:49.567Z"
+      "updated_at": "2026-10-02T18:17:40.953Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E522-2026-11-15-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:49.880Z",
+      "migrated_at": "2026-10-02T18:17:41.309Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:49.880Z"
+      "updated_at": "2026-10-02T18:17:41.309Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E794-2026-11-15-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:50.225Z",
+      "migrated_at": "2026-10-02T18:17:41.660Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:50.225Z"
+      "updated_at": "2026-10-02T18:17:41.660Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-15-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:50.605Z",
+      "migrated_at": "2026-10-02T18:17:42.152Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:50.605Z"
+      "updated_at": "2026-10-02T18:17:42.152Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-118-2026-11-17-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:50.927Z",
+      "migrated_at": "2026-10-02T18:17:42.503Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:50.927Z"
+      "updated_at": "2026-10-02T18:17:42.503Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E522-2026-11-17-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:51.247Z",
+      "migrated_at": "2026-10-02T18:17:42.873Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:51.247Z"
+      "updated_at": "2026-10-02T18:17:42.873Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E794-2026-11-17-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:51.559Z",
+      "migrated_at": "2026-10-02T18:17:43.219Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:51.559Z"
+      "updated_at": "2026-10-02T18:17:43.219Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-118-2026-11-18-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:51.869Z",
+      "migrated_at": "2026-10-02T18:17:43.580Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:51.869Z"
+      "updated_at": "2026-10-02T18:17:43.580Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E522-2026-11-18-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:52.175Z",
+      "migrated_at": "2026-10-02T18:17:43.940Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:52.175Z"
+      "updated_at": "2026-10-02T18:17:43.940Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E794-2026-11-18-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:52.549Z",
+      "migrated_at": "2026-10-02T18:17:44.299Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:52.549Z"
+      "updated_at": "2026-10-02T18:17:44.299Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-118-2026-11-19-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:52.859Z",
+      "migrated_at": "2026-10-02T18:17:44.639Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:52.859Z"
+      "updated_at": "2026-10-02T18:17:44.639Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E522-2026-11-19-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:53.166Z",
+      "migrated_at": "2026-10-02T18:17:45.007Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:53.166Z"
+      "updated_at": "2026-10-02T18:17:45.007Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E794-2026-11-19-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:53.473Z",
+      "migrated_at": "2026-10-02T18:17:45.351Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:53.473Z"
+      "updated_at": "2026-10-02T18:17:45.351Z"
     },
     {
       "observation_id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-19-2026-10-02T18",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:53.792Z",
+      "migrated_at": "2026-10-02T18:17:45.704Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:53.792Z"
+      "updated_at": "2026-10-02T18:17:45.704Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E-118-2026-11-09-2026-10-02T18:07:24.871Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:54.136Z",
+      "migrated_at": "2026-10-02T18:17:52.004Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:54.136Z"
+      "updated_at": "2026-10-02T18:17:52.004Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E142 / 6E522-2026-11-09-2026-10-02T18:07:24.871Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:54.459Z",
+      "migrated_at": "2026-10-02T18:17:52.363Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:54.459Z"
+      "updated_at": "2026-10-02T18:17:52.363Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E7742 / 6E6116-2026-11-09-2026-10-02T18:07:24.871Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:54.784Z",
+      "migrated_at": "2026-10-02T18:17:52.737Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:54.784Z"
+      "updated_at": "2026-10-02T18:17:52.737Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E6968 / 6E794-2026-11-09-2026-10-02T18:07:24.871Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:55.102Z",
+      "migrated_at": "2026-10-02T18:17:53.147Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:55.102Z"
+      "updated_at": "2026-10-02T18:17:53.147Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E-118-2026-11-10-2026-10-02T18:07:26.207Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:55.427Z",
+      "migrated_at": "2026-10-02T18:17:53.505Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:55.427Z"
+      "updated_at": "2026-10-02T18:17:53.505Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E142 / 6E522-2026-11-10-2026-10-02T18:07:26.207Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:55.741Z",
+      "migrated_at": "2026-10-02T18:17:53.854Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:55.741Z"
+      "updated_at": "2026-10-02T18:17:53.854Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E6968 / 6E794-2026-11-10-2026-10-02T18:07:26.207Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:56.114Z",
+      "migrated_at": "2026-10-02T18:17:54.207Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:56.114Z"
+      "updated_at": "2026-10-02T18:17:54.207Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E142 / 6E522-2026-11-11-2026-10-02T18:07:12.527Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:56.431Z",
+      "migrated_at": "2026-10-02T18:17:54.559Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:56.431Z"
+      "updated_at": "2026-10-02T18:17:54.559Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E-118-2026-11-11-2026-10-02T18:07:12.527Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:56.742Z",
+      "migrated_at": "2026-10-02T18:17:54.912Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:56.742Z"
+      "updated_at": "2026-10-02T18:17:54.912Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E6968 / 6E794-2026-11-11-2026-10-02T18:07:12.527Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:57.069Z",
+      "migrated_at": "2026-10-02T18:17:55.268Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:57.069Z"
+      "updated_at": "2026-10-02T18:17:55.268Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E142 / 6E522-2026-11-12-2026-10-02T18:07:27.564Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:57.398Z",
+      "migrated_at": "2026-10-02T18:17:55.624Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:57.398Z"
+      "updated_at": "2026-10-02T18:17:55.624Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E-118-2026-11-12-2026-10-02T18:07:27.564Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:57.708Z",
+      "migrated_at": "2026-10-02T18:17:55.993Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:57.708Z"
+      "updated_at": "2026-10-02T18:17:55.993Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E6968 / 6E794-2026-11-12-2026-10-02T18:07:27.564Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:58.016Z",
+      "migrated_at": "2026-10-02T18:17:56.348Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:58.016Z"
+      "updated_at": "2026-10-02T18:17:56.348Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E7742 / 6E6116-2026-11-12-2026-10-02T18:07:27.564Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:58.474Z",
+      "migrated_at": "2026-10-02T18:17:56.694Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:58.474Z"
+      "updated_at": "2026-10-02T18:17:56.694Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E-118-2026-11-13-2026-10-02T18:07:28.731Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:58.785Z",
+      "migrated_at": "2026-10-02T18:17:57.033Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:58.785Z"
+      "updated_at": "2026-10-02T18:17:57.033Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E6968 / 6E794-2026-11-13-2026-10-02T18:07:28.731Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:59.104Z",
+      "migrated_at": "2026-10-02T18:17:57.398Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:59.104Z"
+      "updated_at": "2026-10-02T18:17:57.398Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E142 / 6E522-2026-11-13-2026-10-02T18:07:28.731Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:59.429Z",
+      "migrated_at": "2026-10-02T18:17:57.753Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:59.429Z"
+      "updated_at": "2026-10-02T18:17:57.753Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E7742 / 6E6116-2026-11-13-2026-10-02T18:07:28.731Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:07:59.745Z",
+      "migrated_at": "2026-10-02T18:17:58.101Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:07:59.745Z"
+      "updated_at": "2026-10-02T18:17:58.101Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E6968 / 6E794-2026-11-14-2026-10-02T18:07:30.172Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:00.073Z",
+      "migrated_at": "2026-10-02T18:17:58.449Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:00.073Z"
+      "updated_at": "2026-10-02T18:17:58.449Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E-118-2026-11-14-2026-10-02T18:07:30.172Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:00.433Z",
+      "migrated_at": "2026-10-02T18:17:58.798Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:00.433Z"
+      "updated_at": "2026-10-02T18:17:58.798Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E-118-2026-11-15-2026-10-02T18:07:31.279Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:00.767Z",
+      "migrated_at": "2026-10-02T18:17:59.158Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:00.767Z"
+      "updated_at": "2026-10-02T18:17:59.158Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E142 / 6E522-2026-11-15-2026-10-02T18:07:31.279Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:01.100Z",
+      "migrated_at": "2026-10-02T18:17:59.503Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:01.100Z"
+      "updated_at": "2026-10-02T18:17:59.503Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E6968 / 6E794-2026-11-15-2026-10-02T18:07:31.279Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:01.431Z",
+      "migrated_at": "2026-10-02T18:17:59.857Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:01.431Z"
+      "updated_at": "2026-10-02T18:17:59.857Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E7742 / 6E6116-2026-11-15-2026-10-02T18:07:31.279Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:01.787Z",
+      "migrated_at": "2026-10-02T18:18:00.245Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:01.787Z"
+      "updated_at": "2026-10-02T18:18:00.245Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E-118-2026-11-16-2026-10-02T18:07:13.941Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:02.155Z",
+      "migrated_at": "2026-10-02T18:18:00.606Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:02.155Z"
+      "updated_at": "2026-10-02T18:18:00.606Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E142 / 6E522-2026-11-16-2026-10-02T18:07:13.941Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:02.487Z",
+      "migrated_at": "2026-10-02T18:18:00.964Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:02.487Z"
+      "updated_at": "2026-10-02T18:18:00.964Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E6968 / 6E794-2026-11-16-2026-10-02T18:07:13.941Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:02.806Z",
+      "migrated_at": "2026-10-02T18:18:01.374Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:02.806Z"
+      "updated_at": "2026-10-02T18:18:01.374Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E7742 / 6E6116-2026-11-16-2026-10-02T18:07:13.941Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:03.128Z",
+      "migrated_at": "2026-10-02T18:18:01.793Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:03.128Z"
+      "updated_at": "2026-10-02T18:18:01.793Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E-118-2026-11-17-2026-10-02T18:07:32.510Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:03.459Z",
+      "migrated_at": "2026-10-02T18:18:02.279Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:03.459Z"
+      "updated_at": "2026-10-02T18:18:02.279Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E6968 / 6E794-2026-11-17-2026-10-02T18:07:32.510Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:03.777Z",
+      "migrated_at": "2026-10-02T18:18:02.666Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:03.777Z"
+      "updated_at": "2026-10-02T18:18:02.666Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E142 / 6E522-2026-11-17-2026-10-02T18:07:32.510Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:04.088Z",
+      "migrated_at": "2026-10-02T18:18:03.030Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:04.088Z"
+      "updated_at": "2026-10-02T18:18:03.030Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E-118-2026-11-18-2026-10-02T18:07:33.950Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:04.401Z",
+      "migrated_at": "2026-10-02T18:18:03.383Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:04.401Z"
+      "updated_at": "2026-10-02T18:18:03.383Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E142 / 6E522-2026-11-18-2026-10-02T18:07:33.950Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:04.730Z",
+      "migrated_at": "2026-10-02T18:18:03.740Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:04.730Z"
+      "updated_at": "2026-10-02T18:18:03.740Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E6968 / 6E794-2026-11-18-2026-10-02T18:07:33.950Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:05.042Z",
+      "migrated_at": "2026-10-02T18:18:04.097Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:05.042Z"
+      "updated_at": "2026-10-02T18:18:04.097Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E-118-2026-11-19-2026-10-02T18:07:35.166Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:05.354Z",
+      "migrated_at": "2026-10-02T18:18:04.450Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:05.354Z"
+      "updated_at": "2026-10-02T18:18:04.450Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E142 / 6E522-2026-11-19-2026-10-02T18:07:35.166Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:05.691Z",
+      "migrated_at": "2026-10-02T18:18:04.814Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:05.691Z"
+      "updated_at": "2026-10-02T18:18:04.814Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E6968 / 6E794-2026-11-19-2026-10-02T18:07:35.166Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:06.027Z",
+      "migrated_at": "2026-10-02T18:18:05.175Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:06.027Z"
+      "updated_at": "2026-10-02T18:18:05.175Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E7742 / 6E6116-2026-11-19-2026-10-02T18:07:35.166Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:06.347Z",
+      "migrated_at": "2026-10-02T18:18:05.530Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:06.347Z"
+      "updated_at": "2026-10-02T18:18:05.530Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E-118-2026-11-21-2026-10-02T18:07:15.422Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:06.673Z",
+      "migrated_at": "2026-10-02T18:18:07.309Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:06.673Z"
+      "updated_at": "2026-10-02T18:18:07.309Z"
     },
     {
       "observation_id": "snap-hist-LKO-PNQ-6E6968 / 6E794-2026-11-21-2026-10-02T18:07:15.422Z",
       "source_database": "firestore",
       "destination_database": "supabase",
       "migration_status": "FAILED",
-      "migrated_at": "2026-10-02T18:08:06.990Z",
+      "migrated_at": "2026-10-02T18:18:07.703Z",
       "verification_status": "FAILED",
       "error": "Verification read-back mismatch",
-      "updated_at": "2026-10-02T18:08:06.990Z"
+      "updated_at": "2026-10-02T18:18:07.703Z"
+    },
+    {
+      "observation_id": "snap-live-LKO-PNQ-6E-118-2026-11-20-2026-10-02T18",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:17:46.078Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:17:46.078Z"
+    },
+    {
+      "observation_id": "snap-live-LKO-PNQ-6E-6E522-2026-11-20-2026-10-02T18",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:17:46.448Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:17:46.448Z"
+    },
+    {
+      "observation_id": "snap-live-LKO-PNQ-6E-6E794-2026-11-20-2026-10-02T18",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:17:46.796Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:17:46.796Z"
+    },
+    {
+      "observation_id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-20-2026-10-02T18",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:17:47.167Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:17:47.167Z"
+    },
+    {
+      "observation_id": "snap-live-LKO-PNQ-6E-118-2026-11-22-2026-10-02T18",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:17:47.512Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:17:47.512Z"
+    },
+    {
+      "observation_id": "snap-live-LKO-PNQ-IX-1617-2026-11-22-2026-10-02T18",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:17:47.879Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:17:47.879Z"
+    },
+    {
+      "observation_id": "snap-live-LKO-PNQ-AI-AI2973-2026-11-22-2026-10-02T18",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:17:48.225Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:17:48.225Z"
+    },
+    {
+      "observation_id": "snap-live-LKO-PNQ-6E-6E794-2026-11-22-2026-10-02T18",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:17:48.573Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:17:48.573Z"
+    },
+    {
+      "observation_id": "snap-live-LKO-PNQ-AI-AI1730-2026-11-22-2026-10-02T18",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:17:48.923Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:17:48.923Z"
+    },
+    {
+      "observation_id": "snap-live-LKO-PNQ-IX-IX1083-2026-11-22-2026-10-02T18",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:17:49.267Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:17:49.267Z"
+    },
+    {
+      "observation_id": "snap-live-LKO-PNQ-IX-IX1257-2026-11-22-2026-10-02T18",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:17:49.611Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:17:49.611Z"
+    },
+    {
+      "observation_id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-22-2026-10-02T18",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:17:49.990Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:17:49.990Z"
+    },
+    {
+      "observation_id": "snap-live-LKO-PNQ-6E-118-2026-11-23-2026-10-02T18",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:17:50.414Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:17:50.414Z"
+    },
+    {
+      "observation_id": "snap-live-LKO-PNQ-6E-6E522-2026-11-23-2026-10-02T18",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:17:50.768Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:17:50.768Z"
+    },
+    {
+      "observation_id": "snap-live-LKO-PNQ-6E-6E794-2026-11-23-2026-10-02T18",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:17:51.151Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:17:51.151Z"
+    },
+    {
+      "observation_id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-23-2026-10-02T18",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:17:51.651Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:17:51.651Z"
+    },
+    {
+      "observation_id": "snap-hist-LKO-PNQ-6E-118-2026-11-20-2026-10-02T18:10:06.402Z",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:18:05.876Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:18:05.876Z"
+    },
+    {
+      "observation_id": "snap-hist-LKO-PNQ-6E142 / 6E522-2026-11-20-2026-10-02T18:10:06.402Z",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:18:06.245Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:18:06.245Z"
+    },
+    {
+      "observation_id": "snap-hist-LKO-PNQ-6E6968 / 6E794-2026-11-20-2026-10-02T18:10:06.402Z",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:18:06.609Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:18:06.609Z"
+    },
+    {
+      "observation_id": "snap-hist-LKO-PNQ-6E7742 / 6E6116-2026-11-20-2026-10-02T18:10:06.402Z",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:18:06.961Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:18:06.961Z"
+    },
+    {
+      "observation_id": "snap-hist-LKO-PNQ-6E-118-2026-11-22-2026-10-02T18:10:07.389Z",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:18:08.054Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:18:08.054Z"
+    },
+    {
+      "observation_id": "snap-hist-LKO-PNQ-IX-1617-2026-11-22-2026-10-02T18:10:07.389Z",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:18:08.400Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:18:08.400Z"
+    },
+    {
+      "observation_id": "snap-hist-LKO-PNQ-AI1824 / AI2973-2026-11-22-2026-10-02T18:10:07.389Z",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:18:08.755Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:18:08.755Z"
+    },
+    {
+      "observation_id": "snap-hist-LKO-PNQ-6E6968 / 6E794-2026-11-22-2026-10-02T18:10:07.389Z",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:18:09.118Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:18:09.118Z"
+    },
+    {
+      "observation_id": "snap-hist-LKO-PNQ-AI1824 / AI1730-2026-11-22-2026-10-02T18:10:07.389Z",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:18:09.482Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:18:09.482Z"
+    },
+    {
+      "observation_id": "snap-hist-LKO-PNQ-IX2173 / IX1083-2026-11-22-2026-10-02T18:10:07.389Z",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:18:09.830Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:18:09.830Z"
+    },
+    {
+      "observation_id": "snap-hist-LKO-PNQ-IX1385 / IX1257-2026-11-22-2026-10-02T18:10:07.389Z",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:18:10.212Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:18:10.212Z"
+    },
+    {
+      "observation_id": "snap-hist-LKO-PNQ-6E7742 / 6E6116-2026-11-22-2026-10-02T18:10:07.389Z",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:18:10.588Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:18:10.588Z"
+    },
+    {
+      "observation_id": "snap-hist-LKO-PNQ-6E-118-2026-11-23-2026-10-02T18:10:09.108Z",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:18:10.936Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:18:10.936Z"
+    },
+    {
+      "observation_id": "snap-hist-LKO-PNQ-6E7742 / 6E6116-2026-11-23-2026-10-02T18:10:09.108Z",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:18:11.321Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:18:11.321Z"
+    },
+    {
+      "observation_id": "snap-hist-LKO-PNQ-6E142 / 6E522-2026-11-23-2026-10-02T18:10:09.108Z",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:18:11.684Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:18:11.684Z"
+    },
+    {
+      "observation_id": "snap-hist-LKO-PNQ-6E6968 / 6E794-2026-11-23-2026-10-02T18:10:09.108Z",
+      "source_database": "firestore",
+      "destination_database": "supabase",
+      "migration_status": "FAILED",
+      "migrated_at": "2026-10-02T18:18:12.164Z",
+      "verification_status": "FAILED",
+      "error": "Verification read-back mismatch",
+      "updated_at": "2026-10-02T18:18:12.164Z"
     }
   ],
-  "lastPersistedAt": "2026-10-02T18:08:43.763Z"
+  "lastPersistedAt": "2026-10-02T18:18:33.078Z"
 }

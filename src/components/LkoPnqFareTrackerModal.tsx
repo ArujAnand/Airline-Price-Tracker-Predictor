@@ -451,111 +451,180 @@ export const LkoPnqFareTrackerModal: React.FC<Props> = ({ isOpen, onClose }) => 
                       </div>
                     </div>
 
-                    {/* Interactive 15-Date Range & Price Matrix */}
-                    <div className="h-64 flex items-end gap-1 sm:gap-2 pt-8 pb-2 px-1 sm:px-2 border-b border-slate-100">
-                      {data.dateBreakdown.map(d => {
-                        const allMaxes = data.dateBreakdown.filter(x => x.maxPrice !== null).map(x => x.maxPrice as number);
-                        const globalMax = (allMaxes.length > 0 ? Math.max(...allMaxes) : 35000) * 1.05;
-                        const isSelected = selectedDate === d.date;
-                        const hasData = d.minPrice !== null && d.maxPrice !== null;
-                        
-                        const minVal = d.minPrice || 0;
-                        const maxVal = d.maxPrice || 0;
-                        const curVal = d.currentPrice ?? d.minPrice ?? 0;
+                    {/* Interactive 15-Date 3-Line Fare Dynamics Chart */}
+                    <div className="relative w-full h-72 border border-slate-100 rounded-lg bg-slate-50/50 overflow-hidden">
+                      {(() => {
+                        const days = data.dateBreakdown;
+                        const allPrices = days.flatMap(d => [d.minPrice, d.maxPrice, d.currentPrice].filter(p => p !== null)) as number[];
+                        const maxVal = allPrices.length > 0 ? Math.max(...allPrices) * 1.1 : 35000;
+                        const minVal = allPrices.length > 0 ? Math.max(0, Math.min(...allPrices) * 0.9) : 5000;
 
-                        const minPct = hasData ? Math.max(6, Math.round((minVal / globalMax) * 100)) : 0;
-                        const maxPct = hasData ? Math.max(minPct + 8, Math.round((maxVal / globalMax) * 100)) : 0;
-                        const curPct = hasData ? Math.max(minPct, Math.min(maxPct, Math.round((curVal / globalMax) * 100))) : 0;
-                        const barHeightPct = Math.max(10, maxPct - minPct);
+                        const width = 800;
+                        const height = 280;
+                        const padLeft = 65;
+                        const padRight = 30;
+                        const padTop = 25;
+                        const padBottom = 45;
+                        const chartW = width - padLeft - padRight;
+                        const chartH = height - padTop - padBottom;
+
+                        const getX = (idx: number) => padLeft + (days.length > 1 ? (idx / (days.length - 1)) * chartW : chartW / 2);
+                        const getY = (val: number) => padTop + (1 - (val - minVal) / (maxVal - minVal || 1)) * chartH;
+
+                        const maxPoints = days.map((d, idx) => ({ ...d, x: getX(idx), y: d.maxPrice !== null ? getY(d.maxPrice) : null }));
+                        const curPoints = days.map((d, idx) => ({ ...d, x: getX(idx), y: d.currentPrice !== null ? getY(d.currentPrice) : null }));
+                        const minPoints = days.map((d, idx) => ({ ...d, x: getX(idx), y: d.minPrice !== null ? getY(d.minPrice) : null }));
+
+                        const maxPathD = maxPoints.filter(p => p.y !== null).map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y?.toFixed(1)}`).join(' ');
+                        const curPathD = curPoints.filter(p => p.y !== null).map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y?.toFixed(1)}`).join(' ');
+                        const minPathD = minPoints.filter(p => p.y !== null).map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y?.toFixed(1)}`).join(' ');
 
                         return (
-                          <div
-                            key={d.date}
-                            onClick={() => setSelectedDate(d.date)}
-                            className={`flex-1 flex flex-col items-center cursor-pointer group h-full justify-end relative rounded-lg p-0.5 transition-all ${
-                              isSelected ? 'bg-blue-50/70 ring-1 ring-blue-400' : 'hover:bg-slate-50'
-                            }`}
+                          <svg
+                            viewBox={`0 0 ${width} ${height}`}
+                            className="w-full h-full"
+                            preserveAspectRatio="none"
                           >
-                            {/* Max Fare Label */}
-                            <span className="text-[8px] sm:text-[9px] font-semibold text-rose-600 mb-0.5 whitespace-nowrap text-center">
-                              {hasData ? (
-                                <>
-                                  <span className="hidden lg:inline">₹{maxVal.toLocaleString('en-IN')}</span>
-                                  <span className="lg:hidden">₹{(maxVal / 1000).toFixed(1)}k</span>
-                                </>
-                              ) : (
-                                '—'
-                              )}
-                            </span>
-
-                            {/* Range Bar & Current Indicator */}
-                            <div className="w-full max-w-[34px] h-full flex flex-col justify-end relative my-1">
-                              {hasData ? (
-                                <div
-                                  style={{
-                                    height: `${barHeightPct}%`,
-                                    marginBottom: `${minPct}%`
-                                  }}
-                                  className={`w-full rounded-md relative transition-all shadow-sm ${
-                                    isSelected
-                                      ? 'bg-gradient-to-t from-emerald-400 via-blue-500 to-rose-400'
-                                      : 'bg-gradient-to-t from-emerald-200 via-blue-200 to-rose-200 group-hover:from-emerald-300 group-hover:to-rose-300'
-                                  }`}
-                                >
-                                  {/* Current Price Marker Pin */}
-                                  <div
-                                    style={{
-                                      bottom: `${barHeightPct > 0 ? Math.min(100, Math.max(0, ((curVal - minVal) / Math.max(1, maxVal - minVal)) * 100)) : 50}%`
-                                    }}
-                                    className="absolute left-1/2 transform -translate-x-1/2 translate-y-1/2 z-10 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-blue-600 border-2 border-white rounded-full shadow-md flex items-center justify-center"
-                                    title={`Current: ₹${curVal.toLocaleString('en-IN')}`}
+                            {/* Vertical Gridlines & Date Labels */}
+                            {days.map((d, idx) => {
+                              const x = getX(idx);
+                              const isSelected = selectedDate === d.date;
+                              return (
+                                <g key={d.date}>
+                                  <line
+                                    x1={x}
+                                    y1={padTop}
+                                    x2={x}
+                                    y2={padTop + chartH}
+                                    stroke={isSelected ? '#3b82f6' : '#e2e8f0'}
+                                    strokeDasharray={isSelected ? 'none' : '3 3'}
+                                    strokeWidth={isSelected ? '1.5' : '1'}
                                   />
-                                </div>
-                              ) : (
-                                <div className="w-full h-8 rounded border border-dashed border-slate-200 bg-slate-50 flex items-center justify-center">
-                                  <span className="text-[8px] text-slate-300">No data</span>
-                                </div>
-                              )}
-                            </div>
+                                  <text
+                                    x={x}
+                                    y={padTop + chartH + 18}
+                                    textAnchor="middle"
+                                    fontSize="10"
+                                    fontWeight={isSelected ? 'bold' : '600'}
+                                    fill={isSelected ? '#2563eb' : '#475569'}
+                                  >
+                                    {d.date.slice(8)} Nov
+                                  </text>
+                                </g>
+                              );
+                            })}
 
-                            {/* Current & Min Fare Combined Footers */}
-                            <div className="flex flex-col items-center gap-0.5 mt-0.5">
-                              {/* Current Price */}
-                              <span className={`text-[8px] sm:text-[9.5px] font-bold whitespace-nowrap text-center ${
-                                isSelected ? 'text-blue-700' : 'text-blue-600'
-                              }`}>
-                                {hasData ? (
-                                  <>
-                                    <span className="hidden lg:inline">₹{curVal.toLocaleString('en-IN')}</span>
-                                    <span className="lg:hidden">₹{(curVal / 1000).toFixed(1)}k</span>
-                                  </>
-                                ) : (
-                                  '—'
-                                )}
-                              </span>
+                            {/* Horizontal Fare Gridlines & Y-axis Labels */}
+                            {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
+                              const y = padTop + (1 - ratio) * chartH;
+                              const fareVal = Math.round(minVal + ratio * (maxVal - minVal));
+                              return (
+                                <g key={ratio}>
+                                  <line
+                                    x1={padLeft}
+                                    y1={y}
+                                    x2={width - padRight}
+                                    y2={y}
+                                    stroke="#e2e8f0"
+                                    strokeDasharray="4 4"
+                                    strokeWidth="1"
+                                  />
+                                  <text
+                                    x={padLeft - 8}
+                                    y={y + 4}
+                                    textAnchor="end"
+                                    fontSize="9.5"
+                                    fill="#64748b"
+                                    fontWeight="500"
+                                    fontFamily="monospace"
+                                  >
+                                    ₹{(fareVal / 1000).toFixed(0)}k
+                                  </text>
+                                </g>
+                              );
+                            })}
 
-                              {/* Min Price */}
-                              <span className="text-[8px] sm:text-[9px] font-semibold text-emerald-600 whitespace-nowrap text-center">
-                                {hasData ? (
-                                  <>
-                                    <span className="hidden lg:inline">₹{minVal.toLocaleString('en-IN')}</span>
-                                    <span className="lg:hidden">₹{(minVal / 1000).toFixed(1)}k</span>
-                                  </>
-                                ) : (
-                                  '—'
-                                )}
-                              </span>
-                            </div>
+                            {/* Max Fare Line (Rose) */}
+                            {maxPathD && (
+                              <path
+                                d={maxPathD}
+                                fill="none"
+                                stroke="#ef4444"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            )}
 
-                            {/* Date Label */}
-                            <span className={`text-[10px] font-medium mt-1 whitespace-nowrap ${
-                              isSelected ? 'text-blue-700 font-bold' : 'text-slate-600'
-                            }`}>
-                              {d.date.slice(8)} Nov
-                            </span>
-                          </div>
+                            {/* Current Lowest Fare Line (Blue) */}
+                            {curPathD && (
+                              <path
+                                d={curPathD}
+                                fill="none"
+                                stroke="#2563eb"
+                                strokeWidth="2.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            )}
+
+                            {/* Min Fare Line (Emerald) */}
+                            {minPathD && (
+                              <path
+                                d={minPathD}
+                                fill="none"
+                                stroke="#10b981"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            )}
+
+                            {/* Interactive Nodes for Max, Current, Min */}
+                            {days.map((d, idx) => {
+                              const x = getX(idx);
+                              const isSelected = selectedDate === d.date;
+                              return (
+                                <g key={`nodes-${d.date}`} onClick={() => setSelectedDate(d.date)} className="cursor-pointer">
+                                  {/* Max Node */}
+                                  {d.maxPrice !== null && (
+                                    <circle
+                                      cx={x}
+                                      cy={getY(d.maxPrice)}
+                                      r={isSelected ? "5" : "3.5"}
+                                      fill="#ef4444"
+                                      stroke="#ffffff"
+                                      strokeWidth="1.5"
+                                    />
+                                  )}
+                                  {/* Current Node */}
+                                  {d.currentPrice !== null && (
+                                    <circle
+                                      cx={x}
+                                      cy={getY(d.currentPrice)}
+                                      r={isSelected ? "6" : "4.5"}
+                                      fill="#2563eb"
+                                      stroke="#ffffff"
+                                      strokeWidth="2"
+                                    />
+                                  )}
+                                  {/* Min Node */}
+                                  {d.minPrice !== null && (
+                                    <circle
+                                      cx={x}
+                                      cy={getY(d.minPrice)}
+                                      r={isSelected ? "5" : "3.5"}
+                                      fill="#10b981"
+                                      stroke="#ffffff"
+                                      strokeWidth="1.5"
+                                    />
+                                  )}
+                                </g>
+                              );
+                            })}
+                          </svg>
                         );
-                      })}
+                      })()}
                     </div>
 
                     {/* Selected Date Metric Highlight Bar */}

@@ -4,7 +4,7 @@
     "start": "2026-11-09",
     "end": "2026-11-23"
   },
-  "totalAuthenticObservations": 313,
+  "totalAuthenticObservations": 376,
   "uniqueDepartureDates": [
     "2026-11-09",
     "2026-11-10",
@@ -34,8 +34,10 @@
     "AI1877 / AI2609",
     "AI2500 / AI1735",
     "IX-1617",
+    "IX1264 / IX1230",
     "IX1384 / AI1735",
     "IX1384 / IX1230",
+    "IX1385 / IX1257",
     "IX2173 / IX1083",
     "IX2173 / IX1230",
     "QP-1412"
@@ -43,24 +45,24 @@
   "airlines": [
     {
       "name": "IndiGo",
-      "count": 293,
+      "count": 344,
       "minPrice": 7550,
       "maxPrice": 34950,
-      "avgPrice": 17461
+      "avgPrice": 17285
     },
     {
       "name": "Air India",
-      "count": 10,
+      "count": 16,
       "minPrice": 12950,
-      "maxPrice": 13701,
-      "avgPrice": 13221
+      "maxPrice": 15628,
+      "avgPrice": 13464
     },
     {
       "name": "Air India Express",
-      "count": 8,
+      "count": 14,
       "minPrice": 10519,
       "maxPrice": 23542,
-      "avgPrice": 13864
+      "avgPrice": 13835
     },
     {
       "name": "Akasa Air",
@@ -85,15 +87,15 @@
     "airline": "IndiGo"
   },
   "earliestObservationTimestamp": "2026-09-25T12:01:41.037+00:00",
-  "latestObservationTimestamp": "2026-10-01T20:40:03.381+00:00",
+  "latestObservationTimestamp": "2026-10-02T18:17:49.917Z",
   "dateBreakdown": [
     {
       "date": "2026-11-09",
-      "observationCount": 24,
+      "observationCount": 28,
       "minPrice": 7550,
       "maxPrice": 16176,
       "currentPrice": 11343,
-      "avgPrice": 13098,
+      "avgPrice": 13106,
       "flightCount": 6,
       "tMinusPoints": [
         {
@@ -139,7 +141,7 @@
         {
           "daysBeforeDeparture": 40,
           "label": "T-40d",
-          "averageFare": 12551,
+          "averageFare": 12647,
           "minFare": 7550,
           "maxFare": 16176,
           "dataPointsCount": 48,
@@ -200,11 +202,11 @@
     },
     {
       "date": "2026-11-10",
-      "observationCount": 24,
+      "observationCount": 27,
       "minPrice": 11943,
       "maxPrice": 17541,
       "currentPrice": 12643,
-      "avgPrice": 14057,
+      "avgPrice": 14127,
       "flightCount": 5,
       "tMinusPoints": [
         {
@@ -250,7 +252,7 @@
         {
           "daysBeforeDeparture": 40,
           "label": "T-40d",
-          "averageFare": 13891,
+          "averageFare": 13910,
           "minFare": 11943,
           "maxFare": 17541,
           "dataPointsCount": 131,
@@ -311,11 +313,11 @@
     },
     {
       "date": "2026-11-11",
-      "observationCount": 21,
+      "observationCount": 24,
       "minPrice": 12669,
       "maxPrice": 23542,
       "currentPrice": 12669,
-      "avgPrice": 13953,
+      "avgPrice": 13936,
       "flightCount": 9,
       "tMinusPoints": [
         {
@@ -361,7 +363,7 @@
         {
           "daysBeforeDeparture": 40,
           "label": "T-40d",
-          "averageFare": 13668,
+          "averageFare": 13693,
           "minFare": 12669,
           "maxFare": 23542,
           "dataPointsCount": 46,
@@ -422,11 +424,11 @@
     },
     {
       "date": "2026-11-12",
-      "observationCount": 20,
-      "minPrice": 14343,
+      "observationCount": 24,
+      "minPrice": 13879,
       "maxPrice": 33375,
-      "currentPrice": 14343,
-      "avgPrice": 22438,
+      "currentPrice": 13879,
+      "avgPrice": 22131,
       "flightCount": 4,
       "tMinusPoints": [
         {
@@ -472,8 +474,8 @@
         {
           "daysBeforeDeparture": 40,
           "label": "T-40d",
-          "averageFare": 22461,
-          "minFare": 14343,
+          "averageFare": 22224,
+          "minFare": 13879,
           "maxFare": 33375,
           "dataPointsCount": 32,
           "distinctDatesCount": 1,
@@ -533,11 +535,11 @@
     },
     {
       "date": "2026-11-13",
-      "observationCount": 20,
+      "observationCount": 24,
       "minPrice": 13543,
       "maxPrice": 33375,
       "currentPrice": 13543,
-      "avgPrice": 22012,
+      "avgPrice": 21455,
       "flightCount": 4,
       "tMinusPoints": [
         {
@@ -583,7 +585,7 @@
         {
           "daysBeforeDeparture": 40,
           "label": "T-40d",
-          "averageFare": 22079,
+          "averageFare": 21740,
           "minFare": 13543,
           "maxFare": 33375,
           "dataPointsCount": 41,
@@ -644,7 +646,7 @@
     },
     {
       "date": "2026-11-14",
-      "observationCount": 10,
+      "observationCount": 12,
       "minPrice": 20481,
       "maxPrice": 20936,
       "currentPrice": 20481,
@@ -755,11 +757,11 @@
     },
     {
       "date": "2026-11-15",
-      "observationCount": 28,
+      "observationCount": 32,
       "minPrice": 15443,
       "maxPrice": 34950,
-      "currentPrice": 15443,
-      "avgPrice": 25953,
+      "currentPrice": 16643,
+      "avgPrice": 25974,
       "flightCount": 4,
       "tMinusPoints": [
         {
@@ -805,7 +807,7 @@
         {
           "daysBeforeDeparture": 40,
           "label": "T-40d",
-          "averageFare": 26004,
+          "averageFare": 26009,
           "minFare": 15443,
           "maxFare": 34950,
           "dataPointsCount": 84,
@@ -866,11 +868,11 @@
     },
     {
       "date": "2026-11-16",
-      "observationCount": 20,
+      "observationCount": 24,
       "minPrice": 13543,
       "maxPrice": 34425,
-      "currentPrice": 14343,
-      "avgPrice": 23299,
+      "currentPrice": 13879,
+      "avgPrice": 22604,
       "flightCount": 4,
       "tMinusPoints": [
         {
@@ -916,12 +918,12 @@
         {
           "daysBeforeDeparture": 40,
           "label": "T-40d",
-          "averageFare": null,
-          "minFare": null,
-          "maxFare": null,
-          "dataPointsCount": 0,
-          "distinctDatesCount": 0,
-          "status": "insufficient_data"
+          "averageFare": 19132,
+          "minFare": 13879,
+          "maxFare": 34425,
+          "dataPointsCount": 4,
+          "distinctDatesCount": 1,
+          "status": "sufficient"
         },
         {
           "daysBeforeDeparture": 50,
@@ -977,11 +979,11 @@
     },
     {
       "date": "2026-11-17",
-      "observationCount": 15,
+      "observationCount": 18,
       "minPrice": 11943,
       "maxPrice": 23001,
       "currentPrice": 11943,
-      "avgPrice": 17710,
+      "avgPrice": 16964,
       "flightCount": 3,
       "tMinusPoints": [
         {
@@ -1037,7 +1039,7 @@
         {
           "daysBeforeDeparture": 50,
           "label": "T-50d",
-          "averageFare": 18121,
+          "averageFare": 17521,
           "minFare": 11943,
           "maxFare": 23001,
           "dataPointsCount": 27,
@@ -1088,11 +1090,11 @@
     },
     {
       "date": "2026-11-18",
-      "observationCount": 15,
+      "observationCount": 18,
       "minPrice": 10743,
       "maxPrice": 18381,
       "currentPrice": 10743,
-      "avgPrice": 14104,
+      "avgPrice": 13892,
       "flightCount": 3,
       "tMinusPoints": [
         {
@@ -1148,7 +1150,7 @@
         {
           "daysBeforeDeparture": 50,
           "label": "T-50d",
-          "averageFare": 14328,
+          "averageFare": 14234,
           "minFare": 10743,
           "maxFare": 18381,
           "dataPointsCount": 51,
@@ -1199,11 +1201,11 @@
     },
     {
       "date": "2026-11-19",
-      "observationCount": 26,
+      "observationCount": 30,
       "minPrice": 9643,
       "maxPrice": 22383,
-      "currentPrice": 9643,
-      "avgPrice": 14515,
+      "currentPrice": 10143,
+      "avgPrice": 14580,
       "flightCount": 10,
       "tMinusPoints": [
         {
@@ -1259,10 +1261,10 @@
         {
           "daysBeforeDeparture": 50,
           "label": "T-50d",
-          "averageFare": 14515,
+          "averageFare": 14580,
           "minFare": 9643,
           "maxFare": 22383,
-          "dataPointsCount": 26,
+          "dataPointsCount": 30,
           "distinctDatesCount": 1,
           "status": "sufficient"
         },
@@ -1310,12 +1312,12 @@
     },
     {
       "date": "2026-11-20",
-      "observationCount": 36,
+      "observationCount": 47,
       "minPrice": 10499,
       "maxPrice": 19221,
-      "currentPrice": 10743,
-      "avgPrice": 12973,
-      "flightCount": 7,
+      "currentPrice": 11686,
+      "avgPrice": 13050,
+      "flightCount": 13,
       "tMinusPoints": [
         {
           "daysBeforeDeparture": 1,
@@ -1370,7 +1372,7 @@
         {
           "daysBeforeDeparture": 50,
           "label": "T-50d",
-          "averageFare": 12677,
+          "averageFare": 12699,
           "minFare": 10499,
           "maxFare": 19221,
           "dataPointsCount": 332,
@@ -1421,11 +1423,11 @@
     },
     {
       "date": "2026-11-21",
-      "observationCount": 14,
+      "observationCount": 16,
       "minPrice": 11343,
       "maxPrice": 18591,
       "currentPrice": 11343,
-      "avgPrice": 14829,
+      "avgPrice": 14518,
       "flightCount": 3,
       "tMinusPoints": [
         {
@@ -1481,7 +1483,7 @@
         {
           "daysBeforeDeparture": 50,
           "label": "T-50d",
-          "averageFare": 15091,
+          "averageFare": 14972,
           "minFare": 11343,
           "maxFare": 18591,
           "dataPointsCount": 48,
@@ -1532,12 +1534,12 @@
     },
     {
       "date": "2026-11-22",
-      "observationCount": 20,
+      "observationCount": 28,
       "minPrice": 9643,
       "maxPrice": 21858,
       "currentPrice": 9643,
-      "avgPrice": 16954,
-      "flightCount": 5,
+      "avgPrice": 16324,
+      "flightCount": 10,
       "tMinusPoints": [
         {
           "daysBeforeDeparture": 1,
@@ -1592,10 +1594,10 @@
         {
           "daysBeforeDeparture": 50,
           "label": "T-50d",
-          "averageFare": 17036,
+          "averageFare": 16324,
           "minFare": 9643,
           "maxFare": 21858,
-          "dataPointsCount": 24,
+          "dataPointsCount": 28,
           "distinctDatesCount": 1,
           "status": "sufficient"
         },
@@ -1643,11 +1645,11 @@
     },
     {
       "date": "2026-11-23",
-      "observationCount": 20,
+      "observationCount": 24,
       "minPrice": 9643,
       "maxPrice": 16713,
       "currentPrice": 9643,
-      "avgPrice": 13646,
+      "avgPrice": 13509,
       "flightCount": 4,
       "tMinusPoints": [
         {
@@ -1703,7 +1705,7 @@
         {
           "daysBeforeDeparture": 50,
           "label": "T-50d",
-          "averageFare": 13681,
+          "averageFare": 13509,
           "minFare": 9643,
           "maxFare": 16713,
           "dataPointsCount": 24,
@@ -1797,20 +1799,20 @@
     {
       "daysBeforeDeparture": 40,
       "label": "T-40d",
-      "averageFare": 18067,
+      "averageFare": 18045,
       "minFare": 7550,
       "maxFare": 34950,
-      "dataPointsCount": 398,
-      "distinctDatesCount": 7,
+      "dataPointsCount": 402,
+      "distinctDatesCount": 8,
       "status": "sufficient"
     },
     {
       "daysBeforeDeparture": 50,
       "label": "T-50d",
-      "averageFare": 14629,
+      "averageFare": 14575,
       "minFare": 9643,
       "maxFare": 34425,
-      "dataPointsCount": 587,
+      "dataPointsCount": 595,
       "distinctDatesCount": 8,
       "status": "sufficient"
     },
@@ -1916,7 +1918,7 @@
       "flightNumber": "6E-118",
       "airline": "IndiGo",
       "departureDate": "2026-11-09",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 11343,
       "lastPrice": 11343,
       "minPrice": 11343,
@@ -1924,7 +1926,7 @@
       "priceDelta": 0,
       "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:01.962+00:00",
-      "lastObservedAt": "2026-10-01T20:28:13.41+00:00",
+      "lastObservedAt": "2026-10-02T18:07:24.871Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:01.962+00:00",
@@ -1952,6 +1954,12 @@
         },
         {
           "timestamp": "2026-10-01T20:28:13.41+00:00",
+          "price": 11343,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:24.871Z",
           "price": 11343,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
@@ -1962,7 +1970,7 @@
       "flightNumber": "6E142 / 6E522",
       "airline": "IndiGo",
       "departureDate": "2026-11-09",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 13509,
       "lastPrice": 13509,
       "minPrice": 13509,
@@ -1970,7 +1978,7 @@
       "priceDelta": 0,
       "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:01.962+00:00",
-      "lastObservedAt": "2026-10-01T20:28:13.41+00:00",
+      "lastObservedAt": "2026-10-02T18:07:24.871Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:01.962+00:00",
@@ -1998,6 +2006,12 @@
         },
         {
           "timestamp": "2026-10-01T20:28:13.41+00:00",
+          "price": 13509,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:24.871Z",
           "price": 13509,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
@@ -2008,15 +2022,15 @@
       "flightNumber": "6E7742 / 6E6116",
       "airline": "IndiGo",
       "departureDate": "2026-11-09",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 15873,
-      "lastPrice": 15873,
-      "minPrice": 15873,
+      "lastPrice": 13879,
+      "minPrice": 13879,
       "maxPrice": 15873,
-      "priceDelta": 0,
-      "priceDeltaPercent": 0,
+      "priceDelta": -1994,
+      "priceDeltaPercent": -12.562212562212563,
       "firstObservedAt": "2026-10-01T10:22:01.962+00:00",
-      "lastObservedAt": "2026-10-01T20:28:13.41+00:00",
+      "lastObservedAt": "2026-10-02T18:07:24.871Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:01.962+00:00",
@@ -2047,6 +2061,12 @@
           "price": 15873,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:24.871Z",
+          "price": 13879,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
       ]
     },
@@ -2054,15 +2074,15 @@
       "flightNumber": "6E6968 / 6E794",
       "airline": "IndiGo",
       "departureDate": "2026-11-09",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 16176,
-      "lastPrice": 15966,
-      "minPrice": 15966,
+      "lastPrice": 13879,
+      "minPrice": 13879,
       "maxPrice": 16176,
-      "priceDelta": -210,
-      "priceDeltaPercent": -1.298219584569733,
+      "priceDelta": -2297,
+      "priceDeltaPercent": -14.200049455984173,
       "firstObservedAt": "2026-10-01T10:22:01.962+00:00",
-      "lastObservedAt": "2026-10-01T20:28:13.41+00:00",
+      "lastObservedAt": "2026-10-02T18:07:24.871Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:01.962+00:00",
@@ -2093,6 +2113,12 @@
           "price": 15966,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:24.871Z",
+          "price": 13879,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
       ]
     },
@@ -2100,7 +2126,7 @@
       "flightNumber": "6E-118",
       "airline": "IndiGo",
       "departureDate": "2026-11-10",
-      "observationsCount": 8,
+      "observationsCount": 9,
       "firstPrice": 11943,
       "lastPrice": 12643,
       "minPrice": 11943,
@@ -2108,7 +2134,7 @@
       "priceDelta": 700,
       "priceDeltaPercent": 5.861173909402997,
       "firstObservedAt": "2026-10-01T05:48:02.458+00:00",
-      "lastObservedAt": "2026-10-01T20:28:03.297+00:00",
+      "lastObservedAt": "2026-10-02T18:07:26.207Z",
       "history": [
         {
           "timestamp": "2026-10-01T05:48:02.458+00:00",
@@ -2154,6 +2180,12 @@
         },
         {
           "timestamp": "2026-10-01T20:28:03.297+00:00",
+          "price": 12643,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:26.207Z",
           "price": 12643,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
@@ -2220,15 +2252,15 @@
       "flightNumber": "6E142 / 6E522",
       "airline": "IndiGo",
       "departureDate": "2026-11-10",
-      "observationsCount": 6,
+      "observationsCount": 7,
       "firstPrice": 13879,
-      "lastPrice": 15189,
+      "lastPrice": 13879,
       "minPrice": 13879,
       "maxPrice": 15189,
-      "priceDelta": 1310,
-      "priceDeltaPercent": 9.43872036890266,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T09:43:23.474+00:00",
-      "lastObservedAt": "2026-10-01T20:28:03.297+00:00",
+      "lastObservedAt": "2026-10-02T18:07:26.207Z",
       "history": [
         {
           "timestamp": "2026-10-01T09:43:23.474+00:00",
@@ -2265,6 +2297,12 @@
           "price": 15189,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:26.207Z",
+          "price": 13879,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
       ]
     },
@@ -2272,15 +2310,15 @@
       "flightNumber": "6E6968 / 6E794",
       "airline": "IndiGo",
       "departureDate": "2026-11-10",
-      "observationsCount": 6,
+      "observationsCount": 7,
       "firstPrice": 13879,
-      "lastPrice": 17541,
+      "lastPrice": 17517,
       "minPrice": 13879,
       "maxPrice": 17541,
-      "priceDelta": 3662,
-      "priceDeltaPercent": 26.38518625261186,
+      "priceDelta": 3638,
+      "priceDeltaPercent": 26.212263131349523,
       "firstObservedAt": "2026-10-01T09:43:23.474+00:00",
-      "lastObservedAt": "2026-10-01T20:28:03.297+00:00",
+      "lastObservedAt": "2026-10-02T18:07:26.207Z",
       "history": [
         {
           "timestamp": "2026-10-01T09:43:23.474+00:00",
@@ -2317,6 +2355,12 @@
           "price": 17541,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:26.207Z",
+          "price": 17517,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
       ]
     },
@@ -2324,7 +2368,7 @@
       "flightNumber": "6E142 / 6E522",
       "airline": "IndiGo",
       "departureDate": "2026-11-11",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 12669,
       "lastPrice": 12669,
       "minPrice": 12669,
@@ -2332,7 +2376,7 @@
       "priceDelta": 0,
       "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:03.569+00:00",
-      "lastObservedAt": "2026-10-01T20:39:49.404+00:00",
+      "lastObservedAt": "2026-10-02T18:07:12.527Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:03.569+00:00",
@@ -2360,6 +2404,12 @@
         },
         {
           "timestamp": "2026-10-01T20:39:49.404+00:00",
+          "price": 12669,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:12.527Z",
           "price": 12669,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
@@ -2436,7 +2486,7 @@
       "flightNumber": "6E-118",
       "airline": "IndiGo",
       "departureDate": "2026-11-11",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 13543,
       "lastPrice": 13543,
       "minPrice": 13543,
@@ -2444,7 +2494,7 @@
       "priceDelta": 0,
       "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:03.569+00:00",
-      "lastObservedAt": "2026-10-01T20:39:49.404+00:00",
+      "lastObservedAt": "2026-10-02T18:07:12.527Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:03.569+00:00",
@@ -2472,6 +2522,12 @@
         },
         {
           "timestamp": "2026-10-01T20:39:49.404+00:00",
+          "price": 13543,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:12.527Z",
           "price": 13543,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
@@ -2504,15 +2560,15 @@
       "flightNumber": "6E6968 / 6E794",
       "airline": "IndiGo",
       "departureDate": "2026-11-11",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 14076,
-      "lastPrice": 14076,
+      "lastPrice": 15231,
       "minPrice": 14076,
-      "maxPrice": 14076,
-      "priceDelta": 0,
-      "priceDeltaPercent": 0,
+      "maxPrice": 15231,
+      "priceDelta": 1155,
+      "priceDeltaPercent": 8.20545609548167,
       "firstObservedAt": "2026-10-01T10:22:03.569+00:00",
-      "lastObservedAt": "2026-10-01T20:39:49.404+00:00",
+      "lastObservedAt": "2026-10-02T18:07:12.527Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:03.569+00:00",
@@ -2541,6 +2597,12 @@
         {
           "timestamp": "2026-10-01T20:39:49.404+00:00",
           "price": 14076,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:12.527Z",
+          "price": 15231,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
@@ -2591,64 +2653,18 @@
       ]
     },
     {
-      "flightNumber": "6E-118",
-      "airline": "IndiGo",
-      "departureDate": "2026-11-12",
-      "observationsCount": 5,
-      "firstPrice": 14343,
-      "lastPrice": 14343,
-      "minPrice": 14343,
-      "maxPrice": 14343,
-      "priceDelta": 0,
-      "priceDeltaPercent": 0,
-      "firstObservedAt": "2026-10-01T10:22:05.232+00:00",
-      "lastObservedAt": "2026-10-01T20:39:50.805+00:00",
-      "history": [
-        {
-          "timestamp": "2026-10-01T10:22:05.232+00:00",
-          "price": 14343,
-          "source": "SerpApi (Google Flights)",
-          "provenance": "REAL_EXTERNAL_OBSERVATION"
-        },
-        {
-          "timestamp": "2026-10-01T16:30:31.745+00:00",
-          "price": 14343,
-          "source": "SerpApi (Google Flights)",
-          "provenance": "REAL_EXTERNAL_OBSERVATION"
-        },
-        {
-          "timestamp": "2026-10-01T18:18:50.912+00:00",
-          "price": 14343,
-          "source": "SerpApi (Google Flights)",
-          "provenance": "REAL_EXTERNAL_OBSERVATION"
-        },
-        {
-          "timestamp": "2026-10-01T19:01:20.571+00:00",
-          "price": 14343,
-          "source": "SerpApi (Google Flights)",
-          "provenance": "REAL_EXTERNAL_OBSERVATION"
-        },
-        {
-          "timestamp": "2026-10-01T20:39:50.805+00:00",
-          "price": 14343,
-          "source": "SerpApi (Google Flights)",
-          "provenance": "REAL_EXTERNAL_OBSERVATION"
-        }
-      ]
-    },
-    {
       "flightNumber": "6E142 / 6E522",
       "airline": "IndiGo",
       "departureDate": "2026-11-12",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 18444,
-      "lastPrice": 19704,
-      "minPrice": 18444,
+      "lastPrice": 13879,
+      "minPrice": 13879,
       "maxPrice": 19704,
-      "priceDelta": 1260,
-      "priceDeltaPercent": 6.831489915419649,
+      "priceDelta": -4565,
+      "priceDeltaPercent": -24.750596399913253,
       "firstObservedAt": "2026-10-01T10:22:05.232+00:00",
-      "lastObservedAt": "2026-10-01T20:39:50.805+00:00",
+      "lastObservedAt": "2026-10-02T18:07:27.564Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:05.232+00:00",
@@ -2679,6 +2695,64 @@
           "price": 19704,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:27.564Z",
+          "price": 13879,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
+      ]
+    },
+    {
+      "flightNumber": "6E-118",
+      "airline": "IndiGo",
+      "departureDate": "2026-11-12",
+      "observationsCount": 6,
+      "firstPrice": 14343,
+      "lastPrice": 14343,
+      "minPrice": 14343,
+      "maxPrice": 14343,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
+      "firstObservedAt": "2026-10-01T10:22:05.232+00:00",
+      "lastObservedAt": "2026-10-02T18:07:27.564Z",
+      "history": [
+        {
+          "timestamp": "2026-10-01T10:22:05.232+00:00",
+          "price": 14343,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-01T16:30:31.745+00:00",
+          "price": 14343,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-01T18:18:50.912+00:00",
+          "price": 14343,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-01T19:01:20.571+00:00",
+          "price": 14343,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-01T20:39:50.805+00:00",
+          "price": 14343,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:27.564Z",
+          "price": 14343,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
       ]
     },
@@ -2686,7 +2760,7 @@
       "flightNumber": "6E6968 / 6E794",
       "airline": "IndiGo",
       "departureDate": "2026-11-12",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 22581,
       "lastPrice": 22581,
       "minPrice": 22581,
@@ -2694,7 +2768,7 @@
       "priceDelta": 0,
       "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:05.232+00:00",
-      "lastObservedAt": "2026-10-01T20:39:50.805+00:00",
+      "lastObservedAt": "2026-10-02T18:07:27.564Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:05.232+00:00",
@@ -2722,6 +2796,12 @@
         },
         {
           "timestamp": "2026-10-01T20:39:50.805+00:00",
+          "price": 22581,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:27.564Z",
           "price": 22581,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
@@ -2732,15 +2812,15 @@
       "flightNumber": "6E7742 / 6E6116",
       "airline": "IndiGo",
       "departureDate": "2026-11-12",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 33375,
-      "lastPrice": 33375,
-      "minPrice": 33375,
+      "lastPrice": 31590,
+      "minPrice": 31590,
       "maxPrice": 33375,
-      "priceDelta": 0,
-      "priceDeltaPercent": 0,
+      "priceDelta": -1785,
+      "priceDeltaPercent": -5.348314606741573,
       "firstObservedAt": "2026-10-01T10:22:05.232+00:00",
-      "lastObservedAt": "2026-10-01T20:39:50.805+00:00",
+      "lastObservedAt": "2026-10-02T18:07:27.564Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:05.232+00:00",
@@ -2771,6 +2851,12 @@
           "price": 33375,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:27.564Z",
+          "price": 31590,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
       ]
     },
@@ -2778,7 +2864,7 @@
       "flightNumber": "6E-118",
       "airline": "IndiGo",
       "departureDate": "2026-11-13",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 13543,
       "lastPrice": 13543,
       "minPrice": 13543,
@@ -2786,7 +2872,7 @@
       "priceDelta": 0,
       "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:07.02+00:00",
-      "lastObservedAt": "2026-10-01T20:39:52.204+00:00",
+      "lastObservedAt": "2026-10-02T18:07:28.731Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:07.02+00:00",
@@ -2817,6 +2903,64 @@
           "price": 13543,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:28.731Z",
+          "price": 13543,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
+      ]
+    },
+    {
+      "flightNumber": "6E6968 / 6E794",
+      "airline": "IndiGo",
+      "departureDate": "2026-11-13",
+      "observationsCount": 6,
+      "firstPrice": 24051,
+      "lastPrice": 13879,
+      "minPrice": 13879,
+      "maxPrice": 24051,
+      "priceDelta": -10172,
+      "priceDeltaPercent": -42.2934597314041,
+      "firstObservedAt": "2026-10-01T10:22:07.02+00:00",
+      "lastObservedAt": "2026-10-02T18:07:28.731Z",
+      "history": [
+        {
+          "timestamp": "2026-10-01T10:22:07.02+00:00",
+          "price": 24051,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-01T16:30:33.148+00:00",
+          "price": 24051,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-01T18:18:52.105+00:00",
+          "price": 24051,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-01T19:01:21.629+00:00",
+          "price": 24051,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-01T20:39:52.204+00:00",
+          "price": 24051,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:28.731Z",
+          "price": 13879,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
       ]
     },
@@ -2824,15 +2968,15 @@
       "flightNumber": "6E142 / 6E522",
       "airline": "IndiGo",
       "departureDate": "2026-11-13",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 14982,
-      "lastPrice": 17604,
-      "minPrice": 14982,
+      "lastPrice": 13879,
+      "minPrice": 13879,
       "maxPrice": 17604,
-      "priceDelta": 2622,
-      "priceDeltaPercent": 17.501001201441728,
+      "priceDelta": -1103,
+      "priceDeltaPercent": -7.36216793485516,
       "firstObservedAt": "2026-10-01T10:22:07.02+00:00",
-      "lastObservedAt": "2026-10-01T20:39:52.204+00:00",
+      "lastObservedAt": "2026-10-02T18:07:28.731Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:07.02+00:00",
@@ -2863,50 +3007,10 @@
           "price": 17604,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
-        }
-      ]
-    },
-    {
-      "flightNumber": "6E6968 / 6E794",
-      "airline": "IndiGo",
-      "departureDate": "2026-11-13",
-      "observationsCount": 5,
-      "firstPrice": 24051,
-      "lastPrice": 24051,
-      "minPrice": 24051,
-      "maxPrice": 24051,
-      "priceDelta": 0,
-      "priceDeltaPercent": 0,
-      "firstObservedAt": "2026-10-01T10:22:07.02+00:00",
-      "lastObservedAt": "2026-10-01T20:39:52.204+00:00",
-      "history": [
-        {
-          "timestamp": "2026-10-01T10:22:07.02+00:00",
-          "price": 24051,
-          "source": "SerpApi (Google Flights)",
-          "provenance": "REAL_EXTERNAL_OBSERVATION"
         },
         {
-          "timestamp": "2026-10-01T16:30:33.148+00:00",
-          "price": 24051,
-          "source": "SerpApi (Google Flights)",
-          "provenance": "REAL_EXTERNAL_OBSERVATION"
-        },
-        {
-          "timestamp": "2026-10-01T18:18:52.105+00:00",
-          "price": 24051,
-          "source": "SerpApi (Google Flights)",
-          "provenance": "REAL_EXTERNAL_OBSERVATION"
-        },
-        {
-          "timestamp": "2026-10-01T19:01:21.629+00:00",
-          "price": 24051,
-          "source": "SerpApi (Google Flights)",
-          "provenance": "REAL_EXTERNAL_OBSERVATION"
-        },
-        {
-          "timestamp": "2026-10-01T20:39:52.204+00:00",
-          "price": 24051,
+          "timestamp": "2026-10-02T18:07:28.731Z",
+          "price": 13879,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
@@ -2916,7 +3020,7 @@
       "flightNumber": "6E7742 / 6E6116",
       "airline": "IndiGo",
       "departureDate": "2026-11-13",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 33375,
       "lastPrice": 33375,
       "minPrice": 33375,
@@ -2924,7 +3028,7 @@
       "priceDelta": 0,
       "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:07.02+00:00",
-      "lastObservedAt": "2026-10-01T20:39:52.204+00:00",
+      "lastObservedAt": "2026-10-02T18:07:28.731Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:07.02+00:00",
@@ -2952,6 +3056,12 @@
         },
         {
           "timestamp": "2026-10-01T20:39:52.204+00:00",
+          "price": 33375,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:28.731Z",
           "price": 33375,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
@@ -2962,7 +3072,7 @@
       "flightNumber": "6E6968 / 6E794",
       "airline": "IndiGo",
       "departureDate": "2026-11-14",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 20481,
       "lastPrice": 20481,
       "minPrice": 20481,
@@ -2970,7 +3080,7 @@
       "priceDelta": 0,
       "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:08.486+00:00",
-      "lastObservedAt": "2026-10-01T20:39:53.505+00:00",
+      "lastObservedAt": "2026-10-02T18:07:30.172Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:08.486+00:00",
@@ -2998,6 +3108,12 @@
         },
         {
           "timestamp": "2026-10-01T20:39:53.505+00:00",
+          "price": 20481,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:30.172Z",
           "price": 20481,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
@@ -3008,7 +3124,7 @@
       "flightNumber": "6E-118",
       "airline": "IndiGo",
       "departureDate": "2026-11-14",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 20936,
       "lastPrice": 20936,
       "minPrice": 20936,
@@ -3016,7 +3132,7 @@
       "priceDelta": 0,
       "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:08.486+00:00",
-      "lastObservedAt": "2026-10-01T20:39:53.505+00:00",
+      "lastObservedAt": "2026-10-02T18:07:30.172Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:08.486+00:00",
@@ -3044,6 +3160,12 @@
         },
         {
           "timestamp": "2026-10-01T20:39:53.505+00:00",
+          "price": 20936,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:30.172Z",
           "price": 20936,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
@@ -3054,15 +3176,15 @@
       "flightNumber": "6E-118",
       "airline": "IndiGo",
       "departureDate": "2026-11-15",
-      "observationsCount": 8,
+      "observationsCount": 9,
       "firstPrice": 17944,
-      "lastPrice": 15443,
+      "lastPrice": 16643,
       "minPrice": 15443,
       "maxPrice": 17944,
-      "priceDelta": -2501,
-      "priceDeltaPercent": -13.937806509139545,
+      "priceDelta": -1301,
+      "priceDeltaPercent": -7.250334373606776,
       "firstObservedAt": "2026-10-01T05:48:04.454+00:00",
-      "lastObservedAt": "2026-10-01T20:28:04.311+00:00",
+      "lastObservedAt": "2026-10-02T18:07:31.279Z",
       "history": [
         {
           "timestamp": "2026-10-01T05:48:04.454+00:00",
@@ -3111,6 +3233,12 @@
           "price": 15443,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:31.279Z",
+          "price": 16643,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
       ]
     },
@@ -3118,7 +3246,7 @@
       "flightNumber": "6E142 / 6E522",
       "airline": "IndiGo",
       "departureDate": "2026-11-15",
-      "observationsCount": 6,
+      "observationsCount": 7,
       "firstPrice": 24744,
       "lastPrice": 24744,
       "minPrice": 24744,
@@ -3126,7 +3254,7 @@
       "priceDelta": 0,
       "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T09:43:25.492+00:00",
-      "lastObservedAt": "2026-10-01T20:28:04.311+00:00",
+      "lastObservedAt": "2026-10-02T18:07:31.279Z",
       "history": [
         {
           "timestamp": "2026-10-01T09:43:25.492+00:00",
@@ -3160,6 +3288,12 @@
         },
         {
           "timestamp": "2026-10-01T20:28:04.311+00:00",
+          "price": 24744,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:31.279Z",
           "price": 24744,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
@@ -3170,7 +3304,7 @@
       "flightNumber": "6E6968 / 6E794",
       "airline": "IndiGo",
       "departureDate": "2026-11-15",
-      "observationsCount": 6,
+      "observationsCount": 7,
       "firstPrice": 28146,
       "lastPrice": 28146,
       "minPrice": 28146,
@@ -3178,7 +3312,7 @@
       "priceDelta": 0,
       "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T09:43:25.492+00:00",
-      "lastObservedAt": "2026-10-01T20:28:04.311+00:00",
+      "lastObservedAt": "2026-10-02T18:07:31.279Z",
       "history": [
         {
           "timestamp": "2026-10-01T09:43:25.492+00:00",
@@ -3212,6 +3346,12 @@
         },
         {
           "timestamp": "2026-10-01T20:28:04.311+00:00",
+          "price": 28146,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:31.279Z",
           "price": 28146,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
@@ -3222,7 +3362,7 @@
       "flightNumber": "6E7742 / 6E6116",
       "airline": "IndiGo",
       "departureDate": "2026-11-15",
-      "observationsCount": 8,
+      "observationsCount": 9,
       "firstPrice": 34950,
       "lastPrice": 34950,
       "minPrice": 34950,
@@ -3230,7 +3370,7 @@
       "priceDelta": 0,
       "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T05:48:04.454+00:00",
-      "lastObservedAt": "2026-10-01T20:28:04.311+00:00",
+      "lastObservedAt": "2026-10-02T18:07:31.279Z",
       "history": [
         {
           "timestamp": "2026-10-01T05:48:04.454+00:00",
@@ -3279,6 +3419,12 @@
           "price": 34950,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:31.279Z",
+          "price": 34950,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
       ]
     },
@@ -3286,7 +3432,7 @@
       "flightNumber": "6E-118",
       "airline": "IndiGo",
       "departureDate": "2026-11-16",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 13543,
       "lastPrice": 14343,
       "minPrice": 13543,
@@ -3294,7 +3440,7 @@
       "priceDelta": 800,
       "priceDeltaPercent": 5.90711068448645,
       "firstObservedAt": "2026-10-01T10:22:10.023+00:00",
-      "lastObservedAt": "2026-10-01T20:39:54.934+00:00",
+      "lastObservedAt": "2026-10-02T18:07:13.941Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:10.023+00:00",
@@ -3325,6 +3471,12 @@
           "price": 14343,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:13.941Z",
+          "price": 14343,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
       ]
     },
@@ -3332,15 +3484,15 @@
       "flightNumber": "6E142 / 6E522",
       "airline": "IndiGo",
       "departureDate": "2026-11-16",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 13879,
-      "lastPrice": 24324,
+      "lastPrice": 13879,
       "minPrice": 13879,
       "maxPrice": 24324,
-      "priceDelta": 10445,
-      "priceDeltaPercent": 75.25758339938035,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:10.023+00:00",
-      "lastObservedAt": "2026-10-01T20:39:54.934+00:00",
+      "lastObservedAt": "2026-10-02T18:07:13.941Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:10.023+00:00",
@@ -3369,6 +3521,12 @@
         {
           "timestamp": "2026-10-01T20:39:54.934+00:00",
           "price": 24324,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:13.941Z",
+          "price": 13879,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
@@ -3378,15 +3536,15 @@
       "flightNumber": "6E6968 / 6E794",
       "airline": "IndiGo",
       "departureDate": "2026-11-16",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 13879,
-      "lastPrice": 24471,
+      "lastPrice": 13879,
       "minPrice": 13879,
       "maxPrice": 24471,
-      "priceDelta": 10592,
-      "priceDeltaPercent": 76.31673751711219,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:10.023+00:00",
-      "lastObservedAt": "2026-10-01T20:39:54.934+00:00",
+      "lastObservedAt": "2026-10-02T18:07:13.941Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:10.023+00:00",
@@ -3417,6 +3575,12 @@
           "price": 24471,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:13.941Z",
+          "price": 13879,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
       ]
     },
@@ -3424,7 +3588,7 @@
       "flightNumber": "6E7742 / 6E6116",
       "airline": "IndiGo",
       "departureDate": "2026-11-16",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 34425,
       "lastPrice": 34425,
       "minPrice": 34425,
@@ -3432,7 +3596,7 @@
       "priceDelta": 0,
       "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:10.023+00:00",
-      "lastObservedAt": "2026-10-01T20:39:54.934+00:00",
+      "lastObservedAt": "2026-10-02T18:07:13.941Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:10.023+00:00",
@@ -3460,6 +3624,12 @@
         },
         {
           "timestamp": "2026-10-01T20:39:54.934+00:00",
+          "price": 34425,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:13.941Z",
           "price": 34425,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
@@ -3470,7 +3640,7 @@
       "flightNumber": "6E-118",
       "airline": "IndiGo",
       "departureDate": "2026-11-17",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 11943,
       "lastPrice": 11943,
       "minPrice": 11943,
@@ -3478,7 +3648,7 @@
       "priceDelta": 0,
       "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:11.528+00:00",
-      "lastObservedAt": "2026-10-01T20:39:56.343+00:00",
+      "lastObservedAt": "2026-10-02T18:07:32.510Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:11.528+00:00",
@@ -3509,6 +3679,12 @@
           "price": 11943,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:32.510Z",
+          "price": 11943,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
       ]
     },
@@ -3516,15 +3692,15 @@
       "flightNumber": "6E6968 / 6E794",
       "airline": "IndiGo",
       "departureDate": "2026-11-17",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 13879,
-      "lastPrice": 23001,
+      "lastPrice": 13879,
       "minPrice": 13879,
       "maxPrice": 23001,
-      "priceDelta": 9122,
-      "priceDeltaPercent": 65.72519633979394,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:11.528+00:00",
-      "lastObservedAt": "2026-10-01T20:39:56.343+00:00",
+      "lastObservedAt": "2026-10-02T18:07:32.510Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:11.528+00:00",
@@ -3555,6 +3731,12 @@
           "price": 23001,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:32.510Z",
+          "price": 13879,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
       ]
     },
@@ -3562,15 +3744,15 @@
       "flightNumber": "6E142 / 6E522",
       "airline": "IndiGo",
       "departureDate": "2026-11-17",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 16191,
-      "lastPrice": 20964,
-      "minPrice": 16191,
+      "lastPrice": 13879,
+      "minPrice": 13879,
       "maxPrice": 20964,
-      "priceDelta": 4773,
-      "priceDeltaPercent": 29.47934037428201,
+      "priceDelta": -2312,
+      "priceDeltaPercent": -14.279538014946574,
       "firstObservedAt": "2026-10-01T10:22:11.528+00:00",
-      "lastObservedAt": "2026-10-01T20:39:56.343+00:00",
+      "lastObservedAt": "2026-10-02T18:07:32.510Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:11.528+00:00",
@@ -3601,6 +3783,12 @@
           "price": 20964,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:32.510Z",
+          "price": 13879,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
       ]
     },
@@ -3608,7 +3796,7 @@
       "flightNumber": "6E-118",
       "airline": "IndiGo",
       "departureDate": "2026-11-18",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 10743,
       "lastPrice": 10743,
       "minPrice": 10743,
@@ -3616,7 +3804,7 @@
       "priceDelta": 0,
       "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:13.084+00:00",
-      "lastObservedAt": "2026-10-01T20:39:57.565+00:00",
+      "lastObservedAt": "2026-10-02T18:07:33.950Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:13.084+00:00",
@@ -3644,6 +3832,12 @@
         },
         {
           "timestamp": "2026-10-01T20:39:57.565+00:00",
+          "price": 10743,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:33.950Z",
           "price": 10743,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
@@ -3654,15 +3848,15 @@
       "flightNumber": "6E142 / 6E522",
       "airline": "IndiGo",
       "departureDate": "2026-11-18",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 13879,
-      "lastPrice": 14139,
+      "lastPrice": 13879,
       "minPrice": 13879,
       "maxPrice": 14139,
-      "priceDelta": 260,
-      "priceDeltaPercent": 1.8733338136753368,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:13.084+00:00",
-      "lastObservedAt": "2026-10-01T20:39:57.565+00:00",
+      "lastObservedAt": "2026-10-02T18:07:33.950Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:13.084+00:00",
@@ -3691,6 +3885,12 @@
         {
           "timestamp": "2026-10-01T20:39:57.565+00:00",
           "price": 14139,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:33.950Z",
+          "price": 13879,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
@@ -3700,15 +3900,15 @@
       "flightNumber": "6E6968 / 6E794",
       "airline": "IndiGo",
       "departureDate": "2026-11-18",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 13879,
-      "lastPrice": 18381,
+      "lastPrice": 13879,
       "minPrice": 13879,
       "maxPrice": 18381,
-      "priceDelta": 4502,
-      "priceDeltaPercent": 32.437495496793716,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:13.084+00:00",
-      "lastObservedAt": "2026-10-01T20:39:57.565+00:00",
+      "lastObservedAt": "2026-10-02T18:07:33.950Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:13.084+00:00",
@@ -3739,6 +3939,12 @@
           "price": 18381,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:33.950Z",
+          "price": 13879,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
       ]
     },
@@ -3746,15 +3952,15 @@
       "flightNumber": "6E-118",
       "airline": "IndiGo",
       "departureDate": "2026-11-19",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 9643,
-      "lastPrice": 9643,
+      "lastPrice": 10143,
       "minPrice": 9643,
-      "maxPrice": 9643,
-      "priceDelta": 0,
-      "priceDeltaPercent": 0,
+      "maxPrice": 10143,
+      "priceDelta": 500,
+      "priceDeltaPercent": 5.185108368764907,
       "firstObservedAt": "2026-10-01T10:22:14.57+00:00",
-      "lastObservedAt": "2026-10-01T20:39:58.827+00:00",
+      "lastObservedAt": "2026-10-02T18:07:35.166Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:14.57+00:00",
@@ -3783,6 +3989,12 @@
         {
           "timestamp": "2026-10-01T20:39:58.827+00:00",
           "price": 9643,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:35.166Z",
+          "price": 10143,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
@@ -3836,15 +4048,15 @@
       "flightNumber": "6E142 / 6E522",
       "airline": "IndiGo",
       "departureDate": "2026-11-19",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 12564,
-      "lastPrice": 12564,
+      "lastPrice": 13614,
       "minPrice": 12564,
-      "maxPrice": 12564,
-      "priceDelta": 0,
-      "priceDeltaPercent": 0,
+      "maxPrice": 13614,
+      "priceDelta": 1050,
+      "priceDeltaPercent": 8.357211079274117,
       "firstObservedAt": "2026-10-01T10:31:03.67+00:00",
-      "lastObservedAt": "2026-10-01T20:39:58.827+00:00",
+      "lastObservedAt": "2026-10-02T18:07:35.166Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:31:03.67+00:00",
@@ -3873,6 +4085,12 @@
         {
           "timestamp": "2026-10-01T20:39:58.827+00:00",
           "price": 12564,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:35.166Z",
+          "price": 13614,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
@@ -3926,15 +4144,15 @@
       "flightNumber": "6E6968 / 6E794",
       "airline": "IndiGo",
       "departureDate": "2026-11-19",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 13879,
-      "lastPrice": 17751,
+      "lastPrice": 13879,
       "minPrice": 13879,
       "maxPrice": 17751,
-      "priceDelta": 3872,
-      "priceDeltaPercent": 27.898263563657324,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:14.57+00:00",
-      "lastObservedAt": "2026-10-01T20:39:58.827+00:00",
+      "lastObservedAt": "2026-10-02T18:07:35.166Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:14.57+00:00",
@@ -3963,6 +4181,12 @@
         {
           "timestamp": "2026-10-01T20:39:58.827+00:00",
           "price": 17751,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:35.166Z",
+          "price": 13879,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
@@ -3972,7 +4196,7 @@
       "flightNumber": "6E7742 / 6E6116",
       "airline": "IndiGo",
       "departureDate": "2026-11-19",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 13879,
       "lastPrice": 22383,
       "minPrice": 13879,
@@ -3980,7 +4204,7 @@
       "priceDelta": 8504,
       "priceDeltaPercent": 61.27242596728871,
       "firstObservedAt": "2026-10-01T10:22:14.57+00:00",
-      "lastObservedAt": "2026-10-01T20:39:58.827+00:00",
+      "lastObservedAt": "2026-10-02T18:07:35.166Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:14.57+00:00",
@@ -4008,6 +4232,12 @@
         },
         {
           "timestamp": "2026-10-01T20:39:58.827+00:00",
+          "price": 22383,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:35.166Z",
           "price": 22383,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
@@ -4102,15 +4332,15 @@
       "flightNumber": "IX-1617",
       "airline": "Air India Express",
       "departureDate": "2026-11-20",
-      "observationsCount": 2,
+      "observationsCount": 3,
       "firstPrice": 10519,
-      "lastPrice": 10519,
+      "lastPrice": 12302,
       "minPrice": 10519,
-      "maxPrice": 10519,
-      "priceDelta": 0,
-      "priceDeltaPercent": 0,
+      "maxPrice": 12302,
+      "priceDelta": 1783,
+      "priceDeltaPercent": 16.950280444909215,
       "firstObservedAt": "2026-10-01T05:48:14.37+00:00",
-      "lastObservedAt": "2026-10-01T05:48:14.37+00:00",
+      "lastObservedAt": "2026-10-02T18:17:49.917Z",
       "history": [
         {
           "timestamp": "2026-10-01T05:48:14.37+00:00",
@@ -4123,6 +4353,12 @@
           "price": 10519,
           "source": "Google Flights (Live Scraping)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:17:49.917Z",
+          "price": 12302,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
       ]
     },
@@ -4130,15 +4366,15 @@
       "flightNumber": "6E-118",
       "airline": "IndiGo",
       "departureDate": "2026-11-20",
-      "observationsCount": 9,
+      "observationsCount": 10,
       "firstPrice": 10743,
-      "lastPrice": 10743,
+      "lastPrice": 11343,
       "minPrice": 10743,
-      "maxPrice": 10743,
-      "priceDelta": 0,
-      "priceDeltaPercent": 0,
+      "maxPrice": 11343,
+      "priceDelta": 600,
+      "priceDeltaPercent": 5.585032113934655,
       "firstObservedAt": "2026-10-01T05:48:14.37+00:00",
-      "lastObservedAt": "2026-10-01T20:28:05.48+00:00",
+      "lastObservedAt": "2026-10-02T18:10:06.402Z",
       "history": [
         {
           "timestamp": "2026-10-01T05:48:14.37+00:00",
@@ -4191,6 +4427,34 @@
         {
           "timestamp": "2026-10-01T20:28:05.48+00:00",
           "price": 10743,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:10:06.402Z",
+          "price": 11343,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
+      ]
+    },
+    {
+      "flightNumber": "IX1264 / IX1230",
+      "airline": "Air India Express",
+      "departureDate": "2026-11-20",
+      "observationsCount": 1,
+      "firstPrice": 11686,
+      "lastPrice": 11686,
+      "minPrice": 11686,
+      "maxPrice": 11686,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
+      "firstObservedAt": "2026-10-02T18:17:49.917Z",
+      "lastObservedAt": "2026-10-02T18:17:49.917Z",
+      "history": [
+        {
+          "timestamp": "2026-10-02T18:17:49.917Z",
+          "price": 11686,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
@@ -4200,15 +4464,15 @@
       "flightNumber": "6E142 / 6E522",
       "airline": "IndiGo",
       "departureDate": "2026-11-20",
-      "observationsCount": 7,
+      "observationsCount": 8,
       "firstPrice": 12249,
-      "lastPrice": 12459,
+      "lastPrice": 13879,
       "minPrice": 12249,
-      "maxPrice": 12459,
-      "priceDelta": 210,
-      "priceDeltaPercent": 1.7144256674014207,
+      "maxPrice": 13879,
+      "priceDelta": 1630,
+      "priceDeltaPercent": 13.307208751734837,
       "firstObservedAt": "2026-10-01T09:20:40.979+00:00",
-      "lastObservedAt": "2026-10-01T20:28:05.48+00:00",
+      "lastObservedAt": "2026-10-02T18:10:06.402Z",
       "history": [
         {
           "timestamp": "2026-10-01T09:20:40.979+00:00",
@@ -4249,6 +4513,100 @@
         {
           "timestamp": "2026-10-01T20:28:05.48+00:00",
           "price": 12459,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:10:06.402Z",
+          "price": 13879,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
+      ]
+    },
+    {
+      "flightNumber": "AI1877 / AI2609",
+      "airline": "Air India",
+      "departureDate": "2026-11-20",
+      "observationsCount": 1,
+      "firstPrice": 13191,
+      "lastPrice": 13191,
+      "minPrice": 13191,
+      "maxPrice": 13191,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
+      "firstObservedAt": "2026-10-02T18:17:49.917Z",
+      "lastObservedAt": "2026-10-02T18:17:49.917Z",
+      "history": [
+        {
+          "timestamp": "2026-10-02T18:17:49.917Z",
+          "price": 13191,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
+      ]
+    },
+    {
+      "flightNumber": "AI2500 / AI1735",
+      "airline": "Air India",
+      "departureDate": "2026-11-20",
+      "observationsCount": 1,
+      "firstPrice": 13407,
+      "lastPrice": 13407,
+      "minPrice": 13407,
+      "maxPrice": 13407,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
+      "firstObservedAt": "2026-10-02T18:17:49.917Z",
+      "lastObservedAt": "2026-10-02T18:17:49.917Z",
+      "history": [
+        {
+          "timestamp": "2026-10-02T18:17:49.917Z",
+          "price": 13407,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
+      ]
+    },
+    {
+      "flightNumber": "AI1824 / AI2973",
+      "airline": "Air India",
+      "departureDate": "2026-11-20",
+      "observationsCount": 1,
+      "firstPrice": 13407,
+      "lastPrice": 13407,
+      "minPrice": 13407,
+      "maxPrice": 13407,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
+      "firstObservedAt": "2026-10-02T18:17:49.917Z",
+      "lastObservedAt": "2026-10-02T18:17:49.917Z",
+      "history": [
+        {
+          "timestamp": "2026-10-02T18:17:49.917Z",
+          "price": 13407,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
+      ]
+    },
+    {
+      "flightNumber": "AI1824 / AI1730",
+      "airline": "Air India",
+      "departureDate": "2026-11-20",
+      "observationsCount": 1,
+      "firstPrice": 13714,
+      "lastPrice": 13714,
+      "minPrice": 13714,
+      "maxPrice": 13714,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
+      "firstObservedAt": "2026-10-02T18:17:49.917Z",
+      "lastObservedAt": "2026-10-02T18:17:49.917Z",
+      "history": [
+        {
+          "timestamp": "2026-10-02T18:17:49.917Z",
+          "price": 13714,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
@@ -4258,15 +4616,15 @@
       "flightNumber": "6E6968 / 6E794",
       "airline": "IndiGo",
       "departureDate": "2026-11-20",
-      "observationsCount": 7,
+      "observationsCount": 8,
       "firstPrice": 13879,
-      "lastPrice": 19221,
+      "lastPrice": 13879,
       "minPrice": 13879,
       "maxPrice": 19221,
-      "priceDelta": 5342,
-      "priceDeltaPercent": 38.48980474097557,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T09:20:40.979+00:00",
-      "lastObservedAt": "2026-10-01T20:28:05.48+00:00",
+      "lastObservedAt": "2026-10-02T18:10:06.402Z",
       "history": [
         {
           "timestamp": "2026-10-01T09:20:40.979+00:00",
@@ -4309,6 +4667,12 @@
           "price": 19221,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:10:06.402Z",
+          "price": 13879,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
       ]
     },
@@ -4316,7 +4680,7 @@
       "flightNumber": "6E7742 / 6E6116",
       "airline": "IndiGo",
       "departureDate": "2026-11-20",
-      "observationsCount": 3,
+      "observationsCount": 4,
       "firstPrice": 13879,
       "lastPrice": 13879,
       "minPrice": 13879,
@@ -4324,7 +4688,7 @@
       "priceDelta": 0,
       "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T09:20:40.979+00:00",
-      "lastObservedAt": "2026-10-01T10:21:51.492+00:00",
+      "lastObservedAt": "2026-10-02T18:10:06.402Z",
       "history": [
         {
           "timestamp": "2026-10-01T09:20:40.979+00:00",
@@ -4340,6 +4704,12 @@
         },
         {
           "timestamp": "2026-10-01T10:21:51.492+00:00",
+          "price": 13879,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:10:06.402Z",
           "price": 13879,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
@@ -4387,10 +4757,32 @@
       ]
     },
     {
+      "flightNumber": "IX2173 / IX1083",
+      "airline": "Air India Express",
+      "departureDate": "2026-11-20",
+      "observationsCount": 1,
+      "firstPrice": 15670,
+      "lastPrice": 15670,
+      "minPrice": 15670,
+      "maxPrice": 15670,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
+      "firstObservedAt": "2026-10-02T18:17:49.917Z",
+      "lastObservedAt": "2026-10-02T18:17:49.917Z",
+      "history": [
+        {
+          "timestamp": "2026-10-02T18:17:49.917Z",
+          "price": 15670,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
+      ]
+    },
+    {
       "flightNumber": "6E-118",
       "airline": "IndiGo",
       "departureDate": "2026-11-21",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 11343,
       "lastPrice": 11343,
       "minPrice": 11343,
@@ -4398,7 +4790,7 @@
       "priceDelta": 0,
       "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:15.969+00:00",
-      "lastObservedAt": "2026-10-01T20:40:00.736+00:00",
+      "lastObservedAt": "2026-10-02T18:07:15.422Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:15.969+00:00",
@@ -4429,6 +4821,12 @@
           "price": 11343,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:15.422Z",
+          "price": 11343,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
       ]
     },
@@ -4436,15 +4834,15 @@
       "flightNumber": "6E6968 / 6E794",
       "airline": "IndiGo",
       "departureDate": "2026-11-21",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 13879,
-      "lastPrice": 18591,
-      "minPrice": 13879,
+      "lastPrice": 13341,
+      "minPrice": 13341,
       "maxPrice": 18591,
-      "priceDelta": 4712,
-      "priceDeltaPercent": 33.95057280783918,
+      "priceDelta": -538,
+      "priceDeltaPercent": -3.876359968297428,
       "firstObservedAt": "2026-10-01T10:22:15.969+00:00",
-      "lastObservedAt": "2026-10-01T20:40:00.736+00:00",
+      "lastObservedAt": "2026-10-02T18:07:15.422Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:15.969+00:00",
@@ -4473,6 +4871,12 @@
         {
           "timestamp": "2026-10-01T20:40:00.736+00:00",
           "price": 18591,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:07:15.422Z",
+          "price": 13341,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
@@ -4522,7 +4926,7 @@
       "flightNumber": "6E-118",
       "airline": "IndiGo",
       "departureDate": "2026-11-22",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 9643,
       "lastPrice": 9643,
       "minPrice": 9643,
@@ -4530,7 +4934,7 @@
       "priceDelta": 0,
       "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:17.569+00:00",
-      "lastObservedAt": "2026-10-01T20:40:01.704+00:00",
+      "lastObservedAt": "2026-10-02T18:10:07.389Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:17.569+00:00",
@@ -4561,6 +4965,56 @@
           "price": 9643,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:10:07.389Z",
+          "price": 9643,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
+      ]
+    },
+    {
+      "flightNumber": "IX-1617",
+      "airline": "Air India Express",
+      "departureDate": "2026-11-22",
+      "observationsCount": 1,
+      "firstPrice": 10599,
+      "lastPrice": 10599,
+      "minPrice": 10599,
+      "maxPrice": 10599,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
+      "firstObservedAt": "2026-10-02T18:10:07.389Z",
+      "lastObservedAt": "2026-10-02T18:10:07.389Z",
+      "history": [
+        {
+          "timestamp": "2026-10-02T18:10:07.389Z",
+          "price": 10599,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
+      ]
+    },
+    {
+      "flightNumber": "AI1824 / AI2973",
+      "airline": "Air India",
+      "departureDate": "2026-11-22",
+      "observationsCount": 1,
+      "firstPrice": 13858,
+      "lastPrice": 13858,
+      "minPrice": 13858,
+      "maxPrice": 13858,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
+      "firstObservedAt": "2026-10-02T18:10:07.389Z",
+      "lastObservedAt": "2026-10-02T18:10:07.389Z",
+      "history": [
+        {
+          "timestamp": "2026-10-02T18:10:07.389Z",
+          "price": 13858,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
       ]
     },
@@ -4568,15 +5022,15 @@
       "flightNumber": "6E6968 / 6E794",
       "airline": "IndiGo",
       "departureDate": "2026-11-22",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 13879,
-      "lastPrice": 21531,
+      "lastPrice": 13879,
       "minPrice": 13879,
       "maxPrice": 21531,
-      "priceDelta": 7652,
-      "priceDeltaPercent": 55.133655162475684,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:17.569+00:00",
-      "lastObservedAt": "2026-10-01T20:40:01.704+00:00",
+      "lastObservedAt": "2026-10-02T18:10:07.389Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:17.569+00:00",
@@ -4605,6 +5059,12 @@
         {
           "timestamp": "2026-10-01T20:40:01.704+00:00",
           "price": 21531,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:10:07.389Z",
+          "price": 13879,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
@@ -4657,6 +5117,72 @@
       ]
     },
     {
+      "flightNumber": "AI1824 / AI1730",
+      "airline": "Air India",
+      "departureDate": "2026-11-22",
+      "observationsCount": 1,
+      "firstPrice": 15628,
+      "lastPrice": 15628,
+      "minPrice": 15628,
+      "maxPrice": 15628,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
+      "firstObservedAt": "2026-10-02T18:10:07.389Z",
+      "lastObservedAt": "2026-10-02T18:10:07.389Z",
+      "history": [
+        {
+          "timestamp": "2026-10-02T18:10:07.389Z",
+          "price": 15628,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
+      ]
+    },
+    {
+      "flightNumber": "IX2173 / IX1083",
+      "airline": "Air India Express",
+      "departureDate": "2026-11-22",
+      "observationsCount": 1,
+      "firstPrice": 16104,
+      "lastPrice": 16104,
+      "minPrice": 16104,
+      "maxPrice": 16104,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
+      "firstObservedAt": "2026-10-02T18:10:07.389Z",
+      "lastObservedAt": "2026-10-02T18:10:07.389Z",
+      "history": [
+        {
+          "timestamp": "2026-10-02T18:10:07.389Z",
+          "price": 16104,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
+      ]
+    },
+    {
+      "flightNumber": "IX1385 / IX1257",
+      "airline": "Air India Express",
+      "departureDate": "2026-11-22",
+      "observationsCount": 1,
+      "firstPrice": 16416,
+      "lastPrice": 16416,
+      "minPrice": 16416,
+      "maxPrice": 16416,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
+      "firstObservedAt": "2026-10-02T18:10:07.389Z",
+      "lastObservedAt": "2026-10-02T18:10:07.389Z",
+      "history": [
+        {
+          "timestamp": "2026-10-02T18:10:07.389Z",
+          "price": 16416,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        }
+      ]
+    },
+    {
       "flightNumber": "6E7114 / 6E6116",
       "airline": "IndiGo",
       "departureDate": "2026-11-22",
@@ -4694,7 +5220,7 @@
       "flightNumber": "6E7742 / 6E6116",
       "airline": "IndiGo",
       "departureDate": "2026-11-22",
-      "observationsCount": 2,
+      "observationsCount": 3,
       "firstPrice": 21858,
       "lastPrice": 21858,
       "minPrice": 21858,
@@ -4702,7 +5228,7 @@
       "priceDelta": 0,
       "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:17.569+00:00",
-      "lastObservedAt": "2026-10-01T20:40:01.704+00:00",
+      "lastObservedAt": "2026-10-02T18:10:07.389Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:17.569+00:00",
@@ -4715,6 +5241,12 @@
           "price": 21858,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:10:07.389Z",
+          "price": 21858,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
       ]
     },
@@ -4722,7 +5254,7 @@
       "flightNumber": "6E-118",
       "airline": "IndiGo",
       "departureDate": "2026-11-23",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 9643,
       "lastPrice": 9643,
       "minPrice": 9643,
@@ -4730,7 +5262,7 @@
       "priceDelta": 0,
       "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:18.98+00:00",
-      "lastObservedAt": "2026-10-01T20:40:03.381+00:00",
+      "lastObservedAt": "2026-10-02T18:10:09.108Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:18.98+00:00",
@@ -4758,6 +5290,12 @@
         },
         {
           "timestamp": "2026-10-01T20:40:03.381+00:00",
+          "price": 9643,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:10:09.108Z",
           "price": 9643,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
@@ -4768,15 +5306,15 @@
       "flightNumber": "6E7742 / 6E6116",
       "airline": "IndiGo",
       "departureDate": "2026-11-23",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 13879,
-      "lastPrice": 16713,
+      "lastPrice": 13879,
       "minPrice": 13879,
       "maxPrice": 16713,
-      "priceDelta": 2834,
-      "priceDeltaPercent": 20.41933856906117,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:18.98+00:00",
-      "lastObservedAt": "2026-10-01T20:40:03.381+00:00",
+      "lastObservedAt": "2026-10-02T18:10:09.108Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:18.98+00:00",
@@ -4805,6 +5343,12 @@
         {
           "timestamp": "2026-10-01T20:40:03.381+00:00",
           "price": 16713,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:10:09.108Z",
+          "price": 13879,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
@@ -4814,15 +5358,15 @@
       "flightNumber": "6E142 / 6E522",
       "airline": "IndiGo",
       "departureDate": "2026-11-23",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 13879,
-      "lastPrice": 14244,
+      "lastPrice": 13879,
       "minPrice": 13879,
       "maxPrice": 14244,
-      "priceDelta": 365,
-      "priceDeltaPercent": 2.629872469198069,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:18.98+00:00",
-      "lastObservedAt": "2026-10-01T20:40:03.381+00:00",
+      "lastObservedAt": "2026-10-02T18:10:09.108Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:18.98+00:00",
@@ -4851,6 +5395,12 @@
         {
           "timestamp": "2026-10-01T20:40:03.381+00:00",
           "price": 14244,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:10:09.108Z",
+          "price": 13879,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
@@ -4860,15 +5410,15 @@
       "flightNumber": "6E6968 / 6E794",
       "airline": "IndiGo",
       "departureDate": "2026-11-23",
-      "observationsCount": 5,
+      "observationsCount": 6,
       "firstPrice": 13879,
-      "lastPrice": 14811,
+      "lastPrice": 13879,
       "minPrice": 13879,
       "maxPrice": 14811,
-      "priceDelta": 932,
-      "priceDeltaPercent": 6.715181209020823,
+      "priceDelta": 0,
+      "priceDeltaPercent": 0,
       "firstObservedAt": "2026-10-01T10:22:18.98+00:00",
-      "lastObservedAt": "2026-10-01T20:40:03.381+00:00",
+      "lastObservedAt": "2026-10-02T18:10:09.108Z",
       "history": [
         {
           "timestamp": "2026-10-01T10:22:18.98+00:00",
@@ -4897,6 +5447,12 @@
         {
           "timestamp": "2026-10-01T20:40:03.381+00:00",
           "price": 14811,
+          "source": "SerpApi (Google Flights)",
+          "provenance": "REAL_EXTERNAL_OBSERVATION"
+        },
+        {
+          "timestamp": "2026-10-02T18:10:09.108Z",
+          "price": 13879,
           "source": "SerpApi (Google Flights)",
           "provenance": "REAL_EXTERNAL_OBSERVATION"
         }
@@ -8659,6 +9215,951 @@
       "timestamp": "2026-10-01T20:40:03.381+00:00",
       "source": "SerpApi (Google Flights)",
       "provenance": "REAL_EXTERNAL_OBSERVATION"
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E522-2026-11-11-2026-10-02T18",
+      "flightNumber": "6E142 / 6E522",
+      "flightId": "LKO-PNQ-6E-6E522-2026-11-11",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-11",
+      "price": 12669,
+      "timestamp": "2026-10-02T18:07:12.527Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-118-2026-11-11-2026-10-02T18",
+      "flightNumber": "6E-118",
+      "flightId": "LKO-PNQ-6E-118-2026-11-11",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-11",
+      "price": 13543,
+      "timestamp": "2026-10-02T18:07:12.527Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E794-2026-11-11-2026-10-02T18",
+      "flightNumber": "6E6968 / 6E794",
+      "flightId": "LKO-PNQ-6E-6E794-2026-11-11",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-11",
+      "price": 15231,
+      "timestamp": "2026-10-02T18:07:12.527Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E522-2026-11-16-2026-10-02T18",
+      "flightNumber": "6E142 / 6E522",
+      "flightId": "LKO-PNQ-6E-6E522-2026-11-16",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-16",
+      "price": 13879,
+      "timestamp": "2026-10-02T18:07:13.941Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E794-2026-11-16-2026-10-02T18",
+      "flightNumber": "6E6968 / 6E794",
+      "flightId": "LKO-PNQ-6E-6E794-2026-11-16",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-16",
+      "price": 13879,
+      "timestamp": "2026-10-02T18:07:13.941Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-118-2026-11-16-2026-10-02T18",
+      "flightNumber": "6E-118",
+      "flightId": "LKO-PNQ-6E-118-2026-11-16",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-16",
+      "price": 14343,
+      "timestamp": "2026-10-02T18:07:13.941Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-16-2026-10-02T18",
+      "flightNumber": "6E7742 / 6E6116",
+      "flightId": "LKO-PNQ-6E-6E6116-2026-11-16",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-16",
+      "price": 34425,
+      "timestamp": "2026-10-02T18:07:13.941Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-118-2026-11-21-2026-10-02T18",
+      "flightNumber": "6E-118",
+      "flightId": "LKO-PNQ-6E-118-2026-11-21",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-21",
+      "price": 11343,
+      "timestamp": "2026-10-02T18:07:15.422Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E794-2026-11-21-2026-10-02T18",
+      "flightNumber": "6E6968 / 6E794",
+      "flightId": "LKO-PNQ-6E-6E794-2026-11-21",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-21",
+      "price": 13341,
+      "timestamp": "2026-10-02T18:07:15.422Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-118-2026-11-09-2026-10-02T18",
+      "flightNumber": "6E-118",
+      "flightId": "LKO-PNQ-6E-118-2026-11-09",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-09",
+      "price": 11343,
+      "timestamp": "2026-10-02T18:07:24.871Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E522-2026-11-09-2026-10-02T18",
+      "flightNumber": "6E142 / 6E522",
+      "flightId": "LKO-PNQ-6E-6E522-2026-11-09",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-09",
+      "price": 13509,
+      "timestamp": "2026-10-02T18:07:24.871Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E794-2026-11-09-2026-10-02T18",
+      "flightNumber": "6E6968 / 6E794",
+      "flightId": "LKO-PNQ-6E-6E794-2026-11-09",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-09",
+      "price": 13879,
+      "timestamp": "2026-10-02T18:07:24.871Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-09-2026-10-02T18",
+      "flightNumber": "6E7742 / 6E6116",
+      "flightId": "LKO-PNQ-6E-6E6116-2026-11-09",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-09",
+      "price": 13879,
+      "timestamp": "2026-10-02T18:07:24.871Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-118-2026-11-10-2026-10-02T18",
+      "flightNumber": "6E-118",
+      "flightId": "LKO-PNQ-6E-118-2026-11-10",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-10",
+      "price": 12643,
+      "timestamp": "2026-10-02T18:07:26.207Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E522-2026-11-10-2026-10-02T18",
+      "flightNumber": "6E142 / 6E522",
+      "flightId": "LKO-PNQ-6E-6E522-2026-11-10",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-10",
+      "price": 13879,
+      "timestamp": "2026-10-02T18:07:26.207Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E794-2026-11-10-2026-10-02T18",
+      "flightNumber": "6E6968 / 6E794",
+      "flightId": "LKO-PNQ-6E-6E794-2026-11-10",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-10",
+      "price": 17517,
+      "timestamp": "2026-10-02T18:07:26.207Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E522-2026-11-12-2026-10-02T18",
+      "flightNumber": "6E142 / 6E522",
+      "flightId": "LKO-PNQ-6E-6E522-2026-11-12",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-12",
+      "price": 13879,
+      "timestamp": "2026-10-02T18:07:27.564Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-118-2026-11-12-2026-10-02T18",
+      "flightNumber": "6E-118",
+      "flightId": "LKO-PNQ-6E-118-2026-11-12",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-12",
+      "price": 14343,
+      "timestamp": "2026-10-02T18:07:27.564Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E794-2026-11-12-2026-10-02T18",
+      "flightNumber": "6E6968 / 6E794",
+      "flightId": "LKO-PNQ-6E-6E794-2026-11-12",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-12",
+      "price": 22581,
+      "timestamp": "2026-10-02T18:07:27.564Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-12-2026-10-02T18",
+      "flightNumber": "6E7742 / 6E6116",
+      "flightId": "LKO-PNQ-6E-6E6116-2026-11-12",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-12",
+      "price": 31590,
+      "timestamp": "2026-10-02T18:07:27.564Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-118-2026-11-13-2026-10-02T18",
+      "flightNumber": "6E-118",
+      "flightId": "LKO-PNQ-6E-118-2026-11-13",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-13",
+      "price": 13543,
+      "timestamp": "2026-10-02T18:07:28.731Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E522-2026-11-13-2026-10-02T18",
+      "flightNumber": "6E142 / 6E522",
+      "flightId": "LKO-PNQ-6E-6E522-2026-11-13",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-13",
+      "price": 13879,
+      "timestamp": "2026-10-02T18:07:28.731Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E794-2026-11-13-2026-10-02T18",
+      "flightNumber": "6E6968 / 6E794",
+      "flightId": "LKO-PNQ-6E-6E794-2026-11-13",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-13",
+      "price": 13879,
+      "timestamp": "2026-10-02T18:07:28.731Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-13-2026-10-02T18",
+      "flightNumber": "6E7742 / 6E6116",
+      "flightId": "LKO-PNQ-6E-6E6116-2026-11-13",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-13",
+      "price": 33375,
+      "timestamp": "2026-10-02T18:07:28.731Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E794-2026-11-14-2026-10-02T18",
+      "flightNumber": "6E6968 / 6E794",
+      "flightId": "LKO-PNQ-6E-6E794-2026-11-14",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-14",
+      "price": 20481,
+      "timestamp": "2026-10-02T18:07:30.172Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-118-2026-11-14-2026-10-02T18",
+      "flightNumber": "6E-118",
+      "flightId": "LKO-PNQ-6E-118-2026-11-14",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-14",
+      "price": 20936,
+      "timestamp": "2026-10-02T18:07:30.172Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-118-2026-11-15-2026-10-02T18",
+      "flightNumber": "6E-118",
+      "flightId": "LKO-PNQ-6E-118-2026-11-15",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-15",
+      "price": 16643,
+      "timestamp": "2026-10-02T18:07:31.279Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E522-2026-11-15-2026-10-02T18",
+      "flightNumber": "6E142 / 6E522",
+      "flightId": "LKO-PNQ-6E-6E522-2026-11-15",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-15",
+      "price": 24744,
+      "timestamp": "2026-10-02T18:07:31.279Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E794-2026-11-15-2026-10-02T18",
+      "flightNumber": "6E6968 / 6E794",
+      "flightId": "LKO-PNQ-6E-6E794-2026-11-15",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-15",
+      "price": 28146,
+      "timestamp": "2026-10-02T18:07:31.279Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-15-2026-10-02T18",
+      "flightNumber": "6E7742 / 6E6116",
+      "flightId": "LKO-PNQ-6E-6E6116-2026-11-15",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-15",
+      "price": 34950,
+      "timestamp": "2026-10-02T18:07:31.279Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-118-2026-11-17-2026-10-02T18",
+      "flightNumber": "6E-118",
+      "flightId": "LKO-PNQ-6E-118-2026-11-17",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-17",
+      "price": 11943,
+      "timestamp": "2026-10-02T18:07:32.510Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E522-2026-11-17-2026-10-02T18",
+      "flightNumber": "6E142 / 6E522",
+      "flightId": "LKO-PNQ-6E-6E522-2026-11-17",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-17",
+      "price": 13879,
+      "timestamp": "2026-10-02T18:07:32.510Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E794-2026-11-17-2026-10-02T18",
+      "flightNumber": "6E6968 / 6E794",
+      "flightId": "LKO-PNQ-6E-6E794-2026-11-17",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-17",
+      "price": 13879,
+      "timestamp": "2026-10-02T18:07:32.510Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-118-2026-11-18-2026-10-02T18",
+      "flightNumber": "6E-118",
+      "flightId": "LKO-PNQ-6E-118-2026-11-18",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-18",
+      "price": 10743,
+      "timestamp": "2026-10-02T18:07:33.950Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E522-2026-11-18-2026-10-02T18",
+      "flightNumber": "6E142 / 6E522",
+      "flightId": "LKO-PNQ-6E-6E522-2026-11-18",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-18",
+      "price": 13879,
+      "timestamp": "2026-10-02T18:07:33.950Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E794-2026-11-18-2026-10-02T18",
+      "flightNumber": "6E6968 / 6E794",
+      "flightId": "LKO-PNQ-6E-6E794-2026-11-18",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-18",
+      "price": 13879,
+      "timestamp": "2026-10-02T18:07:33.950Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-118-2026-11-19-2026-10-02T18",
+      "flightNumber": "6E-118",
+      "flightId": "LKO-PNQ-6E-118-2026-11-19",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-19",
+      "price": 10143,
+      "timestamp": "2026-10-02T18:07:35.166Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E522-2026-11-19-2026-10-02T18",
+      "flightNumber": "6E142 / 6E522",
+      "flightId": "LKO-PNQ-6E-6E522-2026-11-19",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-19",
+      "price": 13614,
+      "timestamp": "2026-10-02T18:07:35.166Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E794-2026-11-19-2026-10-02T18",
+      "flightNumber": "6E6968 / 6E794",
+      "flightId": "LKO-PNQ-6E-6E794-2026-11-19",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-19",
+      "price": 13879,
+      "timestamp": "2026-10-02T18:07:35.166Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-19-2026-10-02T18",
+      "flightNumber": "6E7742 / 6E6116",
+      "flightId": "LKO-PNQ-6E-6E6116-2026-11-19",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-19",
+      "price": 22383,
+      "timestamp": "2026-10-02T18:07:35.166Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-118-2026-11-20-2026-10-02T18",
+      "flightNumber": "6E-118",
+      "flightId": "LKO-PNQ-6E-118-2026-11-20",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-20",
+      "price": 11343,
+      "timestamp": "2026-10-02T18:10:06.402Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E522-2026-11-20-2026-10-02T18",
+      "flightNumber": "6E142 / 6E522",
+      "flightId": "LKO-PNQ-6E-6E522-2026-11-20",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-20",
+      "price": 13879,
+      "timestamp": "2026-10-02T18:10:06.402Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E794-2026-11-20-2026-10-02T18",
+      "flightNumber": "6E6968 / 6E794",
+      "flightId": "LKO-PNQ-6E-6E794-2026-11-20",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-20",
+      "price": 13879,
+      "timestamp": "2026-10-02T18:10:06.402Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-20-2026-10-02T18",
+      "flightNumber": "6E7742 / 6E6116",
+      "flightId": "LKO-PNQ-6E-6E6116-2026-11-20",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-20",
+      "price": 13879,
+      "timestamp": "2026-10-02T18:10:06.402Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-118-2026-11-22-2026-10-02T18",
+      "flightNumber": "6E-118",
+      "flightId": "LKO-PNQ-6E-118-2026-11-22",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-22",
+      "price": 9643,
+      "timestamp": "2026-10-02T18:10:07.389Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-IX-1617-2026-11-22-2026-10-02T18",
+      "flightNumber": "IX-1617",
+      "flightId": "LKO-PNQ-IX-1617-2026-11-22",
+      "airline": "Air India Express",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-22",
+      "price": 10599,
+      "timestamp": "2026-10-02T18:10:07.389Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-AI-AI2973-2026-11-22-2026-10-02T18",
+      "flightNumber": "AI1824 / AI2973",
+      "flightId": "LKO-PNQ-AI-AI2973-2026-11-22",
+      "airline": "Air India",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-22",
+      "price": 13858,
+      "timestamp": "2026-10-02T18:10:07.389Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E794-2026-11-22-2026-10-02T18",
+      "flightNumber": "6E6968 / 6E794",
+      "flightId": "LKO-PNQ-6E-6E794-2026-11-22",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-22",
+      "price": 13879,
+      "timestamp": "2026-10-02T18:10:07.389Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-AI-AI1730-2026-11-22-2026-10-02T18",
+      "flightNumber": "AI1824 / AI1730",
+      "flightId": "LKO-PNQ-AI-AI1730-2026-11-22",
+      "airline": "Air India",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-22",
+      "price": 15628,
+      "timestamp": "2026-10-02T18:10:07.389Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-IX-IX1083-2026-11-22-2026-10-02T18",
+      "flightNumber": "IX2173 / IX1083",
+      "flightId": "LKO-PNQ-IX-IX1083-2026-11-22",
+      "airline": "Air India Express",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-22",
+      "price": 16104,
+      "timestamp": "2026-10-02T18:10:07.389Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-IX-IX1257-2026-11-22-2026-10-02T18",
+      "flightNumber": "IX1385 / IX1257",
+      "flightId": "LKO-PNQ-IX-IX1257-2026-11-22",
+      "airline": "Air India Express",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-22",
+      "price": 16416,
+      "timestamp": "2026-10-02T18:10:07.389Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-22-2026-10-02T18",
+      "flightNumber": "6E7742 / 6E6116",
+      "flightId": "LKO-PNQ-6E-6E6116-2026-11-22",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-22",
+      "price": 21858,
+      "timestamp": "2026-10-02T18:10:07.389Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-118-2026-11-23-2026-10-02T18",
+      "flightNumber": "6E-118",
+      "flightId": "LKO-PNQ-6E-118-2026-11-23",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-23",
+      "price": 9643,
+      "timestamp": "2026-10-02T18:10:09.108Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E522-2026-11-23-2026-10-02T18",
+      "flightNumber": "6E142 / 6E522",
+      "flightId": "LKO-PNQ-6E-6E522-2026-11-23",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-23",
+      "price": 13879,
+      "timestamp": "2026-10-02T18:10:09.108Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E794-2026-11-23-2026-10-02T18",
+      "flightNumber": "6E6968 / 6E794",
+      "flightId": "LKO-PNQ-6E-6E794-2026-11-23",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-23",
+      "price": 13879,
+      "timestamp": "2026-10-02T18:10:09.108Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-6E-6E6116-2026-11-23-2026-10-02T18",
+      "flightNumber": "6E7742 / 6E6116",
+      "flightId": "LKO-PNQ-6E-6E6116-2026-11-23",
+      "airline": "IndiGo",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-23",
+      "price": 13879,
+      "timestamp": "2026-10-02T18:10:09.108Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-IX-IX1230-2026-11-20-2026-10-02T18",
+      "flightNumber": "IX1264 / IX1230",
+      "flightId": "LKO-PNQ-IX-IX1230-2026-11-20",
+      "airline": "Air India Express",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-20",
+      "price": 11686,
+      "timestamp": "2026-10-02T18:17:49.917Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-IX-1617-2026-11-20-2026-10-02T18",
+      "flightNumber": "IX-1617",
+      "flightId": "LKO-PNQ-IX-1617-2026-11-20",
+      "airline": "Air India Express",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-20",
+      "price": 12302,
+      "timestamp": "2026-10-02T18:17:49.917Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-AI-AI2609-2026-11-20-2026-10-02T18",
+      "flightNumber": "AI1877 / AI2609",
+      "flightId": "LKO-PNQ-AI-AI2609-2026-11-20",
+      "airline": "Air India",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-20",
+      "price": 13191,
+      "timestamp": "2026-10-02T18:17:49.917Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-AI-AI1735-2026-11-20-2026-10-02T18",
+      "flightNumber": "AI2500 / AI1735",
+      "flightId": "LKO-PNQ-AI-AI1735-2026-11-20",
+      "airline": "Air India",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-20",
+      "price": 13407,
+      "timestamp": "2026-10-02T18:17:49.917Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-AI-AI2973-2026-11-20-2026-10-02T18",
+      "flightNumber": "AI1824 / AI2973",
+      "flightId": "LKO-PNQ-AI-AI2973-2026-11-20",
+      "airline": "Air India",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-20",
+      "price": 13407,
+      "timestamp": "2026-10-02T18:17:49.917Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-AI-AI1730-2026-11-20-2026-10-02T18",
+      "flightNumber": "AI1824 / AI1730",
+      "flightId": "LKO-PNQ-AI-AI1730-2026-11-20",
+      "airline": "Air India",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-20",
+      "price": 13714,
+      "timestamp": "2026-10-02T18:17:49.917Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
+    },
+    {
+      "id": "snap-live-LKO-PNQ-IX-IX1083-2026-11-20-2026-10-02T18",
+      "flightNumber": "IX2173 / IX1083",
+      "flightId": "LKO-PNQ-IX-IX1083-2026-11-20",
+      "airline": "Air India Express",
+      "origin": "LKO",
+      "destination": "PNQ",
+      "departureDate": "2026-11-20",
+      "price": 15670,
+      "timestamp": "2026-10-02T18:17:49.917Z",
+      "source": "SerpApi (Google Flights)",
+      "provenance": "REAL_EXTERNAL_OBSERVATION",
+      "type": "hourly",
+      "capturedHour": 18
     }
   ]
 }
